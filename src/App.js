@@ -1037,10 +1037,6 @@ function App() {
             usesLeft: newUsesLeft
           };
         }
-
-        if (power.power === "BUDHA" && !capturedPiece && power.usesLeft === 1) {
-          setBudhaDoubleMove(to);
-        }
       }
 
       const cleanedPoweredPieces = {};
@@ -1281,7 +1277,6 @@ function App() {
     setChaosModeShown({ white: false, black: false });
     setPoweredPieces({});
     setFrozenPieces({});
-    setBudhaDoubleMove(null);
     setActivationMode(false);
     setChandraMode(null);
     setChandraPlacementMode(null);
