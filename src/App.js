@@ -49,7 +49,6 @@ function App() {
   // Power system
   const [poweredPieces, setPoweredPieces] = useState({});
   const [frozenPieces, setFrozenPieces] = useState({});
-  const [budhaDoubleMove, setBudhaDoubleMove] = useState(null);
 
   // CHANDRA system
   const [chandraMode, setChandraMode] = useState(null);
@@ -145,6 +144,12 @@ function App() {
     return () => clearInterval(timer);
   }, [game, gameOver, gameStarted, chaosModeShown]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!gameStarted || moveCount === 0) return;
+    // ... rest of the effect
+  }, [moveCount]);
+
   // Tile expiration & frozen piece countdown & CHANDRA expiration & GURU resurrection countdown
   useEffect(() => {
     if (!gameStarted || moveCount === 0) return;
@@ -190,6 +195,17 @@ function App() {
     setResurrectedPieces(updatedResurrected);
   }, [moveCount]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (gameMode === 'asura' &&
+      gameStarted &&
+      !gameOver &&
+      game.turn() === 'b' &&
+      !waitingForBot &&
+      stockfish) {
+      makeAsuraMove();
+    }
+  }, [game, gameStarted, gameOver, gameMode, waitingForBot, stockfish]);
   // Bot move trigger
   useEffect(() => {
     if (gameMode === 'asura' &&
