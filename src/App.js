@@ -5,17 +5,17 @@ import { Chess } from "chess.js";
 // Shared deck with time costs
 const SHARED_DECK = [
   // Tier 1
-  { id: "RAHU", name: "Rahu", color: "#9333ea", radius: 3, tier: 1, cost: 7, description: "Pass through pieces for 2 moves" },
-  { id: "KETU", name: "Ketu", color: "#f97316", radius: 3, tier: 1, cost: 8, description: "When captured: +12s you, -12s opponent" },
-  { id: "SURYA", name: "Surya", color: "#fbbf24", radius: 2, tier: 1, cost: 8, description: "Can't be captured for 2 moves" },
+  { id: "RAHU", name: "Rahu", color: "#9333ea", radius: 3, tier: 1, cost: 7, description: "Pass through pieces for 2 moves", image: "/images/rahu.jpg" },
+  { id: "KETU", name: "Ketu", color: "#f97316", radius: 3, tier: 1, cost: 8, description: "When captured: +12s you, -12s opponent", image: "/images/ketu.jpg" },
+  { id: "SURYA", name: "Surya", color: "#fbbf24", radius: 2, tier: 1, cost: 8, description: "Can't be captured for 2 moves", image: "/images/surya.jpg" },
   // Tier 2
-  { id: "CHANDRA", name: "Chandra", color: "#e5e7eb", radius: 2, tier: 2, cost: 10, description: "Place 1-2 clones on rank (2nd = +5s)" },
-  { id: "GURU", name: "Guru", color: "#a855f7", radius: 2, tier: 2, cost: 9, description: "Resurrect your piece where it died" },
-  { id: "SHUKRA", name: "Shukra", color: "#ec4899", radius: 2, tier: 2, cost: 11, description: "Triple time on next 2 captures" },
+  { id: "CHANDRA", name: "Chandra", color: "#e5e7eb", radius: 2, tier: 2, cost: 10, description: "Place 1-2 clones on rank (2nd = +5s)", image: "/images/chandra.jpg" },
+  { id: "GURU", name: "Guru", color: "#a855f7", radius: 2, tier: 2, cost: 9, description: "Resurrect your piece where it died", image: "/images/guru.jpg" },
+  { id: "SHUKRA", name: "Shukra", color: "#ec4899", radius: 2, tier: 2, cost: 11, description: "Triple time on next 2 captures", image: "/images/shukra.jpg" },
   // Tier 3
-  { id: "BUDHA", name: "Budha", color: "#3b82f6", radius: 1, tier: 3, cost: 10, description: "Two moves (not if first captures)" },
-  { id: "MANGALA", name: "Mangala", color: "#ef4444", radius: 1, tier: 3, cost: 12, description: "Capture any adjacent piece" },
-  { id: "SHANI", name: "Shani", color: "#1f2937", radius: 1, tier: 3, cost: 14, description: "Freeze enemy piece for 2 turns" }
+  { id: "BUDHA", name: "Budha", color: "#3b82f6", radius: 1, tier: 3, cost: 10, description: "Two moves (not if first captures)", image: "/images/budha.jpg" },
+  { id: "MANGALA", name: "Mangala", color: "#ef4444", radius: 1, tier: 3, cost: 12, description: "Capture any adjacent piece", image: "/images/mangala.jpg" },
+  { id: "SHANI", name: "Shani", color: "#1f2937", radius: 1, tier: 3, cost: 14, description: "Freeze enemy piece for 2 turns", image: "/images/shani.jpg" }
 ];
 
 function App() {
@@ -1885,14 +1885,22 @@ function App() {
                                 justifyContent: "center",
                                 cursor: (isUnlocked && !isUsed && game.turn() === 'w') ? "pointer" : "default",
                                 opacity: isUsed ? 0.3 : 1,
-                                fontSize: "11px",
-                                fontWeight: "bold",
-                                color: isUnlocked ? "#000" : "#666",
-                                textAlign: "center",
-                                padding: "5px"
+                                overflow: "hidden",   // ← add this so image doesn't spill outside rounded corners
+                                padding: 0            // ← remove padding so image fills the card fully
                               }}
                             >
-                              {isUnlocked ? card.name : "🔒"}
+                              {isUnlocked ? (
+                                <img
+                                  src={card.image}
+                                  alt={card.name}
+                                  style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "cover",
+                                    display: "block"
+                                  }}
+                                />
+                              ) : "🔒"}
                             </div>
                           );
                         })}
