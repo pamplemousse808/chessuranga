@@ -203,6 +203,7 @@ function App() {
     }
   }, [game, gameStarted, gameOver, gameMode, waitingForBot, stockfish]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps 
   function makeAsuraMove() {
     console.log("Asura's turn - making random move");
     setWaitingForBot(true);
@@ -565,7 +566,7 @@ function App() {
     // Generate unique ID for tracking Asura piece lives
     const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
     const file = square[0];
-    
+
     if (piece.type === 'p') {
       const fileIndex = files.indexOf(file);
       return `${piece.color}_p_${fileIndex}`;
