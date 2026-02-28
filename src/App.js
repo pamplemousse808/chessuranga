@@ -144,8 +144,8 @@ function App() {
     return () => clearInterval(timer);
   }, [game, gameOver, gameStarted, chaosModeShown]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   // Tile expiration & frozen piece countdown & CHANDRA expiration & GURU resurrection countdown
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!gameStarted || moveCount === 0) return;
 
@@ -203,7 +203,6 @@ function App() {
     }
   }, [game, gameStarted, gameOver, gameMode, waitingForBot, stockfish]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps 
   function makeAsuraMove() {
     console.log("Asura's turn - making random move");
     setWaitingForBot(true);
