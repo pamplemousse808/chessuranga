@@ -188,6 +188,7 @@ function App() {
       }
     });
     setResurrectedPieces(updatedResurrected);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moveCount]);
 
   // Bot move trigger
@@ -201,6 +202,7 @@ function App() {
       stockfish) {
       makeAsuraMove();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [game, gameStarted, gameOver, gameMode, waitingForBot, stockfish]);
 
   function makeAsuraMove() {
