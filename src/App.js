@@ -188,7 +188,7 @@ function App() {
       }
     });
     setResurrectedPieces(updatedResurrected);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moveCount]);
 
   // Bot move trigger
@@ -202,7 +202,7 @@ function App() {
       stockfish) {
       makeAsuraMove();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [game, gameStarted, gameOver, gameMode, waitingForBot, stockfish]);
 
   function makeAsuraMove() {
@@ -2015,6 +2015,24 @@ function App() {
                   {shaniMode && <span style={{ color: "#1f2937", marginLeft: "10px" }}>🪐 FREEZE</span>}
                   {waitingForBot && <span style={{ color: "#ff6b6b", marginLeft: "10px" }}>👹 Thinking...</span>}
                 </p>
+              )}
+              {!gameOver && (
+                <button
+                  onClick={resetGame}
+                  style={{
+                    marginTop: "15px",
+                    padding: "10px 20px",
+                    fontSize: "14px",
+                    backgroundColor: "#e94560",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    fontWeight: "bold"
+                  }}
+                >
+                  Main Menu
+                </button>
               )}
             </div>
 
