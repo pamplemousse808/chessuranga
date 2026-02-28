@@ -189,7 +189,7 @@ function App() {
     });
     setResurrectedPieces(updatedResurrected);
   }, [moveCount]);
-  
+
   // Bot move trigger
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -422,6 +422,7 @@ function App() {
 
     if (powerType) {
       if (powerType === "CHANDRA") {
+        const rank = parseInt(square[1]);
         setChandraPlacementMode({
           square: square,
           piece: piece,
