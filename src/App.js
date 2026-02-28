@@ -144,8 +144,8 @@ function App() {
     return () => clearInterval(timer);
   }, [game, gameOver, gameStarted, chaosModeShown]);
 
-  // Tile expiration & frozen piece countdown & CHANDRA expiration & GURU resurrection countdown
   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Tile expiration & frozen piece countdown & CHANDRA expiration & GURU resurrection countdown
   useEffect(() => {
     if (!gameStarted || moveCount === 0) return;
 
@@ -191,7 +191,7 @@ function App() {
   }, [moveCount]);
 
   // Bot move trigger
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps 
   useEffect(() => {
     if (gameMode === 'asura' &&
       gameStarted &&
@@ -565,8 +565,7 @@ function App() {
     // Generate unique ID for tracking Asura piece lives
     const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
     const file = square[0];
-    const rank = square[1];
-
+    
     if (piece.type === 'p') {
       const fileIndex = files.indexOf(file);
       return `${piece.color}_p_${fileIndex}`;
