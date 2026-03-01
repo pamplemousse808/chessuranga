@@ -75,14 +75,18 @@ function App() {
   const stockfishRef = useRef(null);
   const [waitingForBot, setWaitingForBot] = useState(false);
 
-  // Bot initialization - using random moves for now
+  // Bot initialization - Stockfish
   useEffect(() => {
-    if (gameMode === 'asura' && !stockfishRef.current) {
-      console.log("Initializing random bot...");
-      stockfishRef.current = { initialized: true, random: true };
-      setStockfish({ initialized: true, random: true });
+    if (gameMode === 'asura' && gameStarted && !stockfishRef.current) {
+      console.log("Initializing Stockfish via CDN...");
+      const sf = new Worker('https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/stockfish.js');
+      sf.postMessage('uci');
+      sf.postMessage('setoption name Skill Level value 5');
+      sf.postMessage('isready');
+      stockfishRef.current = sf;
+      setStockfish({ initialized: true });
     }
-  }, [gameMode]);
+  }, [gameMode, gameStarted]);
 
   // Initialize Asura lives
   useEffect(() => {
@@ -206,43 +210,49 @@ function App() {
   }, [game, gameStarted, gameOver, gameMode, waitingForBot, stockfish]);
 
   function makeAsuraMove() {
-    console.log("Asura's turn - making random move");
+    console.log("Asura's turn - Stockfish thinking...");
     setWaitingForBot(true);
 
-    setTimeout(() => {
-      const currentGame = new Chess(game.fen());
-      const moves = currentGame.moves({ verbose: true });
+    const sf = stockfishRef.current;
+    if (!sf) {
+      setWaitingForBot(false);
+      return;
+    }
 
-      if (moves.length === 0) {
-        console.log("No legal moves available");
-        setWaitingForBot(false);
-        return;
-      }
+    sf.onmessage = (event) => {
+      const msg = event.data;
+      console.log("Stockfish:", msg);
 
-      const randomMove = moves[Math.floor(Math.random() * moves.length)];
-      console.log("Random move selected:", randomMove.san);
+      if (msg.startsWith('bestmove')) {
+        const parts = msg.split(' ');
+        const move = parts[1];
 
-      const newGame = new Chess(game.fen());
-      const result = newGame.move({
-        from: randomMove.from,
-        to: randomMove.to,
-        promotion: randomMove.promotion || 'q'
-      });
-
-      if (result) {
-        setGame(newGame);
-        setMoveCount(prev => prev + 1);
-        setWaitingForBot(false);
-
-        if (newGame.isCheckmate()) {
-          setGameOver(true);
-          setWinner('white');
+        if (!move || move === '(none)') {
+          setWaitingForBot(false);
+          return;
         }
-      } else {
-        console.error("Move failed");
+
+        const from = move.substring(0, 2);
+        const to = move.substring(2, 4);
+        const promotion = move.length > 4 ? move[4] : 'q';
+
+        const newGame = new Chess(game.fen());
+        const result = newGame.move({ from, to, promotion });
+
+        if (result) {
+          setGame(newGame);
+          setMoveCount(prev => prev + 1);
+          if (newGame.isCheckmate()) {
+            setGameOver(true);
+            setWinner('white');
+          }
+        }
         setWaitingForBot(false);
       }
-    }, 1000);
+    };
+
+    sf.postMessage(`position fen ${game.fen()}`);
+    sf.postMessage('go movetime 500'); // thinks for 500ms per move
   }
 
   function formatTime(seconds) {
@@ -1158,14 +1168,22 @@ function App() {
     if (!moveFrom) {
       const piece = game.get(square);
       if (piece && piece.color === game.turn()) {
+        // Don't allow selecting a frozen piece
+        if (frozenPieces[square]) {
+          return;
+        }
         setMoveFrom(square);
       }
       return;
     }
 
-    // ✅ NEW: if you tap another one of your own pieces, switch selection
+    // if you tap another one of your own pieces, switch selection
     const tappedPiece = game.get(square);
     if (tappedPiece && tappedPiece.color === game.turn()) {
+      // Don't allow selecting a frozen piece
+      if (frozenPieces[square]) {
+        return;
+      }
       setMoveFrom(square);
       return;
     }
