@@ -1211,6 +1211,9 @@ function App() {
 
     if (result !== null) {
       setMoveFrom("");
+    } else {
+      // Move failed - clear selection so player isn't stuck
+      setMoveFrom("");
     }
   }
 
