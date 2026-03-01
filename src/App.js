@@ -78,13 +78,26 @@ function App() {
   // Bot initialization - Stockfish
   useEffect(() => {
     if (gameMode === 'asura' && gameStarted && !stockfishRef.current) {
-      console.log("Initializing Stockfish via CDN...");
-      const sf = new Worker('https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/stockfish.js');
-      sf.postMessage('uci');
-      sf.postMessage('setoption name Skill Level value 5');
-      sf.postMessage('isready');
-      stockfishRef.current = sf;
-      setStockfish({ initialized: true });
+      console.log("Initializing Stockfish via Blob...");
+
+      fetch('https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/stockfish.js')
+        .then(res => res.text())
+        .then(text => {
+          const blob = new Blob([text], { type: 'application/javascript' });
+          const url = URL.createObjectURL(blob);
+          const sf = new Worker(url);
+          sf.postMessage('uci');
+          sf.postMessage('setoption name Skill Level value 5');
+          sf.postMessage('isready');
+          stockfishRef.current = sf;
+          setStockfish({ initialized: true });
+        })
+        .catch(err => {
+          console.error("Stockfish failed to load:", err);
+          // Fall back to random moves
+          stockfishRef.current = { initialized: true, random: true };
+          setStockfish({ initialized: true, random: true });
+        });
     }
   }, [gameMode, gameStarted]);
 
@@ -1541,11 +1554,6 @@ function App() {
                 >
                   👹 Fight the Asura Horde
                 </button>
-              </div>
-
-              <div style={{ marginTop: "40px", fontSize: "14px", color: "#888", maxWidth: "600px" }}>
-                <p><strong>Asura Horde:</strong> Face an endless tide of demons! Pieces resurrect multiple times. Only the Navagraha can save you.</p>
-                <p style={{ marginTop: "10px" }}>Pawns: 3 lives | Knights/Bishops: 2 lives | Rooks: 1 life</p>
               </div>
             </div>
 
