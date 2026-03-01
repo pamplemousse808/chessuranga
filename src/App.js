@@ -1573,7 +1573,7 @@ function App() {
               flexShrink: 0
             }}>
               <h2 style={{ fontSize: "22px", marginBottom: "16px", textAlign: "center", borderBottom: "2px solid rgba(255,255,255,0.3)", paddingBottom: "10px" }}>
-                👹 How to Play: Asura Horde
+                👹 How to Play Asura Horde
               </h2>
 
               <div style={{ marginBottom: "14px" }}>
