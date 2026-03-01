@@ -1236,10 +1236,9 @@ function App() {
         setMoveFrom("");
         return;
       }
+      handleMove(moveFrom, square);
+      setMoveFrom("");
     }
-
-    handleMove(moveFrom, square);
-    setMoveFrom("");
 
     const result = handleMove(sourceSquare, targetSquare);
     setMoveFrom("");
