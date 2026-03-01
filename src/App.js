@@ -23,6 +23,7 @@ function App() {
   const [moveFrom, setMoveFrom] = useState("");
   const [whiteTime, setWhiteTime] = useState(100);
   const [blackTime, setBlackTime] = useState(100);
+  const [startingTime, setStartingTime] = useState(100);
   const [gameOver, setGameOver] = useState(false);
   const [winner, setWinner] = useState(null);
   const [gameStarted, setGameStarted] = useState(false);
@@ -73,11 +74,12 @@ function App() {
   // Format: { 'b_p_0': 3, 'b_n_0': 2, ... } - tracks remaining lives for each piece
   const [stockfish, setStockfish] = useState(null);
   const stockfishRef = useRef(null);
+  const stockfishMoveRef = useRef(null);
   const [waitingForBot, setWaitingForBot] = useState(false);
 
   // Bot initialization - Stockfish
   useEffect(() => {
-    if (gameMode === 'asura' && gameStarted && !stockfishRef.current) {
+    if ((gameMode === 'asura' || gameMode === 'shukracharya') && gameStarted && !stockfishRef.current) {
       console.log("Initializing Stockfish via Blob...");
 
       fetch('https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/stockfish.js')
@@ -87,14 +89,14 @@ function App() {
           const url = URL.createObjectURL(blob);
           const sf = new Worker(url);
           sf.postMessage('uci');
-          sf.postMessage('setoption name Skill Level value 5');
+          const skillLevel = gameMode === 'shukracharya' ? 20 : 5;
+          sf.postMessage(`setoption name Skill Level value ${skillLevel}`);
           sf.postMessage('isready');
           stockfishRef.current = sf;
           setStockfish({ initialized: true });
         })
         .catch(err => {
           console.error("Stockfish failed to load:", err);
-          // Fall back to random moves
           stockfishRef.current = { initialized: true, random: true };
           setStockfish({ initialized: true, random: true });
         });
@@ -223,49 +225,63 @@ function App() {
   }, [game, gameStarted, gameOver, gameMode, waitingForBot, stockfish]);
 
   function makeAsuraMove() {
-    console.log("Asura's turn - Stockfish thinking...");
     setWaitingForBot(true);
+    stockfishMoveRef.current = null;
 
     const sf = stockfishRef.current;
-    if (!sf) {
-      setWaitingForBot(false);
+
+    // Fallback: random move
+    if (!sf || sf.random) {
+      setTimeout(() => {
+        const currentGame = new Chess(game.fen());
+        const moves = currentGame.moves({ verbose: true });
+        if (!moves.length) { setWaitingForBot(false); return; }
+        const randomMove = moves[Math.floor(Math.random() * moves.length)];
+        const newGame = new Chess(game.fen());
+        const result = newGame.move({ from: randomMove.from, to: randomMove.to, promotion: 'q' });
+        if (result) {
+          setGame(newGame);
+          setMoveCount(prev => prev + 1);
+          if (newGame.isCheckmate()) { setGameOver(true); setWinner('white'); }
+        }
+        setWaitingForBot(false);
+      }, 500);
       return;
     }
 
-    sf.onmessage = (event) => {
-      const msg = event.data;
-      console.log("Stockfish:", msg);
+    // Stockfish: depth 10 for bot mode, depth 3 for asura (faster/weaker)
+    const depth = gameMode === 'bot' ? 10 : 3;
+    sf.postMessage(`position fen ${game.fen()}`);
+    sf.postMessage(`go depth ${depth}`);
 
-      if (msg.startsWith('bestmove')) {
-        const parts = msg.split(' ');
-        const move = parts[1];
-
-        if (!move || move === '(none)') {
-          setWaitingForBot(false);
-          return;
-        }
-
-        const from = move.substring(0, 2);
-        const to = move.substring(2, 4);
-        const promotion = move.length > 4 ? move[4] : 'q';
+    // Poll for the bestmove response
+    const poll = setInterval(() => {
+      if (stockfishMoveRef.current) {
+        clearInterval(poll);
+        const moveStr = stockfishMoveRef.current;
+        stockfishMoveRef.current = null;
 
         const newGame = new Chess(game.fen());
-        const result = newGame.move({ from, to, promotion });
+        const result = newGame.move({
+          from: moveStr.slice(0, 2),
+          to: moveStr.slice(2, 4),
+          promotion: moveStr[4] || 'q'
+        });
 
         if (result) {
           setGame(newGame);
           setMoveCount(prev => prev + 1);
-          if (newGame.isCheckmate()) {
-            setGameOver(true);
-            setWinner('white');
-          }
+          if (newGame.isCheckmate()) { setGameOver(true); setWinner('white'); }
         }
         setWaitingForBot(false);
       }
-    };
+    }, 50);
 
-    sf.postMessage(`position fen ${game.fen()}`);
-    sf.postMessage('go movetime 500'); // thinks for 500ms per move
+    // Safety timeout after 5s
+    setTimeout(() => {
+      clearInterval(poll);
+      if (waitingForBot) setWaitingForBot(false);
+    }, 5000);
   }
 
   function formatTime(seconds) {
@@ -1074,7 +1090,7 @@ function App() {
 
   function onSquareClick(square) {
     if (gameOver || !gameStarted) return;
-    if (gameMode === 'asura' && game.turn() === 'b') return; // Don't allow manual moves during bot turn
+    if ((gameMode === 'asura' || gameMode === 'bot') && game.turn() === 'b') return; // Don't allow manual moves during bot turn
 
     if (selectedCard) {
       placeTile(square);
@@ -1286,14 +1302,18 @@ function App() {
   }
 
   function startGame(mode) {
+    const time = (mode === 'asura' || mode === 'shukracharya') ? 300 : 100;
+    setStartingTime(time);
+    setWhiteTime(time);
+    setBlackTime(time);
     setGameMode(mode);
     setGameStarted(true);
   }
 
   function resetGame() {
     setGame(new Chess());
-    setWhiteTime(100);
-    setBlackTime(100);
+    setWhiteTime(startingTime);
+    setBlackTime(startingTime);
     setGameOver(false);
     setWinner(null);
     setGameStarted(false);
@@ -1331,11 +1351,11 @@ function App() {
 
   // Theme colors based on game mode
   const theme = {
-    background: gameMode === 'asura' ? '#0a0a0a' : '#1a1a2e',
-    darkSquare: gameMode === 'asura' ? '#8b0000' : '#4a5568',
-    lightSquare: gameMode === 'asura' ? '#1a1a1a' : '#cbd5e0',
-    accent: gameMode === 'asura' ? '#ff4444' : '#4ecca3',
-    text: gameMode === 'asura' ? '#ff6b6b' : '#eee'
+    background: gameMode === 'asura' ? '#0a0a0a' : gameMode === 'shukracharya' ? '#0d0a1a' : '#1a1a2e',
+    darkSquare: gameMode === 'asura' ? '#8b0000' : gameMode === 'shukracharya' ? '#4a3060' : '#4a5568',
+    lightSquare: gameMode === 'asura' ? '#1a1a1a' : gameMode === 'shukracharya' ? '#d4c5e8' : '#cbd5e0',
+    accent: gameMode === 'asura' ? '#ff4444' : gameMode === 'shukracharya' ? '#e8d5a3' : '#4ecca3',
+    text: gameMode === 'asura' ? '#ff6b6b' : gameMode === 'shukracharya' ? '#e8d5a3' : '#eee'
   };
 
   const customStyles = {};
@@ -1555,6 +1575,22 @@ function App() {
                 </button>
 
                 <button
+                  onClick={() => startGame('shukracharya')}
+                  style={{
+                    padding: "20px 40px",
+                    fontSize: "20px",
+                    backgroundColor: "#e8d5a3",
+                    color: "#1a0a00",
+                    border: "none",
+                    borderRadius: "10px",
+                    cursor: "pointer",
+                    fontWeight: "bold"
+                  }}
+                >
+                  ☄️ Face Shukracharya
+                </button>
+
+                <button
                   onClick={() => startGame('asura')}
                   style={{
                     padding: "20px 40px",
@@ -1571,6 +1607,10 @@ function App() {
                 </button>
               </div>
             </div>
+
+            <p style={{ marginTop: "12px", fontSize: "13px", color: "#aaa" }}>
+              <strong style={{ color: "#e8d5a3" }}>Shukracharya:</strong> Guru of the Asuras. Face the master behind the horde.
+            </p>
 
             {/* RIGHT: How to Play */}
             <div style={{
