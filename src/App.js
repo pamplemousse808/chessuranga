@@ -1221,23 +1221,17 @@ function App() {
     if (gameOver || !gameStarted || selectedCard || activationMode || chandraPlacementMode || guruMode || shaniMode) return false;
     if (gameMode === 'asura' && game.turn() === 'b') return false;
 
-    // Don't allow moving mirages or treat capturing a mirage as a real capture
+    // Don't allow moving or capturing mirages
     if (chandraMode) {
-      if (chandraMode.mirages.includes(moveFrom)) {
-        setMoveFrom("");
-        return;
-      }
-      if (chandraMode.mirages.includes(square)) {
+      if (chandraMode.mirages.includes(sourceSquare)) return false;
+      if (chandraMode.mirages.includes(targetSquare)) {
         // Reveal the mirage!
         const newGame = new Chess(game.fen());
         chandraMode.mirages.forEach(sq => newGame.remove(sq));
         setGame(newGame);
         setChandraMode(null);
-        setMoveFrom("");
-        return;
+        return false;
       }
-      handleMove(moveFrom, square);
-      setMoveFrom("");
     }
 
     const result = handleMove(sourceSquare, targetSquare);
