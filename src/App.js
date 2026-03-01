@@ -1163,13 +1163,16 @@ function App() {
       return;
     }
 
+    // ✅ NEW: if you tap another one of your own pieces, switch selection
+    const tappedPiece = game.get(square);
+    if (tappedPiece && tappedPiece.color === game.turn()) {
+      setMoveFrom(square);
+      return;
+    }
+
     const movingPiece = game.get(moveFrom);
     if (!movingPiece || movingPiece.color !== game.turn()) {
       setMoveFrom("");
-      const piece = game.get(square);
-      if (piece && piece.color === game.turn()) {
-        setMoveFrom(square);
-      }
       return;
     }
 
