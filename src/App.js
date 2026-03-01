@@ -1544,25 +1544,33 @@ function App() {
             <div style={{ width: "280px", display: "flex", flexDirection: "column", gap: "15px" }}>
 
               {/* Selected Card Info */}
-              {selectedCard && (
-                <div style={{
-                  padding: "10px",
-                  backgroundColor: "#16213e",
-                  borderRadius: "8px",
-                  fontSize: "14px"   // was 14px, keep it
-                }}>
-                  <strong style={{ fontSize: "16px" }}>{selectedCard.name}</strong>
-                  <div style={{ fontSize: "22px", color: "#ffd700", marginTop: "5px", fontWeight: "bold" }}>
-                    {getCardCost(selectedCard)}s
+              <div style={{
+                padding: "10px",
+                backgroundColor: "#16213e",
+                borderRadius: "8px",
+                fontSize: "14px",
+                minHeight: "110px"
+              }}>
+                {selectedCard ? (
+                  <>
+                    <strong style={{ fontSize: "16px" }}>{selectedCard.name}</strong>
+                    <div style={{ fontSize: "22px", color: "#ffd700", marginTop: "5px", fontWeight: "bold" }}>
+                      {getCardCost(selectedCard)}s
+                    </div>
+                    <div style={{ fontSize: "15px", color: "#aaa", marginTop: "5px" }}>
+                      {selectedCard.description}
+                    </div>
+                    <div style={{ fontSize: "13px", color: "#aaa", marginTop: "5px" }}>
+                      Click board to place
+                    </div>
+                  </>
+                ) : (
+                  <div style={{ color: "#555", fontSize: "13px", marginTop: "10px", textAlign: "center" }}>
+                    Select a card to see its power
                   </div>
-                  <div style={{ fontSize: "15px", color: "#aaa", marginTop: "5px" }}>  {/* was 11px */}
-                    {selectedCard.description}
-                  </div>
-                  <div style={{ fontSize: "13px", color: "#aaa", marginTop: "5px" }}>  {/* was 12px */}
-                    Click board to place
-                  </div>
-                </div>
-              )}
+                )}
+              </div>
+
               {/* Activation button */}
               {!selectedCard && !chandraPlacementMode && !guruMode && !shaniMode && piecesInZones.length > 0 && (
                 <div>
