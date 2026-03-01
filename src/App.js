@@ -1543,51 +1543,26 @@ function App() {
             {/* LEFT COLUMN: Card info + Cards in 3x3 grid */}
             <div style={{ width: "280px", display: "flex", flexDirection: "column", gap: "15px" }}>
 
-              {/* Card Costs Info */}
-              <div style={{
-                padding: "12px",
-                backgroundColor: "#16213e",
-                borderRadius: "8px",
-                fontSize: "11px"
-              }}>
-                <div style={{ fontWeight: "bold", marginBottom: "6px", fontSize: "12px" }}>
-                  ⏱️ Card Costs {gameMode === 'asura' && <span style={{ color: "#4ecca3" }}>(50% off!)</span>}
-                </div>
-                <div style={{ marginBottom: "3px", color: "#aaa" }}>
-                  Tier 1: {gameMode === 'asura' ? '4s' : '7-8s'}
-                </div>
-                <div style={{ marginBottom: "3px", color: "#aaa" }}>
-                  Tier 2: {gameMode === 'asura' ? '5-6s' : '9-11s'}
-                </div>
-                <div style={{ marginBottom: "8px", color: "#aaa" }}>
-                  Tier 3: {gameMode === 'asura' ? '5-7s' : '10-14s'}
-                </div>
-                <div style={{ fontSize: "10px", color: "#888", fontStyle: "italic" }}>
-                  Final 30s: All cards 50% off
-                </div>
-              </div>
-
               {/* Selected Card Info */}
               {selectedCard && (
                 <div style={{
                   padding: "10px",
                   backgroundColor: "#16213e",
                   borderRadius: "8px",
-                  fontSize: "14px"
+                  fontSize: "14px"   // was 14px, keep it
                 }}>
-                  <strong>{selectedCard.name}</strong>
-                  <div style={{ fontSize: "18px", color: "#ffd700", marginTop: "5px", fontWeight: "bold" }}>
+                  <strong style={{ fontSize: "16px" }}>{selectedCard.name}</strong>
+                  <div style={{ fontSize: "22px", color: "#ffd700", marginTop: "5px", fontWeight: "bold" }}>
                     {getCardCost(selectedCard)}s
                   </div>
-                  <div style={{ fontSize: "11px", color: "#aaa", marginTop: "5px" }}>
+                  <div style={{ fontSize: "15px", color: "#aaa", marginTop: "5px" }}>  {/* was 11px */}
                     {selectedCard.description}
                   </div>
-                  <div style={{ fontSize: "12px", color: "#aaa", marginTop: "5px" }}>
+                  <div style={{ fontSize: "13px", color: "#aaa", marginTop: "5px" }}>  {/* was 12px */}
                     Click board to place
                   </div>
                 </div>
               )}
-
               {/* Activation button */}
               {!selectedCard && !chandraPlacementMode && !guruMode && !shaniMode && piecesInZones.length > 0 && (
                 <div>
@@ -1921,24 +1896,28 @@ function App() {
               </h1>
 
               {showChaosPopup && (
-                <div style={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  backgroundColor: "#ff6b6b",
-                  padding: "30px",
-                  borderRadius: "15px",
-                  zIndex: 1000,
-                  textAlign: "center",
-                  border: "3px solid #fff",
-                  boxShadow: "0 0 30px rgba(255, 107, 107, 0.5)"
-                }}>
-                  <h2 style={{ marginBottom: "10px", fontSize: "28px" }}>
-                    🔥 CHAOS MODE 🔥
+                <div
+                  onClick={() => setShowChaosPopup(false)}
+                  style={{
+                    position: "absolute",
+                    top: "10px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    backgroundColor: "#ff6b6b",
+                    padding: "12px 24px",
+                    borderRadius: "15px",
+                    zIndex: 1000,
+                    textAlign: "center",
+                    border: "3px solid #fff",
+                    boxShadow: "0 0 30px rgba(255, 107, 107, 0.5)",
+                    cursor: "pointer"
+                  }}
+                >
+                  <h2 style={{ margin: 0, fontSize: "20px" }}>
+                    🔥 CHAOS MODE — All cards half price! 🔥
                   </h2>
-                  <p style={{ fontSize: "18px" }}>
-                    All cards half price!
+                  <p style={{ margin: "4px 0 0 0", fontSize: "11px", opacity: 0.8 }}>
+                    tap to dismiss
                   </p>
                 </div>
               )}
@@ -2126,6 +2105,29 @@ function App() {
                   {blackCaptured.map((piece, i) => (
                     <span key={i} style={{ fontSize: "20px" }}>{getPieceSymbol(piece)}</span>
                   ))}
+                </div>
+              </div>
+              {/* Card Costs Info */}
+              <div style={{
+                padding: "12px",
+                backgroundColor: "#16213e",
+                borderRadius: "8px",
+                fontSize: "12px"
+              }}>
+                <div style={{ fontWeight: "bold", marginBottom: "8px", fontSize: "13px" }}>
+                  ⏱️ Card Costs {gameMode === 'asura' && <span style={{ color: "#4ecca3" }}>(50% off!)</span>}
+                </div>
+                <div style={{ marginBottom: "4px", color: "#aaa" }}>
+                  Tier 1: {gameMode === 'asura' ? '4s' : '7-8s'}
+                </div>
+                <div style={{ marginBottom: "4px", color: "#aaa" }}>
+                  Tier 2: {gameMode === 'asura' ? '5-6s' : '9-11s'}
+                </div>
+                <div style={{ marginBottom: "8px", color: "#aaa" }}>
+                  Tier 3: {gameMode === 'asura' ? '5-7s' : '10-14s'}
+                </div>
+                <div style={{ fontSize: "11px", color: "#888", fontStyle: "italic" }}>
+                  Final 30s: All cards 50% off
                 </div>
               </div>
             </div>
