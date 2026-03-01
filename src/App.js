@@ -93,6 +93,14 @@ function App() {
           sf.postMessage(`setoption name Skill Level value ${skillLevel}`);
           sf.postMessage('isready');
           stockfishRef.current = sf;
+          sf.onmessage = (e) => {
+            if (typeof e.data === 'string' && e.data.startsWith('bestmove')) {
+              const move = e.data.split(' ')[1];
+              if (move && move !== '(none)') {
+                stockfishMoveRef.current = move;
+              }
+            }
+          };
           setStockfish({ initialized: true });
         })
         .catch(err => {
@@ -213,7 +221,7 @@ function App() {
   // Bot move trigger
   // eslint-disable-next-line react-hooks/exhaustive-deps 
   useEffect(() => {
-    if (gameMode === 'asura' &&
+    if ((gameMode === 'asura' || gameMode === 'shukracharya') &&
       gameStarted &&
       !gameOver &&
       game.turn() === 'b' &&
@@ -249,8 +257,8 @@ function App() {
       return;
     }
 
-    // Stockfish: depth 10 for bot mode, depth 3 for asura (faster/weaker)
-    const depth = gameMode === 'bot' ? 10 : 3;
+    // Stockfish: depth 10 for shukracharya mode, depth 3 for asura (faster/weaker)
+    const depth = gameMode === 'shukracharya' ? 10 : 3;
     sf.postMessage(`position fen ${game.fen()}`);
     sf.postMessage(`go depth ${depth}`);
 
@@ -1090,7 +1098,7 @@ function App() {
 
   function onSquareClick(square) {
     if (gameOver || !gameStarted) return;
-    if ((gameMode === 'asura' || gameMode === 'bot') && game.turn() === 'b') return; // Don't allow manual moves during bot turn
+    if ((gameMode === 'asura' || gameMode === 'shukracharya') && game.turn() === 'b') return; // Don't allow manual moves during bot turn
 
     if (selectedCard) {
       placeTile(square);
