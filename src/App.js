@@ -1550,14 +1550,14 @@ function App() {
               <div style={{ marginBottom: "14px" }}>
                 <div style={{ fontWeight: "bold", fontSize: "15px", marginBottom: "4px" }}>⚔️ Your Quest</div>
                 <div style={{ fontSize: "13px", opacity: 0.9, lineHeight: "1.5" }}>
-                  The demon king has invaded — and for reasons best not questioned, challenged you to a game of chess. Classic villain behaviour.
+                  The Demon King has invaded — and for reasons best not questioned, challenged you to a game of chess.
                 </div>
               </div>
 
               <div style={{ marginBottom: "14px" }}>
                 <div style={{ fontWeight: "bold", fontSize: "15px", marginBottom: "4px" }}>🌟 Your Allies</div>
                 <div style={{ fontSize: "13px", opacity: 0.9, lineHeight: "1.5" }}>
-                  The celestial Navagraha have descended to lend you their cosmic powers. Lucky you.
+                  The celestial Navagraha have descended to lend you their cosmic powers. Hoss!!
                 </div>
               </div>
 
