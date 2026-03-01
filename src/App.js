@@ -1480,52 +1480,115 @@ function App() {
 
         {/* Mode selection screen */}
         {!gameStarted && (
-          <div style={{ textAlign: "center" }}>
-            <h1 style={{ fontSize: "48px", marginBottom: "20px" }}>
-              {gameMode === 'asura' ? '⚔️ ASURA HORDE ⚔️' : 'Chessuranga'}
-            </h1>
-            <p style={{ fontSize: "18px", marginBottom: "40px", color: "#aaa" }}>
-              100-second bullet chess with celestial powers
-            </p>
+          <div style={{ display: "flex", gap: "40px", alignItems: "flex-start", justifyContent: "center" }}>
 
-            <div style={{ display: "flex", gap: "20px", justifyContent: "center" }}>
-              <button
-                onClick={() => startGame('pvp')}
-                style={{
-                  padding: "20px 40px",
-                  fontSize: "20px",
-                  backgroundColor: "#4ecca3",
-                  color: "#000",
-                  border: "none",
-                  borderRadius: "10px",
-                  cursor: "pointer",
-                  fontWeight: "bold"
-                }}
-              >
-                🌟 Play vs Friend
-              </button>
+            {/* LEFT: Title + Buttons */}
+            <div style={{ textAlign: "center", maxWidth: "500px" }}>
+              <h1 style={{ fontSize: "48px", marginBottom: "20px" }}>
+                {gameMode === 'asura' ? '⚔️ ASURA HORDE ⚔️' : 'Chessuranga'}
+              </h1>
+              <p style={{ fontSize: "18px", marginBottom: "40px", color: "#aaa" }}>
+                100-second bullet chess with celestial powers
+              </p>
 
-              <button
-                onClick={() => startGame('asura')}
-                style={{
-                  padding: "20px 40px",
-                  fontSize: "20px",
-                  backgroundColor: "#ff4444",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "10px",
-                  cursor: "pointer",
-                  fontWeight: "bold"
-                }}
-              >
-                👹 Fight the Asura Horde
-              </button>
+              <div style={{ display: "flex", gap: "20px", justifyContent: "center" }}>
+                <button
+                  onClick={() => startGame('pvp')}
+                  style={{
+                    padding: "20px 40px",
+                    fontSize: "20px",
+                    backgroundColor: "#4ecca3",
+                    color: "#000",
+                    border: "none",
+                    borderRadius: "10px",
+                    cursor: "pointer",
+                    fontWeight: "bold"
+                  }}
+                >
+                  🌟 Play vs Friend
+                </button>
+
+                <button
+                  onClick={() => startGame('asura')}
+                  style={{
+                    padding: "20px 40px",
+                    fontSize: "20px",
+                    backgroundColor: "#ff4444",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "10px",
+                    cursor: "pointer",
+                    fontWeight: "bold"
+                  }}
+                >
+                  👹 Fight the Asura Horde
+                </button>
+              </div>
+
+              <div style={{ marginTop: "40px", fontSize: "14px", color: "#888", maxWidth: "600px" }}>
+                <p><strong>Asura Horde:</strong> Face an endless tide of demons! Pieces resurrect multiple times. Only the Navagraha can save you.</p>
+                <p style={{ marginTop: "10px" }}>Pawns: 3 lives | Knights/Bishops: 2 lives | Rooks: 1 life</p>
+              </div>
             </div>
 
-            <div style={{ marginTop: "40px", fontSize: "14px", color: "#888", maxWidth: "600px" }}>
-              <p><strong>Asura Horde:</strong> Face an endless tide of demons! Pieces resurrect multiple times. Only the Navagraha can save you.</p>
-              <p style={{ marginTop: "10px" }}>Pawns: 3 lives | Knights/Bishops: 2 lives | Rooks: 1 life</p>
+            {/* RIGHT: How to Play */}
+            <div style={{
+              width: "320px",
+              backgroundColor: "#ff4444",
+              border: "3px solid #ff6b6b",
+              borderRadius: "16px",
+              padding: "24px",
+              color: "#fff",
+              boxShadow: "0 0 40px rgba(255, 68, 68, 0.4)",
+              textAlign: "left",
+              flexShrink: 0
+            }}>
+              <h2 style={{ fontSize: "22px", marginBottom: "16px", textAlign: "center", borderBottom: "2px solid rgba(255,255,255,0.3)", paddingBottom: "10px" }}>
+                👹 How to Play: Asura Horde
+              </h2>
+
+              <div style={{ marginBottom: "14px" }}>
+                <div style={{ fontWeight: "bold", fontSize: "15px", marginBottom: "4px" }}>⚔️ Your Quest</div>
+                <div style={{ fontSize: "13px", opacity: 0.9, lineHeight: "1.5" }}>
+                  The demon king has invaded — and for reasons best not questioned, challenged you to a game of chess. Classic villain behaviour.
+                </div>
+              </div>
+
+              <div style={{ marginBottom: "14px" }}>
+                <div style={{ fontWeight: "bold", fontSize: "15px", marginBottom: "4px" }}>🌟 Your Allies</div>
+                <div style={{ fontSize: "13px", opacity: 0.9, lineHeight: "1.5" }}>
+                  The celestial Navagraha have descended to lend you their cosmic powers. Lucky you.
+                </div>
+              </div>
+
+              <div style={{ marginBottom: "14px" }}>
+                <div style={{ fontWeight: "bold", fontSize: "15px", marginBottom: "6px" }}>🔓 Unlocking Powers</div>
+                <div style={{ fontSize: "13px", opacity: 0.9, lineHeight: "1.8" }}>
+                  <div>♟ Capture a <strong>pawn</strong> → Tier 1</div>
+                  <div>♞ Capture a <strong>knight or bishop</strong> → Tier 2</div>
+                  <div>♜ Capture a <strong>rook or queen</strong> → Tier 3</div>
+                </div>
+              </div>
+
+              <div style={{ marginBottom: "14px" }}>
+                <div style={{ fontWeight: "bold", fontSize: "15px", marginBottom: "4px" }}>⏱️ Watch the Clock</div>
+                <div style={{ fontSize: "13px", opacity: 0.9, lineHeight: "1.5" }}>
+                  Using Navagraha powers costs you time. But capturing Asura demons earns it back — so play bold!
+                </div>
+              </div>
+
+              <div style={{ marginBottom: "18px" }}>
+                <div style={{ fontWeight: "bold", fontSize: "15px", marginBottom: "4px" }}>☠️ Beware</div>
+                <div style={{ fontSize: "13px", opacity: 0.9, lineHeight: "1.5" }}>
+                  The demon horde regenerates. Slay them once and they'll return. Only by truly overwhelming them can you win.
+                </div>
+              </div>
+
+              <div style={{ textAlign: "center", fontSize: "14px", fontWeight: "bold", borderTop: "2px solid rgba(255,255,255,0.3)", paddingTop: "12px" }}>
+                Good luck. The cosmos is counting on you. 🙏
+              </div>
             </div>
+
           </div>
         )}
 
