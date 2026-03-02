@@ -331,10 +331,11 @@ function App() {
   }
 
   function addTime(player, seconds) {
+    console.log('addTime called:', player, seconds, 'startingTime:', startingTime);
     if (player === "w") {
-      setWhiteTime((prev) => Math.min(prev + seconds, 100));
+      setWhiteTime((prev) => Math.min(prev + seconds, startingTime));
     } else {
-      setBlackTime((prev) => Math.min(prev + seconds, 100));
+      setBlackTime((prev) => Math.min(prev + seconds, startingTime));
     }
   }
 
@@ -738,6 +739,8 @@ function App() {
           promotion: promotion,
         });
 
+
+        const result = newGame.move(moveObj);
         if (!move) return null;
 
         if (capturedPiece) {
