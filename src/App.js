@@ -21,7 +21,7 @@ const SHARED_DECK = [
 function HowToPlay() {
   const [activeTab, setActiveTab] = useState('asura');
 
-  const sharedSections = (
+  const sharedTop = (
     <>
       <div style={{ marginBottom: "14px" }}>
         <div style={{ fontWeight: "bold", fontSize: "15px", marginBottom: "6px" }}>🔓 Unlocking Powers</div>
@@ -37,18 +37,14 @@ function HowToPlay() {
           Using Navagraha powers costs you time. But capturing enemies earns it back — so play bold!
         </div>
       </div>
-      <div style={{ marginBottom: "18px" }}>
-        <div style={{ fontWeight: "bold", fontSize: "15px", marginBottom: "4px" }}>☠️ Beware</div>
-        <div style={{ fontSize: "13px", opacity: 0.9, lineHeight: "1.5" }}>
-          The demon horde regenerates. Slay them once and they'll return. Only by truly overwhelming them can you win.
-        </div>
-      </div>
-      <div style={{ textAlign: "center", fontSize: "14px", fontWeight: "bold", borderTop: "2px solid rgba(255,255,255,0.3)", paddingTop: "12px" }}>
-        Good luck. The cosmos is counting on you. 🙏
-      </div>
     </>
   );
 
+  const footer = (
+    <div style={{ textAlign: "center", fontSize: "14px", fontWeight: "bold", borderTop: "2px solid rgba(255,255,255,0.3)", paddingTop: "12px" }}>
+      Good luck. The cosmos is counting on you. 🙏
+    </div>
+  );
   return (
     <div style={{ maxWidth: "400px", margin: "0 auto" }}>
 
@@ -114,7 +110,14 @@ function HowToPlay() {
                 The celestial Navagraha have descended to lend you their cosmic powers. Hoss!!
               </div>
             </div>
-            {sharedSections}
+            {sharedTop}
+            <div style={{ marginBottom: "18px" }}>
+              <div style={{ fontWeight: "bold", fontSize: "15px", marginBottom: "4px" }}>☠️ Beware</div>
+              <div style={{ fontSize: "13px", opacity: 0.9, lineHeight: "1.5" }}>
+                The demon horde regenerates. Slay them once and they'll return. Only by truly overwhelming them can you win.
+              </div>
+            </div>
+            {footer}
           </>
         ) : (
           <>
@@ -130,7 +133,8 @@ function HowToPlay() {
                 The Navagraha have granted you their cosmic powers. Use them wisely — you'll need every one.
               </div>
             </div>
-            {sharedSections}
+            {sharedTop}
+            {footer}
           </>
         )}
 
@@ -149,6 +153,8 @@ function App() {
   const [winner, setWinner] = useState(null);
   const [gameStarted, setGameStarted] = useState(false);
   const [moveCount, setMoveCount] = useState(0);
+  const [shukraDifficulty, setShukraDifficulty] = useState(null);
+  const [showShukraSelect, setShowShukraSelect] = useState(false);
 
   // Game mode
   const [gameMode, setGameMode] = useState(null); // 'pvp' or 'asura'
@@ -213,6 +219,11 @@ function App() {
           worker = new Worker(url);
           worker.postMessage('uci');
           const skillLevel = gameMode === 'shukracharya' ? 20 : 5;
+          // Remove the skillLevel line for shukracharya, keep for asura
+          if (gameMode === 'asura') {
+            sf.postMessage('setoption name Skill Level value 5');
+          }
+          sf.postMessage('isready');
           worker.postMessage(`setoption name Skill Level value ${skillLevel}`);
           worker.postMessage('isready');
           worker.onmessage = (e) => {
@@ -389,7 +400,10 @@ function App() {
     }
 
     // Stockfish: depth 10 for shukracharya mode, depth 3 for asura (faster/weaker)
-    const depth = gameMode === 'shukracharya' ? 10 : 3;
+    const depthMap = { shishya: 5, acharya: 8, guru: 12 };
+    const depth = gameMode === 'shukracharya'
+      ? (depthMap[shukraDifficulty] || 8)
+      : 3;
     sf.postMessage(`position fen ${game.fen()}`);
     sf.postMessage(`go depth ${depth}`);
 
@@ -1459,6 +1473,17 @@ function App() {
     setGameStarted(true);
   }
 
+  function startGame(mode, difficulty = null) {
+    const time = (mode === 'asura' || mode === 'shukracharya') ? 300 : 100;
+    setStartingTime(time);
+    setWhiteTime(time);
+    setBlackTime(time);
+    setGameMode(mode);
+    setGameStarted(true);
+    setShowShukraSelect(false);
+    if (difficulty) setShukraDifficulty(difficulty);
+  }
+
   function resetGame() {
     setGame(new Chess());
     setWhiteTime(startingTime);
@@ -1489,6 +1514,8 @@ function App() {
     setShaniMode(null);
     setAsuraLives({});
     setWaitingForBot(false);
+    setShukraDifficulty(null);
+    setShowShukraSelect(false);
 
     // Clean up Stockfish if it exists and has terminate method
     if (stockfishRef.current && typeof stockfishRef.current.terminate === 'function') {
@@ -1697,106 +1724,167 @@ function App() {
         {!gameStarted && (
           <div style={{ textAlign: "center", maxWidth: "900px", margin: "0 auto" }}>
 
-            {/* Logo */}
-            <img
-              src="/images/chessuranga.jpg"
-              alt="Chessuranga"
-              style={{
-                width: "100%",
-                maxWidth: "700px",
-                borderRadius: "16px",
-                marginBottom: "12px",
-                boxShadow: "0 0 60px rgba(100, 60, 255, 0.4)"
-              }}
-            />
+            {/* Logo with buttons overlaid */}
+            <div style={{ position: "relative", marginBottom: "40px" }}>
+              <img
+                src="/images/chessuranga.jpg"
+                alt="Chessuranga"
+                style={{
+                  width: "100%",
+                  borderRadius: "16px",
+                  display: "block",
+                  boxShadow: "0 0 60px rgba(100, 60, 255, 0.4)"
+                }}
+              />
 
-            {/* Subtitle */}
-            <p style={{ fontSize: "20px", marginBottom: "48px", color: "#aaa", letterSpacing: "2px", fontStyle: "italic" }}>
-              ✨ Let's Get Cosmic ✨
-            </p>
+              {/* Semi-transparent overlay at bottom */}
+              <div style={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                right: 0,
+                borderRadius: "0 0 16px 16px",
+                background: "linear-gradient(transparent, rgba(10,10,20,0.85))",
+                padding: "60px 20px 24px 20px",
+              }}>
+                <div style={{ display: "flex", gap: "20px", justifyContent: "center", flexWrap: "wrap" }}>
 
-            {/* Buttons */}
-            <div style={{ display: "flex", gap: "20px", justifyContent: "center", flexWrap: "wrap", marginBottom: "48px" }}>
+                  <div style={{ textAlign: "center", maxWidth: "200px" }}>
+                    <button
+                      onClick={() => startGame('pvp')}
+                      style={{
+                        padding: "16px 24px",
+                        fontSize: "16px",
+                        backgroundColor: "#4ecca3",
+                        color: "#000",
+                        border: "none",
+                        borderRadius: "10px",
+                        cursor: "pointer",
+                        fontWeight: "bold",
+                        width: "100%",
+                        marginBottom: "8px"
+                      }}
+                    >
+                      🌟 Play vs Friend
+                    </button>
+                    <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>
+                      100-second bullet chess with celestial powers
+                    </p>
+                  </div>
 
-              {/* PvP */}
-              <div style={{ textAlign: "center", maxWidth: "200px" }}>
-                <button
-                  onClick={() => startGame('pvp')}
-                  style={{
-                    padding: "20px 30px",
-                    fontSize: "18px",
-                    backgroundColor: "#4ecca3",
-                    color: "#000",
-                    border: "none",
-                    borderRadius: "10px",
-                    cursor: "pointer",
-                    fontWeight: "bold",
-                    width: "100%",
-                    marginBottom: "10px"
-                  }}
-                >
-                  🌟 Play vs Friend
-                </button>
-                <p style={{ fontSize: "12px", color: "#aaa", lineHeight: "1.5" }}>
-                  100-second bullet chess with celestial powers
-                </p>
+                  <div style={{ textAlign: "center", maxWidth: "200px" }}>
+                    <button
+                      onClick={() => startGame('shukracharya')}
+                      style={{
+                        padding: "16px 24px",
+                        fontSize: "16px",
+                        backgroundColor: "#e8d5a3",
+                        color: "#1a0a00",
+                        border: "none",
+                        borderRadius: "10px",
+                        cursor: "pointer",
+                        fontWeight: "bold",
+                        width: "100%",
+                        marginBottom: "8px"
+                      }}
+                    >
+                      ☄️ Face Shukracharya
+                    </button>
+                    <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>
+                      Guru of the Asuras. Face the master behind the horde in a 1v1.
+                    </p>
+                  </div>
+                  
+                  <div style={{ textAlign: "center", maxWidth: "200px" }}>
+                    {!showShukraSelect ? (
+                      <>
+                        <button
+                          onClick={() => setShowShukraSelect(true)}
+                          style={{
+                            padding: "16px 24px",
+                            fontSize: "16px",
+                            backgroundColor: "#e8d5a3",
+                            color: "#1a0a00",
+                            border: "none",
+                            borderRadius: "10px",
+                            cursor: "pointer",
+                            fontWeight: "bold",
+                            width: "100%",
+                            marginBottom: "8px"
+                          }}
+                        >
+                          ☄️ Face Shukracharya
+                        </button>
+                        <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>
+                          Guru of the Asuras. Face the master behind the horde in a 1v1.
+                        </p>
+                      </>
+                    ) : (
+                      <div style={{
+                        backgroundColor: "rgba(232,213,163,0.15)",
+                        border: "2px solid #e8d5a3",
+                        borderRadius: "12px",
+                        padding: "16px",
+                        textAlign: "center"
+                      }}>
+                        <p style={{ color: "#e8d5a3", fontWeight: "bold", fontSize: "13px", marginBottom: "12px", marginTop: 0 }}>
+                          Choose your challenge:
+                        </p>
+
+                        {[
+                          { key: 'shishya', label: '🌱 Shishya', sub: 'Student · ~1400 ELO' },
+                          { key: 'acharya', label: '📚 Acharya', sub: 'Teacher · ~1700 ELO' },
+                          { key: 'guru', label: '🔱 Guru', sub: 'Master · ~2000 ELO' },
+                        ].map(({ key, label, sub }) => (
+                          <div key={key} style={{ marginBottom: "8px" }}>
+                            <button
+                              onClick={() => startGame('shukracharya', key)}
+                              style={{
+                                padding: "10px 16px",
+                                fontSize: "14px",
+                                backgroundColor: "#e8d5a3",
+                                color: "#1a0a00",
+                                border: "none",
+                                borderRadius: "8px",
+                                cursor: "pointer",
+                                fontWeight: "bold",
+                                width: "100%",
+                                marginBottom: "2px"
+                              }}
+                            >
+                              {label}
+                            </button>
+                            <p style={{ fontSize: "10px", color: "#bbb", margin: 0 }}>{sub}</p>
+                          </div>
+                        ))}
+
+                        <button
+                          onClick={() => setShowShukraSelect(false)}
+                          style={{
+                            marginTop: "6px",
+                            fontSize: "11px",
+                            background: "none",
+                            border: "none",
+                            color: "#aaa",
+                            cursor: "pointer",
+                            textDecoration: "underline"
+                          }}
+                        >
+                          ← back
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-
-              {/* Shukracharya */}
-              <div style={{ textAlign: "center", maxWidth: "200px" }}>
-                <button
-                  onClick={() => startGame('shukracharya')}
-                  style={{
-                    padding: "20px 30px",
-                    fontSize: "18px",
-                    backgroundColor: "#e8d5a3",
-                    color: "#1a0a00",
-                    border: "none",
-                    borderRadius: "10px",
-                    cursor: "pointer",
-                    fontWeight: "bold",
-                    width: "100%",
-                    marginBottom: "10px"
-                  }}
-                >
-                  ☄️ Face Shukracharya
-                </button>
-                <p style={{ fontSize: "12px", color: "#aaa", lineHeight: "1.5" }}>
-                  Guru of the Asuras. Face the master behind the horde in a 1v1.
-                </p>
-              </div>
-
-              {/* Asura */}
-              <div style={{ textAlign: "center", maxWidth: "200px" }}>
-                <button
-                  onClick={() => startGame('asura')}
-                  style={{
-                    padding: "20px 30px",
-                    fontSize: "18px",
-                    backgroundColor: "#ff4444",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: "10px",
-                    cursor: "pointer",
-                    fontWeight: "bold",
-                    width: "100%",
-                    marginBottom: "10px"
-                  }}
-                >
-                  👹 Fight the Asura Horde
-                </button>
-                <p style={{ fontSize: "12px", color: "#aaa", lineHeight: "1.5" }}>
-                  They are endless. They are relentless. Are you ready?
-                </p>
-              </div>
-
             </div>
 
-            {/* How to Play - toggled */}
+            {/* How to Play */}
             <HowToPlay />
 
           </div>
         )}
+
 
         {gameStarted && (
           <div style={{
