@@ -1712,166 +1712,25 @@ function App() {
         {!gameStarted && (
           <div style={{ textAlign: "center", maxWidth: "900px", margin: "0 auto" }}>
 
-            {/* Logo with buttons overlaid */}
-            <div style={{ position: "relative", marginBottom: "40px" }}>
-              <img
-                src="/images/chessuranga.jpg"
-                alt="Chessuranga"
-                style={{
-                  width: "100%",
-                  borderRadius: "16px",
-                  display: "block",
-                  boxShadow: "0 0 60px rgba(100, 60, 255, 0.4)"
-                }}
-              />
+            {/* Logo - full width, no overlay */}
+            <img
+              src="/images/chessuranga.jpg"
+              alt="Chessuranga"
+              style={{
+                width: "100%",
+                borderRadius: "16px",
+                display: "block",
+                marginBottom: "24px",
+                boxShadow: "0 0 60px rgba(100, 60, 255, 0.4)"
+              }}
+            />
 
-              {/* Semi-transparent overlay at bottom */}
-              <div style={{
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                right: 0,
-                borderRadius: "0 0 16px 16px",
-                background: "linear-gradient(transparent, rgba(10,10,20,0.85))",
-                padding: "60px 20px 24px 20px",
-              }}>
-                <div style={{ display: "flex", gap: "20px", justifyContent: "center", flexWrap: "wrap", marginBottom: "40px", alignItems: "flex-start" }}>
-
-                  {/* PvP */}
-                  <div style={{ textAlign: "center", maxWidth: "200px" }}>
-                    <button
-                      onClick={() => startGame('pvp')}
-                      style={{
-                        padding: "16px 24px",
-                        fontSize: "16px",
-                        backgroundColor: "#4ecca3",
-                        color: "#000",
-                        border: "none",
-                        borderRadius: "10px",
-                        cursor: "pointer",
-                        fontWeight: "bold",
-                        width: "100%",
-                        marginBottom: "8px"
-                      }}
-                    >
-                      🌟 Play vs Friend
-                    </button>
-                    <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>
-                      100-second bullet chess with celestial powers
-                    </p>
-                  </div>
-
-                  {/* Shukracharya */}
-                  <div style={{ textAlign: "center", maxWidth: "200px" }}>
-                    {!showShukraSelect ? (
-                      <>
-                        <button
-                          onClick={() => setShowShukraSelect(true)}
-                          style={{
-                            padding: "16px 24px",
-                            fontSize: "16px",
-                            backgroundColor: "#e8d5a3",
-                            color: "#1a0a00",
-                            border: "none",
-                            borderRadius: "10px",
-                            cursor: "pointer",
-                            fontWeight: "bold",
-                            width: "100%",
-                            marginBottom: "8px"
-                          }}
-                        >
-                          ☄️ Face Shukracharya
-                        </button>
-                        <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>
-                          Guru of the Asuras. Face the master behind the horde in a 1v1.
-                        </p>
-                      </>
-                    ) : (
-                      <div style={{
-                        backgroundColor: "rgba(232,213,163,0.15)",
-                        border: "2px solid #e8d5a3",
-                        borderRadius: "12px",
-                        padding: "16px",
-                        textAlign: "center"
-                      }}>
-                        <p style={{ color: "#e8d5a3", fontWeight: "bold", fontSize: "13px", marginBottom: "12px", marginTop: 0 }}>
-                          Choose your challenge:
-                        </p>
-                        {[
-                          { key: 'shishya', label: '🌱 Shishya', sub: 'Student · ~1400 ELO' },
-                          { key: 'acharya', label: '📚 Acharya', sub: 'Teacher · ~1700 ELO' },
-                          { key: 'guru', label: '🔱 Guru', sub: 'Master · ~2000 ELO' },
-                        ].map(({ key, label, sub }) => (
-                          <div key={key} style={{ marginBottom: "8px" }}>
-                            <button
-                              onClick={() => startGame('shukracharya', key)}
-                              style={{
-                                padding: "10px 16px",
-                                fontSize: "14px",
-                                backgroundColor: "#e8d5a3",
-                                color: "#1a0a00",
-                                border: "none",
-                                borderRadius: "8px",
-                                cursor: "pointer",
-                                fontWeight: "bold",
-                                width: "100%",
-                                marginBottom: "2px"
-                              }}
-                            >
-                              {label}
-                            </button>
-                            <p style={{ fontSize: "13px", color: "#ddd", margin: 0 }}>{sub}</p>
-                          </div>
-                        ))}
-                        <button
-                          onClick={() => setShowShukraSelect(false)}
-                          style={{
-                            marginTop: "6px",
-                            fontSize: "11px",
-                            background: "none",
-                            border: "none",
-                            color: "#aaa",
-                            cursor: "pointer",
-                            textDecoration: "underline"
-                          }}
-                        >
-                          ← back
-                        </button>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Asura */}
-                  <div style={{ textAlign: "center", maxWidth: "200px" }}>
-                    <button
-                      onClick={() => startGame('asura')}
-                      style={{
-                        padding: "16px 24px",
-                        fontSize: "16px",
-                        backgroundColor: "#ff4444",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: "10px",
-                        cursor: "pointer",
-                        fontWeight: "bold",
-                        width: "100%",
-                        marginBottom: "8px"
-                      }}
-                    >
-                      👹 Fight the Asura Horde
-                    </button>
-                    <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>
-                      They are endless. They are relentless. Are you ready?
-                    </p>
-                  </div>
-
-                </div>
-              </div>
+            {/* Buttons row */}
+            <div style={{ display: "flex", gap: "20px", justifyContent: "center", flexWrap: "wrap", marginBottom: "40px", alignItems: "flex-start" }}>
+              {/* ... buttons here ... */}
             </div>
 
-            {/* How to Play */}
             <HowToPlay />
-
           </div>
         )}
 
