@@ -82,18 +82,19 @@ function App() {
     if ((gameMode === 'asura' || gameMode === 'shukracharya') && gameStarted && !stockfishRef.current) {
       console.log("Initializing Stockfish via Blob...");
 
+      let worker = null;
+
       fetch('https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/stockfish.js')
         .then(res => res.text())
         .then(text => {
           const blob = new Blob([text], { type: 'application/javascript' });
           const url = URL.createObjectURL(blob);
-          const sf = new Worker(url);
-          sf.postMessage('uci');
+          worker = new Worker(url);
+          worker.postMessage('uci');
           const skillLevel = gameMode === 'shukracharya' ? 20 : 5;
-          sf.postMessage(`setoption name Skill Level value ${skillLevel}`);
-          sf.postMessage('isready');
-          stockfishRef.current = sf;
-          sf.onmessage = (e) => {
+          worker.postMessage(`setoption name Skill Level value ${skillLevel}`);
+          worker.postMessage('isready');
+          worker.onmessage = (e) => {
             if (typeof e.data === 'string' && e.data.startsWith('bestmove')) {
               const move = e.data.split(' ')[1];
               if (move && move !== '(none)') {
@@ -101,6 +102,7 @@ function App() {
               }
             }
           };
+          stockfishRef.current = worker;
           setStockfish({ initialized: true });
         })
         .catch(err => {
@@ -108,8 +110,16 @@ function App() {
           stockfishRef.current = { initialized: true, random: true };
           setStockfish({ initialized: true, random: true });
         });
+
+      return () => {
+        if (worker) {
+          worker.terminate();
+          stockfishRef.current = null;
+        }
+      };
     }
   }, [gameMode, gameStarted]);
+
 
   // Initialize Asura lives
   useEffect(() => {
