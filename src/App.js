@@ -733,14 +733,21 @@ function App() {
 
         const capturedPiece = gameCopy.get(to);
 
-        const move = gameCopy.move({
+        const moveObj = {
           from: from,
           to: to,
-          promotion: promotion,
-        });
+        };
 
+        const piece2 = gameCopy.get(from);
+        if (piece2 && piece2.type === 'p') {
+          const targetRank = parseInt(to[1]);
+          if ((piece2.color === 'w' && targetRank === 8) || (piece2.color === 'b' && targetRank === 1)) {
+            moveObj.promotion = 'q';
+          }
+        }
 
-        const result = newGame.move(moveObj);
+        const move = gameCopy.move(moveObj);
+
         if (!move) return null;
 
         if (capturedPiece) {
