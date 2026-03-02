@@ -218,13 +218,9 @@ function App() {
           const url = URL.createObjectURL(blob);
           worker = new Worker(url);
           worker.postMessage('uci');
-          const skillLevel = gameMode === 'shukracharya' ? 20 : 5;
-          // Remove the skillLevel line for shukracharya, keep for asura
           if (gameMode === 'asura') {
-            sf.postMessage('setoption name Skill Level value 5');
+            worker.postMessage('setoption name Skill Level value 5');
           }
-          sf.postMessage('isready');
-          worker.postMessage(`setoption name Skill Level value ${skillLevel}`);
           worker.postMessage('isready');
           worker.onmessage = (e) => {
             if (typeof e.data === 'string' && e.data.startsWith('bestmove')) {
@@ -1464,15 +1460,6 @@ function App() {
     setGuruMode(null);
   }
 
-  function startGame(mode) {
-    const time = (mode === 'asura' || mode === 'shukracharya') ? 300 : 100;
-    setStartingTime(time);
-    setWhiteTime(time);
-    setBlackTime(time);
-    setGameMode(mode);
-    setGameStarted(true);
-  }
-
   function startGame(mode, difficulty = null) {
     const time = (mode === 'asura' || mode === 'shukracharya') ? 300 : 100;
     setStartingTime(time);
@@ -1483,6 +1470,7 @@ function App() {
     setShowShukraSelect(false);
     if (difficulty) setShukraDifficulty(difficulty);
   }
+
 
   function resetGame() {
     setGame(new Chess());
@@ -1794,7 +1782,7 @@ function App() {
                       Guru of the Asuras. Face the master behind the horde in a 1v1.
                     </p>
                   </div>
-                  
+
                   <div style={{ textAlign: "center", maxWidth: "200px" }}>
                     {!showShukraSelect ? (
                       <>
