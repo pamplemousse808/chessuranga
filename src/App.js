@@ -19,7 +19,7 @@ const SHARED_DECK = [
 ];
 
 function HowToPlay() {
-  const [activeTab, setActiveTab] = React.useState('asura');
+  const [activeTab, setActiveTab] = useState('asura');
 
   const sharedSections = (
     <>
