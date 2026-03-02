@@ -1735,8 +1735,9 @@ function App() {
                 background: "linear-gradient(transparent, rgba(10,10,20,0.85))",
                 padding: "60px 20px 24px 20px",
               }}>
-                <div style={{ display: "flex", gap: "20px", justifyContent: "center", flexWrap: "wrap" }}>
+                <div style={{ display: "flex", gap: "20px", justifyContent: "center", flexWrap: "wrap", marginBottom: "40px", alignItems: "flex-start" }}>
 
+                  {/* PvP */}
                   <div style={{ textAlign: "center", maxWidth: "200px" }}>
                     <button
                       onClick={() => startGame('pvp')}
@@ -1760,29 +1761,7 @@ function App() {
                     </p>
                   </div>
 
-                  <div style={{ textAlign: "center", maxWidth: "200px" }}>
-                    <button
-                      onClick={() => startGame('shukracharya')}
-                      style={{
-                        padding: "16px 24px",
-                        fontSize: "16px",
-                        backgroundColor: "#e8d5a3",
-                        color: "#1a0a00",
-                        border: "none",
-                        borderRadius: "10px",
-                        cursor: "pointer",
-                        fontWeight: "bold",
-                        width: "100%",
-                        marginBottom: "8px"
-                      }}
-                    >
-                      ☄️ Face Shukracharya
-                    </button>
-                    <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>
-                      Guru of the Asuras. Face the master behind the horde in a 1v1.
-                    </p>
-                  </div>
-
+                  {/* Shukracharya */}
                   <div style={{ textAlign: "center", maxWidth: "200px" }}>
                     {!showShukraSelect ? (
                       <>
@@ -1818,7 +1797,6 @@ function App() {
                         <p style={{ color: "#e8d5a3", fontWeight: "bold", fontSize: "13px", marginBottom: "12px", marginTop: 0 }}>
                           Choose your challenge:
                         </p>
-
                         {[
                           { key: 'shishya', label: '🌱 Shishya', sub: 'Student · ~1400 ELO' },
                           { key: 'acharya', label: '📚 Acharya', sub: 'Teacher · ~1700 ELO' },
@@ -1842,10 +1820,9 @@ function App() {
                             >
                               {label}
                             </button>
-                            <p style={{ fontSize: "10px", color: "#bbb", margin: 0 }}>{sub}</p>
+                            <p style={{ fontSize: "13px", color: "#ddd", margin: 0 }}>{sub}</p>
                           </div>
                         ))}
-
                         <button
                           onClick={() => setShowShukraSelect(false)}
                           style={{
@@ -1863,6 +1840,31 @@ function App() {
                       </div>
                     )}
                   </div>
+
+                  {/* Asura */}
+                  <div style={{ textAlign: "center", maxWidth: "200px" }}>
+                    <button
+                      onClick={() => startGame('asura')}
+                      style={{
+                        padding: "16px 24px",
+                        fontSize: "16px",
+                        backgroundColor: "#ff4444",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: "10px",
+                        cursor: "pointer",
+                        fontWeight: "bold",
+                        width: "100%",
+                        marginBottom: "8px"
+                      }}
+                    >
+                      👹 Fight the Asura Horde
+                    </button>
+                    <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>
+                      They are endless. They are relentless. Are you ready?
+                    </p>
+                  </div>
+
                 </div>
               </div>
             </div>
