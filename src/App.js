@@ -384,8 +384,20 @@ function App() {
         if (!moves.length) { setWaitingForBot(false); return; }
         const randomMove = moves[Math.floor(Math.random() * moves.length)];
         const newGame = new Chess(game.fen());
+        const capturedPiece = newGame.get(randomMove.to);
         const result = newGame.move({ from: randomMove.from, to: randomMove.to, promotion: 'q' });
         if (result) {
+          if (capturedPiece) {
+            setCaptureHistory(prev => [...prev, {
+              piece: capturedPiece.type,
+              square: randomMove.to,
+              color: capturedPiece.color
+            }]);
+            if (capturedPiece.color === 'w') {
+              setWhiteCaptured(prev => [...prev, capturedPiece.type]);
+            }
+            checkTierUnlocks(capturedPiece.type);
+          }
           setGame(newGame);
           setMoveCount(prev => prev + 1);
           if (newGame.isCheckmate()) { setGameOver(true); setWinner('white'); }
@@ -411,6 +423,10 @@ function App() {
         stockfishMoveRef.current = null;
 
         const newGame = new Chess(game.fen());
+
+        // Record capture BEFORE the move is made
+        const capturedPiece = newGame.get(moveStr.slice(2, 4));
+
         const result = newGame.move({
           from: moveStr.slice(0, 2),
           to: moveStr.slice(2, 4),
@@ -418,6 +434,19 @@ function App() {
         });
 
         if (result) {
+          // Record capture in history if a piece was taken
+          if (capturedPiece) {
+            setCaptureHistory(prev => [...prev, {
+              piece: capturedPiece.type,
+              square: moveStr.slice(2, 4),
+              color: capturedPiece.color
+            }]);
+            if (capturedPiece.color === 'w') {
+              setWhiteCaptured(prev => [...prev, capturedPiece.type]);
+            }
+            checkTierUnlocks(capturedPiece.type);
+          }
+
           setGame(newGame);
           setMoveCount(prev => prev + 1);
           if (newGame.isCheckmate()) { setGameOver(true); setWinner('white'); }
