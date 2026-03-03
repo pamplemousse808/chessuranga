@@ -204,6 +204,7 @@ function App() {
   const [stockfish, setStockfish] = useState(null);
   const stockfishRef = useRef(null);
   const stockfishMoveRef = useRef(null);
+  const poweredPiecesRef = useRef(poweredPieces);
   const [waitingForBot, setWaitingForBot] = useState(false);
 
   // Bot initialization - Stockfish
@@ -311,6 +312,10 @@ function App() {
     return () => clearInterval(timer);
   }, [game, gameOver, gameStarted, chaosModeShown]);
 
+  useEffect(() => {
+    poweredPiecesRef.current = poweredPieces;
+  }, [poweredPieces]);
+
   // Tile expiration & frozen piece countdown & CHANDRA expiration & GURU resurrection countdown
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -395,7 +400,14 @@ function App() {
         const currentGame = new Chess(game.fen());
         const moves = currentGame.moves({ verbose: true });
         if (!moves.length) { setWaitingForBot(false); return; }
-        const randomMove = moves[Math.floor(Math.random() * moves.length)];
+
+        const safeMoves = moves.filter(m =>
+          !(poweredPiecesRef.current[m.to]?.power === "SURYA" &&
+            poweredPiecesRef.current[m.to].usesLeft > 0)
+        );
+        const movesToUse = safeMoves.length > 0 ? safeMoves : moves;
+        const randomMove = movesToUse[Math.floor(Math.random() * movesToUse.length)];
+
         const newGame = new Chess(game.fen());
         const capturedPiece = newGame.get(randomMove.to);
         const result = newGame.move({ from: randomMove.from, to: randomMove.to, promotion: 'q' });
@@ -437,14 +449,27 @@ function App() {
 
         const newGame = new Chess(game.fen());
 
-        // Record capture BEFORE the move is made
-        const capturedPiece = newGame.get(moveStr.slice(2, 4));
+        const isSuryaProtected = poweredPiecesRef.current[moveStr.slice(2, 4)]?.power === "SURYA" &&
+          poweredPiecesRef.current[moveStr.slice(2, 4)].usesLeft > 0;
 
-        const result = newGame.move({
-          from: moveStr.slice(0, 2),
-          to: moveStr.slice(2, 4),
-          promotion: moveStr[4] || 'q'
-        });
+        let finalMove = { from: moveStr.slice(0, 2), to: moveStr.slice(2, 4), promotion: moveStr[4] || 'q' };
+
+        if (isSuryaProtected) {
+          const currentGame = new Chess(game.fen());
+          const moves = currentGame.moves({ verbose: true });
+          const safeMoves = moves.filter(m =>
+            !(poweredPiecesRef.current[m.to]?.power === "SURYA" &&
+              poweredPiecesRef.current[m.to].usesLeft > 0)
+          );
+          const fallback = safeMoves.length > 0 ? safeMoves : moves;
+          const alt = fallback[Math.floor(Math.random() * fallback.length)];
+          finalMove = { from: alt.from, to: alt.to, promotion: alt.promotion || 'q' };
+        }
+
+        // Record capture BEFORE the move is made
+        const capturedPiece = newGame.get(finalMove.to);
+
+        const result = newGame.move(finalMove);
 
         if (result) {
           // Record capture in history if a piece was taken
