@@ -219,7 +219,7 @@ function App() {
           worker = new Worker(url);
           worker.postMessage('uci');
           if (gameMode === 'asura') {
-            worker.postMessage('setoption name Skill Level value 5');
+            worker.postMessage('setoption name Skill Level value 4');
           }
           worker.postMessage('isready');
           worker.onmessage = (e) => {
