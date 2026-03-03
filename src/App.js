@@ -171,6 +171,7 @@ function App() {
   const [tier2Unlocked, setTier2Unlocked] = useState(false);
   const [tier3Unlocked, setTier3Unlocked] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
+  const [cardCooldowns, setCardCooldowns] = useState({});
 
   // Tile system
   const [activeTiles, setActiveTiles] = useState([]);
@@ -354,6 +355,17 @@ function App() {
       }
     });
     setResurrectedPieces(updatedResurrected);
+
+    if (gameMode === 'asura') {
+      setCardCooldowns(prev => {
+        const updated = { ...prev };
+        Object.keys(updated).forEach(id => {
+          updated[id] = updated[id] - 1;
+          if (updated[id] <= 0) delete updated[id];
+        });
+        return updated;
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moveCount]);
 
@@ -609,8 +621,11 @@ function App() {
     };
 
     setActiveTiles([...activeTiles, newTile]);
-    setUsedCards([...usedCards, card.id]);
-    setSelectedCard(null);
+    if (gameMode === 'asura') {
+      setCardCooldowns(prev => ({ ...prev, [card.id]: 6 }));
+    } else {
+      setUsedCards([...usedCards, card.id]);
+    } setSelectedCard(null);
   }
 
   function activateTileForPiece(square) {
@@ -1297,7 +1312,7 @@ function App() {
     setGuruMode(null);
     setGuruPickerMode(null);
   }
-  
+
   function onSquareClick(square) {
     if (gameOver || !gameStarted) return;
     if ((gameMode === 'asura' || gameMode === 'shukracharya') && game.turn() === 'b') return; // Don't allow manual moves during bot turn
@@ -1541,6 +1556,8 @@ function App() {
     setWaitingForBot(false);
     setShukraDifficulty(null);
     setShowShukraSelect(false);
+    setGuruPickerMode(null);
+    setCardCooldowns({});
 
     // Clean up Stockfish if it exists and has terminate method
     if (stockfishRef.current && typeof stockfishRef.current.terminate === 'function') {
@@ -2219,7 +2236,10 @@ function App() {
                         gap: "5px"
                       }}>
                         {tierCards.map(card => {
-                          const isUsed = usedCards.includes(card.id);
+                          const isUsed = gameMode === 'asura'
+                            ? !!cardCooldowns[card.id]
+                            : usedCards.includes(card.id);
+                          const cooldown = cardCooldowns[card.id];
                           const isSelected = selectedCard?.id === card.id;
 
                           return (
@@ -2239,22 +2259,47 @@ function App() {
                                 alignItems: "center",
                                 justifyContent: "center",
                                 cursor: (isUnlocked && !isUsed && game.turn() === 'w') ? "pointer" : "default",
-                                opacity: isUsed ? 0.3 : 1,
-                                overflow: "hidden",   // ← add this so image doesn't spill outside rounded corners
-                                padding: 0            // ← remove padding so image fills the card fully
+                                opacity: isUsed ? 0.4 : 1,
+                                overflow: "hidden",
+                                padding: 0,
+                                position: "relative"
                               }}
                             >
                               {isUnlocked ? (
-                                <img
-                                  src={card.image}
-                                  alt={card.name}
-                                  style={{
-                                    width: "100%",
-                                    height: "100%",
-                                    objectFit: "cover",
-                                    display: "block"
-                                  }}
-                                />
+                                <>
+                                  <img
+                                    src={card.image}
+                                    alt={card.name}
+                                    style={{
+                                      width: "100%",
+                                      height: "100%",
+                                      objectFit: "cover",
+                                      display: "block",
+                                      filter: isUsed ? "grayscale(80%)" : "none"
+                                    }}
+                                  />
+                                  {cooldown && (
+                                    <div style={{
+                                      position: "absolute",
+                                      top: "50%",
+                                      left: "50%",
+                                      transform: "translate(-50%, -50%)",
+                                      backgroundColor: "rgba(0,0,0,0.75)",
+                                      color: "#fff",
+                                      fontWeight: "bold",
+                                      fontSize: "22px",
+                                      borderRadius: "50%",
+                                      width: "36px",
+                                      height: "36px",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                      border: "2px solid #a855f7"
+                                    }}>
+                                      {cooldown}
+                                    </div>
+                                  )}
+                                </>
                               ) : "🔒"}
                             </div>
                           );
@@ -2351,6 +2396,69 @@ function App() {
               }}>
                 {gameMode === 'asura' ? '👹 Asura' : 'Black'}: {formatTime(blackTime)}
               </div>
+
+              {guruPickerMode && (
+                <div style={{
+                  position: "fixed",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  backgroundColor: "#1a1a2e",
+                  border: "2px solid #a855f7",
+                  borderRadius: "16px",
+                  padding: "24px",
+                  zIndex: 1000,
+                  textAlign: "center",
+                  boxShadow: "0 0 40px rgba(168, 85, 247, 0.5)"
+                }}>
+                  <h3 style={{ color: "#a855f7", marginBottom: "16px" }}>
+                    ✨ Choose which piece to resurrect
+                  </h3>
+                  <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+                    {guruPickerMode.options.map((res, i) => {
+                      const symbols = { p: '♟', n: '♞', b: '♝', r: '♜', q: '♛' };
+                      return (
+                        <button
+                          key={i}
+                          onClick={() => performResurrection(res, guruPickerMode.square)}
+                          style={{
+                            padding: "16px 24px",
+                            fontSize: "32px",
+                            backgroundColor: "rgba(168, 85, 247, 0.2)",
+                            border: "2px solid #a855f7",
+                            borderRadius: "12px",
+                            cursor: "pointer",
+                            color: "#fff",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            gap: "8px"
+                          }}
+                        >
+                          {symbols[res.piece] || res.piece}
+                          <span style={{ fontSize: "12px", color: "#aaa" }}>
+                            {res.piece === 'n' ? 'Knight' : res.piece === 'b' ? 'Bishop' : res.piece === 'r' ? 'Rook' : res.piece === 'q' ? 'Queen' : 'Pawn'}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <button
+                    onClick={() => { setGuruPickerMode(null); setGuruMode(null); }}
+                    style={{
+                      marginTop: "16px",
+                      fontSize: "12px",
+                      background: "none",
+                      border: "none",
+                      color: "#aaa",
+                      cursor: "pointer",
+                      textDecoration: "underline"
+                    }}
+                  >
+                    cancel
+                  </button>
+                </div>
+              )}
 
               <div style={{ width: "600px", height: "600px", flexShrink: 0 }}>
                 <Chessboard
