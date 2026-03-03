@@ -627,7 +627,9 @@ function App() {
       if (powerType === "GURU") {
         const tileRadius = SHARED_DECK.find(c => c.id === "GURU").radius;
         const squaresInRange = getSquaresInRadius(tileSquare, tileRadius);
-
+        console.log('captureHistory:', JSON.stringify(captureHistory));
+        console.log('piece color:', piece.color);
+        console.log('squares in range:', squaresInRange);
         const availableResurrections = captureHistory.filter(capture => {
           const occupant = game.get(capture.square);
           return capture.color === piece.color &&
