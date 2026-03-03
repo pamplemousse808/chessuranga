@@ -155,6 +155,7 @@ function App() {
   const [moveCount, setMoveCount] = useState(0);
   const [shukraDifficulty, setShukraDifficulty] = useState(null);
   const [showShukraSelect, setShowShukraSelect] = useState(false);
+  const [guruPickerMode, setGuruPickerMode] = useState(null);
 
   // Game mode
   const [gameMode, setGameMode] = useState(null); // 'pvp' or 'asura'
@@ -1279,6 +1280,24 @@ function App() {
     }
   }
 
+  function performResurrection(resurrection, square) {
+    const newGame = new Chess(game.fen());
+    newGame.put({
+      type: resurrection.piece,
+      color: guruMode.playerColor
+    }, square);
+    setGame(newGame);
+    setResurrectedPieces({
+      ...resurrectedPieces,
+      [square]: { turnsLeft: 2, resurrectedFrom: resurrection }
+    });
+    setCaptureHistory(captureHistory.filter(c =>
+      !(c.square === square && c.piece === resurrection.piece && c.color === resurrection.color)
+    ));
+    setGuruMode(null);
+    setGuruPickerMode(null);
+  }
+  
   function onSquareClick(square) {
     if (gameOver || !gameStarted) return;
     if ((gameMode === 'asura' || gameMode === 'shukracharya') && game.turn() === 'b') return; // Don't allow manual moves during bot turn
@@ -1289,28 +1308,14 @@ function App() {
     }
 
     if (guruMode) {
-      const resurrection = guruMode.availableResurrections.find(r => r.square === square);
-      if (resurrection) {
-        const newGame = new Chess(game.fen());
-        newGame.put({
-          type: resurrection.piece,
-          color: guruMode.playerColor
-        }, square);
-        setGame(newGame);
+      const resurrections = guruMode.availableResurrections.filter(r => r.square === square);
 
-        setResurrectedPieces({
-          ...resurrectedPieces,
-          [square]: {
-            turnsLeft: 2,
-            resurrectedFrom: resurrection
-          }
-        });
-
-        setCaptureHistory(captureHistory.filter(c =>
-          !(c.square === square && c.piece === resurrection.piece && c.color === resurrection.color)
-        ));
-
-        setGuruMode(null);
+      if (resurrections.length === 1) {
+        // Only one piece — resurrect immediately as before
+        performResurrection(resurrections[0], square);
+      } else if (resurrections.length > 1) {
+        // Multiple pieces — show picker
+        setGuruPickerMode({ square, options: resurrections });
       }
       return;
     }
