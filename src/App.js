@@ -629,6 +629,7 @@ function App() {
         const squaresInRange = getSquaresInRadius(tileSquare, tileRadius);
 
         const availableResurrections = captureHistory.filter(capture => {
+          console.log('checking:', capture, 'inRange:', squaresInRange.includes(capture.square), 'occupied:', game.get(capture.square));
           return capture.color === piece.color &&
             squaresInRange.includes(capture.square) &&
             !game.get(capture.square);
@@ -1517,7 +1518,7 @@ function App() {
   const theme = {
     background: gameMode === 'asura' ? '#0a0a0a' : gameMode === 'shukracharya' ? '#0d0a1a' : '#1a1a2e',
     darkSquare: gameMode === 'asura' ? '#8b0000' : gameMode === 'shukracharya' ? '#4a3060' : '#4a5568',
-    lightSquare: gameMode === 'asura' ? '#1a1a1a' : gameMode === 'shukracharya' ? '#d4c5e8' : '#cbd5e0',
+    lightSquare: gameMode === 'asura' ? '#3a0000' : gameMode === 'shukracharya' ? '#d4c5e8' : '#cbd5e0',
     accent: gameMode === 'asura' ? '#ff4444' : gameMode === 'shukracharya' ? '#e8d5a3' : '#4ecca3',
     text: gameMode === 'asura' ? '#ff6b6b' : gameMode === 'shukracharya' ? '#e8d5a3' : '#eee'
   };
