@@ -1296,7 +1296,21 @@ function App() {
   }
 
   function performResurrection(resurrection, square) {
-    const newGame = new Chess(game.fen());
+    const occupant = game.get(square);
+    if (occupant && occupant.color !== guruMode.playerColor) {
+      // Record the capture before overwriting
+      setCaptureHistory(prev => [...prev, {
+        piece: occupant.type,
+        square: square,
+        color: occupant.color
+      }]);
+      if (occupant.color === 'b') {
+        setWhiteCaptured(prev => [...prev, occupant.type]);
+      } else {
+        setBlackCaptured(prev => [...prev, occupant.type]);
+      }
+      checkTierUnlocks(occupant.type);
+    } const newGame = new Chess(game.fen());
     newGame.put({
       type: resurrection.piece,
       color: guruMode.playerColor
