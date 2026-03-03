@@ -629,10 +629,10 @@ function App() {
         const squaresInRange = getSquaresInRadius(tileSquare, tileRadius);
 
         const availableResurrections = captureHistory.filter(capture => {
-          console.log('checking:', capture, 'inRange:', squaresInRange.includes(capture.square), 'occupied:', game.get(capture.square));
+          const occupant = game.get(capture.square);
           return capture.color === piece.color &&
             squaresInRange.includes(capture.square) &&
-            !game.get(capture.square);
+            (!occupant || occupant.color !== piece.color);
         });
 
         if (availableResurrections.length === 0) {
