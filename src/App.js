@@ -360,12 +360,22 @@ function App() {
         setGuruMode({ tileSquare, playerColor: piece.color, availableResurrections: avail }); setActivationMode(false); return;
       }
       if (powerType === "SHANI") {
-        const tr = SHARED_DECK.find(c => c.id === "SHANI").radius;
-        const sir = getSquaresInRadius(tileSquare, tr);
-        const enemies = []; const ec = piece.color === "w" ? "b" : "w";
-        sir.forEach(sq => { const tp = game.get(sq); if (tp && tp.color === ec && !frozenPieces[sq]) enemies.push({ square: sq, piece: tp }); });
+        const shaniRadius = SHARED_DECK.find(c => c.id === "SHANI").radius;
+        const searchCenter = tileSquare || square;
+        const sir = getSquaresInRadius(searchCenter, shaniRadius);
+        const enemies = [];
+        const ec = piece.color === "w" ? "b" : "w";
+        sir.forEach(sq => {
+          const tp = game.get(sq);
+          if (tp && tp.color === ec && !frozenPieces[sq]) {
+            enemies.push({ square: sq, piece: tp });
+          }
+        });
+        console.log("SHANI activated from", square, "tileSquare:", tileSquare, "enemies found:", enemies.length);
         if (enemies.length === 0) { alert("No enemy pieces to freeze in range!"); setActivationMode(false); return; }
-        setShaniMode({ tileSquare, playerColor: piece.color, enemyPieces: enemies }); setActivationMode(false); return;
+        setShaniMode({ tileSquare: searchCenter, playerColor: piece.color, enemyPieces: enemies });
+        setActivationMode(false);
+        return;
       }
       const np = { ...poweredPieces };
       let usesLeft = 1;
@@ -1068,14 +1078,14 @@ function App() {
             {/* Āhvān hint — fades out after first tap */}
             {!showCardOverlay && game.turn() === "w" && !selectedCard && (
               <div
-                onClick={() => setShowCardOverlay(true)}
-                style={{ width: "100%", marginTop: "16px", padding: "12px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.1)", backgroundColor: "rgba(255,255,255,0.04)", textAlign: "center", cursor: "pointer", animation: "bannerPulse 2.5s infinite" }}
+                onClick={() => { if (game.turn() === "w" && !selectedCard) setShowCardOverlay(true); }}
+                style={{ width: "100%", marginTop: "16px", padding: "12px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.1)", backgroundColor: "rgba(255,255,255,0.04)", textAlign: "center", cursor: game.turn() === "w" ? "pointer" : "default", animation: "bannerPulse 2.5s infinite", opacity: (!showCardOverlay && game.turn() === "w" && !selectedCard) ? 1 : 0, transition: "opacity 0.3s ease", pointerEvents: game.turn() === "w" ? "auto" : "none" }}
               >
                 <div style={{ fontSize: "13px", color: theme.accent, fontWeight: "600", letterSpacing: "0.03em" }}>
                   ✨ Tap <strong>Āhvān</strong> to summon the Navagraha
                 </div>
                 <div style={{ fontSize: "11px", color: "#555", marginTop: "4px" }}>
-                  celestial powers unlock as you capture pieces
+                  Celestial powers unlock as you capture pieces
                 </div>
               </div>
             )}
