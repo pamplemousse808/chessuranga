@@ -1076,32 +1076,31 @@ function App() {
             </div>
 
             {/* Āhvān hint — fades out after first tap */}
-            {!showCardOverlay && game.turn() === "w" && !selectedCard && (
-              <div
-                onClick={() => { if (game.turn() === "w" && !selectedCard) setShowCardOverlay(true); }}
-                style={{
-                  width: "100%",
-                  marginTop: "16px",
-                  padding: "12px",
-                  borderRadius: "12px",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  backgroundColor: "rgba(255,255,255,0.04)",
-                  textAlign: "center",
-                  cursor: game.turn() === "w" ? "pointer" : "default",
-                  animation: "bannerPulse 2.5s infinite",
-                  opacity: (!showCardOverlay && game.turn() === "w" && !selectedCard) ? 1 : 0,
-                  transition: "opacity 0.3s ease",
-                  pointerEvents: game.turn() === "w" ? "auto" : "none"
-                }}
-              >
-                <div style={{ fontSize: "13px", color: theme.accent, fontWeight: "600", letterSpacing: "0.03em" }}>
-                  ✨ Tap <strong>Āhvān</strong> to summon the Navagraha
-                </div>
-                <div style={{ fontSize: "11px", color: "#555", marginTop: "4px" }}>
-                  Celestial powers unlock as you capture pieces
-                </div>
+            <div
+              onClick={() => { if (game.turn() === "w" && !selectedCard) setShowCardOverlay(true); }}
+              style={{
+                width: "100%",
+                marginTop: "16px",
+                padding: "12px",
+                borderRadius: "12px",
+                border: "1px solid rgba(255,255,255,0.1)",
+                backgroundColor: "rgba(255,255,255,0.04)",
+                textAlign: "center",
+                cursor: game.turn() === "w" ? "pointer" : "default",
+                animation: "bannerPulse 2.5s infinite",
+                opacity: (!showCardOverlay && game.turn() === "w" && !selectedCard) ? 1 : 0,
+                transition: "opacity 0.3s ease",
+                pointerEvents: game.turn() === "w" ? "auto" : "none"
+              }}
+            >
+              <div style={{ fontSize: "13px", color: theme.accent, fontWeight: "600", letterSpacing: "0.03em" }}>
+                ✨ Tap <strong>Āhvān</strong> to summon the Navagraha
               </div>
-            )}
+              <div style={{ fontSize: "11px", color: "#555", marginTop: "4px" }}>
+                Celestial powers unlock as you capture pieces
+              </div>
+            </div>
+      
 
             {/* Activate power button */}
             {!selectedCard && !chandraPlacementMode && !guruMode && !shaniMode && piecesInZones.length > 0 && game.turn() === "w" && (
