@@ -610,7 +610,7 @@ function App() {
           const files = ["a","b","c","d","e","f","g","h"];
           const of2 = files.indexOf(chandraPlacementMode.square[0]), or = parseInt(chandraPlacementMode.square[1]);
           const oIL = (of2 + or) % 2 === 0, cf = files.indexOf(square[0]);
-          if (oIL !== (cf + cr) % 2 === 0) return;
+          if (oIL !== ((cf + cr) % 2 === 0)) return;
         }
         if (!piece || square === chandraPlacementMode.square) {
           if (square === chandraPlacementMode.square) return;
@@ -624,7 +624,7 @@ function App() {
     if (!moveFrom) { const piece = game.get(square); if (piece && piece.color === game.turn()) { if (frozenPieces[square]) return; setMoveFrom(square); } return; }
     const tp2 = game.get(square); if (tp2 && tp2.color === game.turn()) { if (frozenPieces[square]) return; setMoveFrom(square); return; }
     const mp = game.get(moveFrom); if (!mp || mp.color !== game.turn()) { setMoveFrom(""); return; }
-    const result = handleMove(moveFrom, square);
+    handleMove(moveFrom, square);
     setMoveFrom("");
   }
 
