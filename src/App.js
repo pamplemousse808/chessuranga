@@ -2284,7 +2284,7 @@ function App() {
                         gap: "5px"
                       }}>
                         {tierCards.map(card => {
-                          const isUsed = gameMode === 'asura'
+                          const isUsed = (gameMode === 'asura' || gameMode === 'shukracharya')
                             ? !!cardCooldowns[card.id]
                             : usedCards.includes(card.id);
                           const cooldown = cardCooldowns[card.id];
