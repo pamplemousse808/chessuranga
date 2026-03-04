@@ -902,7 +902,7 @@ function App() {
                   {gameMode !== "asura" && <><p style={{ fontSize: "20px", marginBottom: "10px" }}>White Score: {finalScore.white}</p><p style={{ fontSize: "20px", marginBottom: "30px" }}>Black Score: {finalScore.black}</p></>}
                   <button onClick={resetGame} style={{ padding: "15px 30px", fontSize: "18px", backgroundColor: theme.accent, border: "none", borderRadius: "5px", cursor: "pointer", color: "#000", fontWeight: "bold" }}>Main Menu</button>
                   <p style={{ marginTop: "12px", fontSize: "11px", color: "#888", cursor: "pointer" }}>
-                    or tap anywhere to review the board
+                    or tap this popup to review the board
                   </p>
                 </div>
               )}
@@ -982,7 +982,7 @@ function App() {
                 {gameMode !== "asura" && <><p style={{ fontSize: "18px", marginBottom: "8px" }}>White: {finalScore.white}</p><p style={{ fontSize: "18px", marginBottom: "20px" }}>Black: {finalScore.black}</p></>}
                 <button onClick={resetGame} style={{ padding: "14px 28px", fontSize: "16px", backgroundColor: theme.accent, border: "none", borderRadius: "8px", cursor: "pointer", color: "#000", fontWeight: "bold" }}>Main Menu</button>
                 <p style={{ marginTop: "12px", fontSize: "11px", color: "#888", cursor: "pointer" }}>
-                  or tap anywhere to review the board
+                  or tap this popup to review the board
                 </p>
                 {gameOver && gameOverDismissed && (
                   <div onClick={() => setGameOverDismissed(false)} style={{ position: "fixed", top: "12px", left: "50%", transform: "translateX(-50%)", backgroundColor: theme.accent, color: "#000", padding: "8px 20px", borderRadius: "20px", fontSize: "13px", fontWeight: "bold", cursor: "pointer", zIndex: 300, boxShadow: "0 4px 15px rgba(0,0,0,0.4)" }}>
@@ -1064,6 +1064,21 @@ function App() {
               </div>
               <button onClick={resetGame} style={{ position: "fixed", bottom: "24px", left: "20px", zIndex: 200, padding: "10px 16px", fontSize: "12px", backgroundColor: "#e94560", color: "#fff", border: "none", borderRadius: "20px", cursor: "pointer", fontWeight: "bold", boxShadow: "0 4px 15px rgba(233,69,96,0.5)" }}>✕ Menu</button>
             </div>
+
+            {/* Āhvān hint — fades out after first tap */}
+            {!showCardOverlay && game.turn() === "w" && !selectedCard && (
+              <div
+                onClick={() => setShowCardOverlay(true)}
+                style={{ width: "100%", marginTop: "16px", padding: "12px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.1)", backgroundColor: "rgba(255,255,255,0.04)", textAlign: "center", cursor: "pointer", animation: "bannerPulse 2.5s infinite" }}
+              >
+                <div style={{ fontSize: "13px", color: theme.accent, fontWeight: "600", letterSpacing: "0.03em" }}>
+                  ✨ Tap <strong>Āhvān</strong> to summon the Navagraha
+                </div>
+                <div style={{ fontSize: "11px", color: "#555", marginTop: "4px" }}>
+                  celestial powers unlock as you capture pieces
+                </div>
+              </div>
+            )}
 
             {/* Activate power button */}
             {!selectedCard && !chandraPlacementMode && !guruMode && !shaniMode && piecesInZones.length > 0 && game.turn() === "w" && (
