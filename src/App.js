@@ -14,15 +14,15 @@ function useIsMobile() {
 }
 
 const SHARED_DECK = [
-  { id: "RAHU",    name: "Rahu",    color: "#9333ea", radius: 3, tier: 1, cost: 7,  description: "Pass through pieces for 2 moves",        image: "/images/rahu.jpg" },
-  { id: "KETU",    name: "Ketu",    color: "#f97316", radius: 3, tier: 1, cost: 8,  description: "When captured: +12s you, -12s opponent", image: "/images/ketu.jpg" },
-  { id: "SURYA",   name: "Surya",   color: "#fbbf24", radius: 2, tier: 1, cost: 8,  description: "Can't be captured for 2 moves",          image: "/images/surya.jpg" },
-  { id: "CHANDRA", name: "Chandra", color: "#e5e7eb", radius: 2, tier: 2, cost: 10, description: "Place 1-2 clones on rank (2nd = +5s)",    image: "/images/chandra.jpg" },
-  { id: "GURU",    name: "Guru",    color: "#a855f7", radius: 2, tier: 2, cost: 9,  description: "Resurrect your piece where it died",      image: "/images/guru.jpg" },
-  { id: "SHUKRA",  name: "Shukra",  color: "#ec4899", radius: 2, tier: 2, cost: 11, description: "Triple time on next 2 captures",          image: "/images/shukra.jpg" },
-  { id: "BUDHA",   name: "Budha",   color: "#3b82f6", radius: 1, tier: 3, cost: 10, description: "Two moves (not if first captures)",       image: "/images/budha.jpg" },
-  { id: "MANGALA", name: "Mangala", color: "#ef4444", radius: 1, tier: 3, cost: 12, description: "Capture any adjacent piece",              image: "/images/mangala.jpg" },
-  { id: "SHANI",   name: "Shani",   color: "#1f2937", radius: 1, tier: 3, cost: 14, description: "Freeze enemy piece for 2 turns",          image: "/images/shani.jpg" },
+  { id: "RAHU", name: "Rahu", color: "#9333ea", radius: 3, tier: 1, cost: 7, description: "Pass through pieces for 2 moves", image: "/images/rahu.jpg" },
+  { id: "KETU", name: "Ketu", color: "#f97316", radius: 3, tier: 1, cost: 8, description: "When captured: +12s you, -12s opponent", image: "/images/ketu.jpg" },
+  { id: "SURYA", name: "Surya", color: "#fbbf24", radius: 2, tier: 1, cost: 8, description: "Can't be captured for 2 moves", image: "/images/surya.jpg" },
+  { id: "CHANDRA", name: "Chandra", color: "#e5e7eb", radius: 2, tier: 2, cost: 10, description: "Place 1-2 clones on rank (2nd = +5s)", image: "/images/chandra.jpg" },
+  { id: "GURU", name: "Guru", color: "#a855f7", radius: 2, tier: 2, cost: 9, description: "Resurrect your piece where it died", image: "/images/guru.jpg" },
+  { id: "SHUKRA", name: "Shukra", color: "#ec4899", radius: 2, tier: 2, cost: 11, description: "Triple time on next 2 captures", image: "/images/shukra.jpg" },
+  { id: "BUDHA", name: "Budha", color: "#3b82f6", radius: 1, tier: 3, cost: 10, description: "Two moves (not if first captures)", image: "/images/budha.jpg" },
+  { id: "MANGALA", name: "Mangala", color: "#ef4444", radius: 1, tier: 3, cost: 12, description: "Capture any adjacent piece", image: "/images/mangala.jpg" },
+  { id: "SHANI", name: "Shani", color: "#1f2937", radius: 1, tier: 3, cost: 14, description: "Freeze enemy piece for 2 turns", image: "/images/shani.jpg" },
 ];
 
 // ── HowToPlay ─────────────────────────────────────────────────────────────────
@@ -188,6 +188,7 @@ function App() {
   const stockfishMoveRef = useRef(null);
   const poweredPiecesRef = useRef(poweredPieces);
   const [waitingForBot, setWaitingForBot] = useState(false);
+  const [gameOverDismissed, setGameOverDismissed] = useState(false);
   // Mobile UI state
   const [showCardOverlay, setShowCardOverlay] = useState(false);
 
@@ -287,8 +288,7 @@ function App() {
   function getPieceValue(p) { return ({ p: 2, n: 4, b: 4, r: 6, q: 8 }[p] || 0); }
   function getMaterialValue(p) { return ({ p: 1, n: 3, b: 3, r: 5, q: 9 }[p] || 0); }
   function calculateMaterialScore() { let w = 0, b = 0; whiteCaptured.forEach(p => w += getMaterialValue(p)); blackCaptured.forEach(p => b += getMaterialValue(p)); return { white: w, black: b }; }
-  function calculateFinalScore() { const m = calculateMaterialScore(); let w = m.white, b = m.black; if (winner === "white") w += game.isCheckmate() ? 10 : 5; else if (winner === "black") b += game.isCheckmate() ? 10 : 5; return { white: w, black: b }; }
-  function addTime(player, seconds) { if (player === "w") setWhiteTime(p => Math.min(p + seconds, startingTime)); else setBlackTime(p => Math.min(p + seconds, startingTime)); }
+  function calculateFinalScore() { const m = calculateMaterialScore(); let w = m.white, b = m.black; if (winner === "white") w += 10; else if (winner === "black") b += 10; return { white: w, black: b }; } function addTime(player, seconds) { if (player === "w") setWhiteTime(p => Math.min(p + seconds, startingTime)); else setBlackTime(p => Math.min(p + seconds, startingTime)); }
   function subtractTime(player, seconds) { if (player === "w") setWhiteTime(p => Math.max(p - seconds, 0)); else setBlackTime(p => Math.max(p - seconds, 0)); }
 
   function getCardCost(card) {
@@ -305,7 +305,7 @@ function App() {
   }
 
   function getSquaresInRadius(center, radius) {
-    const files = ["a","b","c","d","e","f","g","h"];
+    const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
     const fi = files.indexOf(center[0]); const r = parseInt(center[1]); const sqs = [];
     for (let f = fi - radius; f <= fi + radius; f++) for (let rr = r - radius; rr <= r + radius; rr++) if (f >= 0 && f < 8 && rr >= 1 && rr <= 8) sqs.push(files[f] + rr);
     return sqs;
@@ -392,14 +392,14 @@ function App() {
   function wouldGiveCheck(gameCopy, square) {
     const piece = gameCopy.get(square); if (!piece) return false;
     const ec = piece.color === "w" ? "b" : "w"; let ks = null;
-    for (let f of ["a","b","c","d","e","f","g","h"]) { for (let r = 1; r <= 8; r++) { const sq = f + r; const p = gameCopy.get(sq); if (p && p.type === "k" && p.color === ec) { ks = sq; break; } } if (ks) break; }
+    for (let f of ["a", "b", "c", "d", "e", "f", "g", "h"]) { for (let r = 1; r <= 8; r++) { const sq = f + r; const p = gameCopy.get(sq); if (p && p.type === "k" && p.color === ec) { ks = sq; break; } } if (ks) break; }
     if (!ks) return false;
     try { const m = gameCopy.move({ from: square, to: ks }); if (m) { gameCopy.undo(); return true; } } catch { return false; }
     return false;
   }
 
   function getPieceId(square, piece) {
-    const files = ["a","b","c","d","e","f","g","h"];
+    const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
     if (piece.type === "p") return `${piece.color}_p_${files.indexOf(square[0])}`;
     return `${piece.color}_${piece.type}_${files.indexOf(square[0]) < 4 ? 0 : 1}`;
   }
@@ -409,7 +409,7 @@ function App() {
       setGame(prevGame => {
         const ng = new Chess(prevGame.fen());
         const parts = pieceId.split("_"); const type = parts[1]; const index = parseInt(parts[2]);
-        const files = ["a","b","c","d","e","f","g","h"];
+        const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
         let sq = null;
         if (type === "p") { sq = files[index] + "7"; if (ng.get(sq)) sq = files[index] + "6"; }
         else if (type === "n") sq = index === 0 ? "b8" : "g8";
@@ -418,8 +418,8 @@ function App() {
         else if (type === "q") sq = "d8";
         else if (type === "k") sq = "e8";
         if (ng.get(sq)) {
-          if (type === "p") { for (let rank of ["7","6","5"]) { const s = files[index] + rank; if (!ng.get(s)) { sq = s; break; } } }
-          else { for (let rank of ["8","7","6"]) { for (let file of files) { const s = file + rank; if (!ng.get(s)) { sq = s; break; } } if (sq && !ng.get(sq)) break; } }
+          if (type === "p") { for (let rank of ["7", "6", "5"]) { const s = files[index] + rank; if (!ng.get(s)) { sq = s; break; } } }
+          else { for (let rank of ["8", "7", "6"]) { for (let file of files) { const s = file + rank; if (!ng.get(s)) { sq = s; break; } } if (sq && !ng.get(sq)) break; } }
         }
         if (sq && !ng.get(sq) && ng.turn() === "w") ng.put({ type: pieceType, color: "b" }, sq);
         return ng;
@@ -483,18 +483,18 @@ function App() {
       if (frozenPieces[from]) return null;
       if (cp && poweredPieces[to]?.power === "SURYA" && poweredPieces[to].usesLeft > 0) return null;
 
-      const files = ["a","b","c","d","e","f","g","h"];
+      const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
       let moveWasMade = false; let gc = new Chess(game.fen());
 
       if (power?.power === "RAHU" && power.usesLeft > 0) {
         const ff = files.indexOf(from[0]), fr = parseInt(from[1]), tf = files.indexOf(to[0]), tr = parseInt(to[1]);
         let valid = false;
-        if (piece.type === "p") { const dir = piece.color === "w" ? 1 : -1; const sr = piece.color === "w" ? 2 : 7; if (ff === tf && !cp && (tr === fr + dir || (fr === sr && tr === fr + 2 * dir))) valid = true; else if (Math.abs(ff-tf) === 1 && tr === fr + dir && cp) valid = true; }
-        else if (piece.type === "n") { const fd = Math.abs(tf-ff), rd = Math.abs(tr-fr); if ((fd===2&&rd===1)||(fd===1&&rd===2)) valid = true; }
-        else if (piece.type === "b") { if (Math.abs(tf-ff)===Math.abs(tr-fr)) valid = true; }
-        else if (piece.type === "r") { if (ff===tf||fr===tr) valid = true; }
-        else if (piece.type === "q") { if (Math.abs(tf-ff)===Math.abs(tr-fr)||ff===tf||fr===tr) valid = true; }
-        else if (piece.type === "k") { if (Math.abs(tf-ff)<=1&&Math.abs(tr-fr)<=1) valid = true; }
+        if (piece.type === "p") { const dir = piece.color === "w" ? 1 : -1; const sr = piece.color === "w" ? 2 : 7; if (ff === tf && !cp && (tr === fr + dir || (fr === sr && tr === fr + 2 * dir))) valid = true; else if (Math.abs(ff - tf) === 1 && tr === fr + dir && cp) valid = true; }
+        else if (piece.type === "n") { const fd = Math.abs(tf - ff), rd = Math.abs(tr - fr); if ((fd === 2 && rd === 1) || (fd === 1 && rd === 2)) valid = true; }
+        else if (piece.type === "b") { if (Math.abs(tf - ff) === Math.abs(tr - fr)) valid = true; }
+        else if (piece.type === "r") { if (ff === tf || fr === tr) valid = true; }
+        else if (piece.type === "q") { if (Math.abs(tf - ff) === Math.abs(tr - fr) || ff === tf || fr === tr) valid = true; }
+        else if (piece.type === "k") { if (Math.abs(tf - ff) <= 1 && Math.abs(tr - fr) <= 1) valid = true; }
         if (valid) {
           if (cp && cp.color === piece.color) return null;
           gc.remove(from); if (cp) gc.remove(to); gc.put({ type: piece.type, color: piece.color }, to);
@@ -504,7 +504,7 @@ function App() {
 
       if (!moveWasMade && power?.power === "MANGALA" && power.usesLeft > 0) {
         const ff = files.indexOf(from[0]), fr = parseInt(from[1]), tf = files.indexOf(to[0]), tr = parseInt(to[1]);
-        if (Math.abs(tf-ff)<=1 && Math.abs(tr-fr)<=1 && cp && cp.color !== piece.color) {
+        if (Math.abs(tf - ff) <= 1 && Math.abs(tr - fr) <= 1 && cp && cp.color !== piece.color) {
           gc.remove(from); gc.remove(to); gc.put({ type: piece.type, color: piece.color }, to);
           const fp = gc.fen().split(" "); fp[1] = fp[1] === "w" ? "b" : "w"; gc.load(fp.join(" ")); moveWasMade = true;
         }
@@ -577,12 +577,12 @@ function App() {
       if (stockfishMoveRef.current) {
         clearInterval(poll); const ms = stockfishMoveRef.current; stockfishMoveRef.current = null;
         const ng = new Chess(game.fen());
-        const isSP = poweredPiecesRef.current[ms.slice(2,4)]?.power === "SURYA" && poweredPiecesRef.current[ms.slice(2,4)].usesLeft > 0;
-        let fm = { from: ms.slice(0,2), to: ms.slice(2,4), promotion: ms[4] || "q" };
+        const isSP = poweredPiecesRef.current[ms.slice(2, 4)]?.power === "SURYA" && poweredPiecesRef.current[ms.slice(2, 4)].usesLeft > 0;
+        let fm = { from: ms.slice(0, 2), to: ms.slice(2, 4), promotion: ms[4] || "q" };
         if (isSP) { const cg2 = new Chess(game.fen()); const mv2 = cg2.moves({ verbose: true }); const sf2 = mv2.filter(m => !(poweredPiecesRef.current[m.to]?.power === "SURYA" && poweredPiecesRef.current[m.to].usesLeft > 0)); const fb = sf2.length > 0 ? sf2 : mv2; const alt = fb[Math.floor(Math.random() * fb.length)]; fm = { from: alt.from, to: alt.to, promotion: alt.promotion || "q" }; }
         const scp = ng.get(fm.to); const res = ng.move(fm);
         if (res) {
-          if (scp) { setCaptureHistory(p => [...p, { piece: scp.type, square: ms.slice(2,4), color: scp.color }]); if (scp.color === "w") setWhiteCaptured(p => [...p, scp.type]); checkTierUnlocks(scp.type); }
+          if (scp) { setCaptureHistory(p => [...p, { piece: scp.type, square: ms.slice(2, 4), color: scp.color }]); if (scp.color === "w") setWhiteCaptured(p => [...p, scp.type]); checkTierUnlocks(scp.type); }
           setGame(ng); setMoveCount(p => p + 1); if (ng.isCheckmate()) { setGameOver(true); setWinner("white"); }
         }
         setWaitingForBot(false);
@@ -607,7 +607,7 @@ function App() {
       if (cr === chandraPlacementMode.rank) {
         const piece = game.get(square);
         if (chandraPlacementMode.piece.type === "b") {
-          const files = ["a","b","c","d","e","f","g","h"];
+          const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
           const of2 = files.indexOf(chandraPlacementMode.square[0]), or = parseInt(chandraPlacementMode.square[1]);
           const oIL = (of2 + or) % 2 === 0, cf = files.indexOf(square[0]);
           if (oIL !== ((cf + cr) % 2 === 0)) return;
@@ -668,7 +668,7 @@ function App() {
     setChandraMode(null); setChandraPlacementMode(null); setGuruMode(null); setResurrectedPieces({});
     setShaniMode(null); setAsuraLives({}); setWaitingForBot(false);
     setShukraDifficulty(null); setShowShukraSelect(false); setGuruPickerMode(null); setCardCooldowns({});
-    setShowCardOverlay(false);
+    setShowCardOverlay(false); setGameOverDismissed(false);
     if (stockfishRef.current?.terminate) stockfishRef.current.terminate();
     stockfishRef.current = null; setStockfish(null);
   }
@@ -695,7 +695,7 @@ function App() {
   if (guruMode) guruMode.availableResurrections.forEach(r => { customStyles[r.square] = { ...(customStyles[r.square] || {}), backgroundColor: "rgba(168,85,247,0.4)", border: "3px dashed #a855f7", boxShadow: "0 0 20px rgba(168,85,247,0.6)", cursor: "pointer" }; });
   if (shaniMode) shaniMode.enemyPieces.forEach(ep => { customStyles[ep.square] = { ...(customStyles[ep.square] || {}), backgroundColor: "rgba(31,41,55,0.5)", border: "3px dashed #1f2937", boxShadow: "0 0 20px rgba(31,41,55,0.8)", cursor: "pointer" }; });
   if (chandraPlacementMode) {
-    const files = ["a","b","c","d","e","f","g","h"];
+    const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
     files.forEach(f => { const sq = f + chandraPlacementMode.rank; if (!game.get(sq) && sq !== chandraPlacementMode.square) customStyles[sq] = { ...(customStyles[sq] || {}), backgroundColor: "rgba(229,231,235,0.3)", border: "2px dashed #e5e7eb" }; });
     chandraPlacementMode.mirages.forEach(ms => { customStyles[ms] = { ...(customStyles[ms] || {}), backgroundColor: "rgba(229,231,235,0.6)", border: "3px solid #e5e7eb", boxShadow: "0 0 15px #e5e7eb" }; });
     customStyles[chandraPlacementMode.square] = { ...(customStyles[chandraPlacementMode.square] || {}), border: "3px solid #ffd700", boxShadow: "0 0 20px #ffd700" };
@@ -715,10 +715,10 @@ function App() {
   // ── Active special mode label for mobile banner ───────────────────────────
   const specialModeLabel = activationMode ? "⚡ Tap a glowing piece to activate"
     : chandraPlacementMode ? "🌙 Tap empty squares on this rank to place clones"
-    : guruMode ? "🪐 Tap a death square to resurrect"
-    : shaniMode ? "🪐 Tap an enemy piece to freeze"
-    : selectedCard ? `✨ ${selectedCard.name} selected — tap the board to place`
-    : null;
+      : guruMode ? "🪐 Tap a death square to resurrect"
+        : shaniMode ? "🪐 Tap an enemy piece to freeze"
+          : selectedCard ? `✨ ${selectedCard.name} selected — tap the board to place`
+            : null;
 
   return (
     <>
@@ -802,6 +802,11 @@ function App() {
                   </>
                 ) : (
                   <div style={{ color: "#555", fontSize: "13px", marginTop: "10px", textAlign: "center" }}>Select a card to see its power</div>
+                )}
+                {gameOver && gameOverDismissed && (
+                  <div onClick={() => setGameOverDismissed(false)} style={{ position: "fixed", top: "12px", left: "50%", transform: "translateX(-50%)", backgroundColor: theme.accent, color: "#000", padding: "8px 20px", borderRadius: "20px", fontSize: "13px", fontWeight: "bold", cursor: "pointer", zIndex: 300, boxShadow: "0 4px 15px rgba(0,0,0,0.4)" }}>
+                    {winner === "white" ? "🌟 You won!" : "👹 You lost!"} · tap to see result
+                  </div>
                 )}
               </div>
 
@@ -891,11 +896,14 @@ function App() {
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
               <h1 style={{ marginBottom: "20px", fontSize: "32px" }}>{gameMode === "asura" ? "⚔️ ASURA HORDE ⚔️" : "Chessuranga"}</h1>
               {showChaosPopup && <div onClick={() => setShowChaosPopup(false)} style={{ position: "absolute", top: "10px", left: "50%", transform: "translateX(-50%)", backgroundColor: "#ff6b6b", padding: "12px 24px", borderRadius: "15px", zIndex: 1000, textAlign: "center", border: "3px solid #fff", boxShadow: "0 0 30px rgba(255,107,107,0.5)", cursor: "pointer" }}><h2 style={{ margin: 0, fontSize: "20px" }}>🔥 CHAOS MODE — All cards half price! 🔥</h2><p style={{ margin: "4px 0 0 0", fontSize: "11px", opacity: 0.8 }}>tap to dismiss</p></div>}
-              {gameOver && finalScore && (
-                <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", backgroundColor: "#16213e", padding: "40px", borderRadius: "15px", zIndex: 1000, textAlign: "center", border: `3px solid ${theme.accent}` }}>
+              {gameOver && finalScore && !gameOverDismissed && (
+                <div onClick={() => setGameOverDismissed(true)} style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", backgroundColor: "#16213e", padding: "40px", borderRadius: "15px", zIndex: 1000, textAlign: "center", border: `3px solid ${theme.accent}` }}>
                   <h2 style={{ marginBottom: "20px", fontSize: "32px" }}>{gameMode === "asura" ? (winner === "white" ? "🌟 The Navagraha Prevail! 🌟" : "👹 The Asura Reign! 👹") : `${winner === "white" ? "White" : "Black"} Wins!`}</h2>
                   {gameMode !== "asura" && <><p style={{ fontSize: "20px", marginBottom: "10px" }}>White Score: {finalScore.white}</p><p style={{ fontSize: "20px", marginBottom: "30px" }}>Black Score: {finalScore.black}</p></>}
                   <button onClick={resetGame} style={{ padding: "15px 30px", fontSize: "18px", backgroundColor: theme.accent, border: "none", borderRadius: "5px", cursor: "pointer", color: "#000", fontWeight: "bold" }}>Main Menu</button>
+                  <p style={{ marginTop: "12px", fontSize: "11px", color: "#888", cursor: "pointer" }}>
+                    or tap anywhere to review the board
+                  </p>
                 </div>
               )}
               <div style={{ fontSize: "32px", fontWeight: "bold", marginBottom: "10px", color: blackTime < 30 ? "#ff6b6b" : theme.text }}>{gameMode === "asura" ? "👹 Asura" : "Black"}: {formatTime(blackTime)}</div>
@@ -968,11 +976,19 @@ function App() {
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%", maxWidth: "500px", margin: "0 auto", position: "relative" }}>
 
             {/* Game over overlay */}
-            {gameOver && finalScore && (
-              <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", backgroundColor: "#16213e", padding: "32px 24px", borderRadius: "15px", zIndex: 500, textAlign: "center", border: `3px solid ${theme.accent}`, width: "88vw", maxWidth: "380px" }}>
+            {gameOver && finalScore && !gameOverDismissed && (
+              <div onClick={() => setGameOverDismissed(true)} style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", backgroundColor: "#16213e", padding: "32px 24px", borderRadius: "15px", zIndex: 500, textAlign: "center", border: `3px solid ${theme.accent}`, width: "88vw", maxWidth: "380px" }}>
                 <h2 style={{ marginBottom: "16px", fontSize: "24px" }}>{gameMode === "asura" ? (winner === "white" ? "🌟 The Navagraha Prevail! 🌟" : "👹 The Asura Reign! 👹") : `${winner === "white" ? "White" : "Black"} Wins!`}</h2>
                 {gameMode !== "asura" && <><p style={{ fontSize: "18px", marginBottom: "8px" }}>White: {finalScore.white}</p><p style={{ fontSize: "18px", marginBottom: "20px" }}>Black: {finalScore.black}</p></>}
                 <button onClick={resetGame} style={{ padding: "14px 28px", fontSize: "16px", backgroundColor: theme.accent, border: "none", borderRadius: "8px", cursor: "pointer", color: "#000", fontWeight: "bold" }}>Main Menu</button>
+                <p style={{ marginTop: "12px", fontSize: "11px", color: "#888", cursor: "pointer" }}>
+                  or tap anywhere to review the board
+                </p>
+                {gameOver && gameOverDismissed && (
+                  <div onClick={() => setGameOverDismissed(false)} style={{ position: "fixed", top: "12px", left: "50%", transform: "translateX(-50%)", backgroundColor: theme.accent, color: "#000", padding: "8px 20px", borderRadius: "20px", fontSize: "13px", fontWeight: "bold", cursor: "pointer", zIndex: 300, boxShadow: "0 4px 15px rgba(0,0,0,0.4)" }}>
+                    {winner === "white" ? "🌟 You won!" : "👹 You lost!"} · tap to see result
+                  </div>
+                )}
               </div>
             )}
 
@@ -1046,7 +1062,7 @@ function App() {
               <div style={{ fontSize: "13px", color: "#888" }}>
                 {waitingForBot ? <span style={{ color: "#ff6b6b" }}>👹 Thinking...</span> : `Turn: ${game.turn() === "w" ? (gameMode === "asura" ? "You" : "White") : (gameMode === "asura" ? "Asura" : "Black")}`}
               </div>
-              <button onClick={resetGame} style={{ padding: "6px 14px", fontSize: "12px", backgroundColor: "#e94560", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}>Menu</button>
+              <button onClick={resetGame} style={{ position: "fixed", bottom: "24px", left: "20px", zIndex: 200, padding: "10px 16px", fontSize: "12px", backgroundColor: "#e94560", color: "#fff", border: "none", borderRadius: "20px", cursor: "pointer", fontWeight: "bold", boxShadow: "0 4px 15px rgba(233,69,96,0.5)" }}>✕ Menu</button>
             </div>
 
             {/* Activate power button */}
@@ -1097,9 +1113,9 @@ function App() {
               {/* Main button */}
               <button
                 onClick={() => setShowCardOverlay(true)}
-                style={{ width: "56px", height: "56px", borderRadius: "50%", backgroundColor: theme.accent, border: "none", fontSize: "24px", cursor: "pointer", boxShadow: `0 4px 20px ${theme.accent}88`, display: "flex", alignItems: "center", justifyContent: "center", color: "#000" }}
+                style={{ height: "56px", borderRadius: "28px", padding: "0 20px", backgroundColor: theme.accent, border: "none", fontSize: "14px", cursor: "pointer", boxShadow: `0 4px 20px ${theme.accent}88`, display: "flex", alignItems: "center", justifyContent: "center", color: "#000", fontWeight: "bold", gap: "6px", whiteSpace: "nowrap" }}
               >
-                ✨
+                ✨ Āhvān
               </button>
             </div>
 
@@ -1120,7 +1136,7 @@ function App() {
             />
           </div>
         )}
-      </div>
+      </div >
     </>
   );
 }
