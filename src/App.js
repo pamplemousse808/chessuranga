@@ -348,7 +348,16 @@ function App() {
         setChandraMode({ ...chandraMode, turnsLeft: newTurnsLeft });
       }
     }
+    const updatedPowered = {};
+    Object.keys(poweredPieces).forEach(square => {
+      const piece = poweredPieces[square];
+      const newUsesLeft = piece.usesLeft - 0.5;
+      if (newUsesLeft > 0) {
+        updatedPowered[square] = { ...piece, usesLeft: newUsesLeft };
+      }
+    });
 
+    setPoweredPieces(updatedPowered);
     const updatedResurrected = {};
     Object.keys(resurrectedPieces).forEach(square => {
       const turnsLeft = resurrectedPieces[square].turnsLeft - 0.5;
@@ -646,7 +655,7 @@ function App() {
     };
 
     setActiveTiles([...activeTiles, newTile]);
-    if (gameMode === 'asura') {
+    if (gameMode === 'asura' || gameMode === 'shukracharya') {
       setCardCooldowns(prev => ({ ...prev, [card.id]: 6 }));
     } else {
       setUsedCards([...usedCards, card.id]);
