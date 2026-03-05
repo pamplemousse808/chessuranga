@@ -220,13 +220,14 @@ function DailyPuzzle({ onBack }) {
   const [moveFrom, setMoveFrom] = useState("");
   const [moveCount, setMoveCount] = useState(0);
   const [cardsUsed, setCardsUsed] = useState([]);
+  const [availableCards, setAvailableCards] = useState(dailyData.dailyCards);
   const [selectedCard, setSelectedCard] = useState(null);
   const [poweredPieces, setPoweredPieces] = useState({});
   const [activeTiles, setActiveTiles] = useState([]);
   const [activationMode, setActivationMode] = useState(false);
   const [frozenPieces] = useState({});
   const [puzzleOver, setPuzzleOver] = useState(null);
-  const [captureHistory] = useState([]);
+  const [captureHistory, setCaptureHistory] = useState([]);
   const [moveHistory, setMoveHistory] = useState([]);
   const par = dailyData.par;
 
@@ -234,12 +235,12 @@ function DailyPuzzle({ onBack }) {
     try {
       const s = localStorage.getItem("chessuranga_daily");
       if (s) { const p = JSON.parse(s); if (p.dayNum === dailyData.dayNum) return p; }
-    } catch (e) { }
+    } catch (e) {}
     return null;
   });
 
   function sqsInRadius(center, radius) {
-    const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
+    const files = ["a","b","c","d","e","f","g","h"];
     const fi = files.indexOf(center[0]), r = parseInt(center[1]), out = [];
     for (let f = fi - radius; f <= fi + radius; f++)
       for (let rr = r - radius; rr <= r + radius; rr++)
@@ -293,23 +294,23 @@ function DailyPuzzle({ onBack }) {
     let gc = new Chess(game.fen()); let moved = false;
 
     if (power?.power === "RAHU" && power.usesLeft > 0) {
-      const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
+      const files = ["a","b","c","d","e","f","g","h"];
       const [ff, fr, tf, tr] = [files.indexOf(from[0]), parseInt(from[1]), files.indexOf(to[0]), parseInt(to[1])];
       let ok = false;
-      if (piece.type === "n") { const fd = Math.abs(tf - ff), rd = Math.abs(tr - fr); ok = (fd === 2 && rd === 1) || (fd === 1 && rd === 2); }
-      else if (piece.type === "b") ok = Math.abs(tf - ff) === Math.abs(tr - fr);
-      else if (piece.type === "r") ok = ff === tf || fr === tr;
-      else if (piece.type === "q") ok = Math.abs(tf - ff) === Math.abs(tr - fr) || ff === tf || fr === tr;
-      else if (piece.type === "k") ok = Math.abs(tf - ff) <= 1 && Math.abs(tr - fr) <= 1;
+      if (piece.type === "n") { const fd = Math.abs(tf-ff), rd = Math.abs(tr-fr); ok = (fd===2&&rd===1)||(fd===1&&rd===2); }
+      else if (piece.type === "b") ok = Math.abs(tf-ff) === Math.abs(tr-fr);
+      else if (piece.type === "r") ok = ff===tf || fr===tr;
+      else if (piece.type === "q") ok = Math.abs(tf-ff)===Math.abs(tr-fr)||ff===tf||fr===tr;
+      else if (piece.type === "k") ok = Math.abs(tf-ff)<=1&&Math.abs(tr-fr)<=1;
       if (ok && !(cp && cp.color === piece.color)) {
         gc.remove(from); if (cp) gc.remove(to); gc.put({ type: piece.type, color: piece.color }, to);
         const fp = gc.fen().split(" "); fp[1] = "b"; gc.load(fp.join(" ")); moved = true;
       }
     }
     if (!moved && power?.power === "MANGALA" && power.usesLeft > 0) {
-      const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
+      const files = ["a","b","c","d","e","f","g","h"];
       const [ff, fr, tf, tr] = [files.indexOf(from[0]), parseInt(from[1]), files.indexOf(to[0]), parseInt(to[1])];
-      if (Math.abs(tf - ff) <= 1 && Math.abs(tr - fr) <= 1 && cp && cp.color !== piece.color) {
+      if (Math.abs(tf-ff)<=1&&Math.abs(tr-fr)<=1&&cp&&cp.color!==piece.color) {
         gc.remove(from); gc.remove(to); gc.put({ type: piece.type, color: piece.color }, to);
         const fp = gc.fen().split(" "); fp[1] = "b"; gc.load(fp.join(" ")); moved = true;
       }
@@ -332,7 +333,7 @@ function DailyPuzzle({ onBack }) {
       const score = total <= par ? "⭐⭐⭐" : total <= par + 2 ? "⭐⭐" : "⭐";
       const result = { result: "won", moves: newMoveCount, cardsUsed: cardsUsed.length, totalMoves: total, par, score };
       setPuzzleOver(result);
-      try { localStorage.setItem("chessuranga_daily", JSON.stringify({ dayNum: dailyData.dayNum, ...result })); } catch (e) { }
+      try { localStorage.setItem("chessuranga_daily", JSON.stringify({ dayNum: dailyData.dayNum, ...result })); } catch (e) {}
       return gc;
     }
 
@@ -347,7 +348,7 @@ function DailyPuzzle({ onBack }) {
         setMoveHistory(mh => [...mh, { isBot: true }]);
         if (bg.isCheckmate()) {
           setPuzzleOver({ result: "failed", moves: newMoveCount });
-          try { localStorage.setItem("chessuranga_daily", JSON.stringify({ dayNum: dailyData.dayNum, result: "failed" })); } catch (e) { }
+          try { localStorage.setItem("chessuranga_daily", JSON.stringify({ dayNum: dailyData.dayNum, result: "failed" })); } catch (e) {}
         }
         return bg;
       });
@@ -413,7 +414,7 @@ function DailyPuzzle({ onBack }) {
           </div>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
             <button onClick={onBack} style={{ padding: "12px 24px", backgroundColor: "transparent", border: "2px solid #4a3060", borderRadius: "10px", color: "#a88a5a", cursor: "pointer", fontSize: "14px" }}>← Menu</button>
-            <button onClick={() => { try { navigator.clipboard.writeText(`Chessuranga #${puzzleNum} — come play! chessuranga.com`); alert("Copied!"); } catch (e) { } }} style={{ padding: "12px 24px", backgroundColor: "#ffd700", border: "none", borderRadius: "10px", color: "#000", cursor: "pointer", fontSize: "14px", fontWeight: "bold" }}>Share 📤</button>
+            <button onClick={() => { try { navigator.clipboard.writeText(`Chessuranga #${puzzleNum} — come play! chessuranga.com`); alert("Copied!"); } catch (e) {} }} style={{ padding: "12px 24px", backgroundColor: "#ffd700", border: "none", borderRadius: "10px", color: "#000", cursor: "pointer", fontSize: "14px", fontWeight: "bold" }}>Share 📤</button>
           </div>
           <p style={{ marginTop: "16px", fontSize: "11px", color: "#4a3060" }}>New puzzle daily at midnight UTC</p>
         </div>
