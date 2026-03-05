@@ -13,6 +13,72 @@ function useIsMobile() {
   return isMobile;
 }
 
+// ─── DAILY PUZZLE SYSTEM ────────────────────────────────────────────────────
+
+const DAILY_PUZZLES = [
+  { fen: "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4", title: "The Scholar's Gambit", matein: 4, par: 4, flavor: "The oldest trap in the cosmos.", cardHints: { "MANGALA": "Use MANGALA to reach the f7 square!", "RAHU": "RAHU can slide past the defender on e5." } },
+  { fen: "r1b1kb1r/pppp1ppp/2n5/4p3/2BPP3/8/PPP2PPP/RNBQK1nR w KQkq - 0 6", title: "Knight's Folly", matein: 3, par: 3, flavor: "The knight dares to enter the lion's den.", cardHints: { "MANGALA": "MANGALA removes the guard instantly." } },
+  { fen: "6k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1", title: "The Rook's Sermon", matein: 3, par: 3, flavor: "One rook. One truth. Inevitable.", cardHints: { "SURYA": "SURYA protects your rook from counterplay." } },
+  { fen: "4k3/4Q3/4K3/8/8/8/8/8 w - - 0 1", title: "Queen's Meditation", matein: 2, par: 2, flavor: "She circles. He cannot escape.", cardHints: {} },
+  { fen: "r3k2r/ppp2ppp/2n5/3pp3/1b2P3/2NP1N2/PPP2PPP/R1BQK2R w KQkq - 0 8", title: "The Demon's Fork", matein: 5, par: 5, flavor: "Two paths. Both lead to ruin.", cardHints: { "BUDHA": "BUDHA's double move breaks the stalemate threat." } },
+  { fen: "2bqkb1r/rpp2ppp/p1np1n2/4p3/2B1P3/2NP1N2/PPP2PPP/R1BQK2R w KQkq - 2 7", title: "The Open Diagonal", matein: 4, par: 4, flavor: "Bishops speak in slanted truths.", cardHints: { "RAHU": "RAHU lets your bishop phase through the pawn screen." } },
+  { fen: "5rk1/5ppp/8/3Q4/8/8/5PPP/5RK1 w - - 0 1", title: "Rook & Queen's Dance", matein: 3, par: 3, flavor: "They move as one. The king has nowhere to hide.", cardHints: {} },
+  { fen: "r1bq1rk1/pppp1ppp/2n2n2/2b1p3/2B1P3/2NP1N2/PPP2PPP/R1BQK2R w KQ - 4 6", title: "Symmetry's Illusion", matein: 5, par: 5, flavor: "Mirrors lie. One side will shatter.", cardHints: { "SHANI": "Freeze the knight on f6 — it's the key defender." } },
+  { fen: "3k4/3Q4/3K4/8/8/8/8/8 w - - 0 1", title: "Triangle of Fate", matein: 3, par: 3, flavor: "The ancient triangle. The king cannot escape geometry.", cardHints: {} },
+  { fen: "r1bqkbnr/pppp1ppp/8/4p3/4P3/8/PPPPKPPP/RNBQ1BNR w kq - 2 3", title: "The King's Walk", matein: 5, par: 5, flavor: "Dangerous is he who walks without fear.", cardHints: { "BUDHA": "Double move secures the center before they can react." } },
+  { fen: "8/8/8/4k3/8/4K3/4R3/8 w - - 0 1", title: "Rook's Verdict", matein: 4, par: 4, flavor: "Patience is a rook's greatest weapon.", cardHints: {} },
+  { fen: "r1b1r1k1/ppp2ppp/2n5/3pN3/3P4/2PB4/PP3PPP/R3K2R w KQ - 0 12", title: "The Sacrificial Knight", matein: 4, par: 4, flavor: "Give to receive. The oldest bargain.", cardHints: { "MANGALA": "MANGALA on Ne5 captures without needing line of sight." } },
+  { fen: "6k1/6pp/5p2/8/2B5/8/8/6K1 w - - 0 1", title: "Bishop's Sermon", matein: 3, par: 3, flavor: "Diagonal truth cuts through all defenses.", cardHints: {} },
+  { fen: "r2qkb1r/ppp1pppp/2n5/3pP3/3P4/5N2/PPP2PPP/RNBQKB1R w KQkq d6 0 5", title: "The En Passant Prophecy", matein: 4, par: 4, flavor: "The ghost capture. They never see it coming.", cardHints: { "RAHU": "RAHU makes your pawn unstoppable through the blockade." } },
+  { fen: "8/8/8/2k5/2pP4/8/8/4K3 w - - 0 1", title: "Pawn's Ascension", matein: 5, par: 5, flavor: "The humble pawn walks the longest road.", cardHints: {} },
+  { fen: "r1bqk2r/pppp1ppp/2n2n2/4p3/2B1P3/3P1N2/PPP2PPP/RNBQK2R w KQkq - 0 5", title: "The Fried Liver", matein: 4, par: 4, flavor: "Bold is the player who sacrifices for the attack.", cardHints: { "MANGALA": "MANGALA crashes through the f7 barrier instantly." } },
+  { fen: "8/8/8/8/3k4/8/3PK3/8 w - - 0 1", title: "Pawn Endgame", matein: 5, par: 5, flavor: "One pawn. One dream. One destiny.", cardHints: {} },
+  { fen: "r1b1kbnr/pppp1ppp/8/4p3/2BnP3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4", title: "The Knight Infiltrates", matein: 3, par: 3, flavor: "Into the heart of the enemy.", cardHints: { "SHANI": "Freeze the knight on d4 and the position opens." } },
+  { fen: "6k1/8/6K1/5Q2/8/8/8/8 w - - 0 1", title: "Queen's Waltz", matein: 3, par: 3, flavor: "She dances, and kings fall.", cardHints: {} },
+  { fen: "r2qkbnr/ppp1pppp/2n5/3pP3/8/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 4", title: "The French Defense Breaks", matein: 4, par: 4, flavor: "Every wall has a door.", cardHints: { "BUDHA": "Two moves in a row — the center collapses." } },
+  { fen: "8/8/1k6/8/8/1K6/1R6/8 w - - 0 1", title: "The Rook Barrier", matein: 4, par: 4, flavor: "A wall of rank. A wall of file.", cardHints: {} },
+  { fen: "r1bqkb1r/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3", title: "Open Game", matein: 5, par: 5, flavor: "When pawns clear, destiny beckons.", cardHints: { "RAHU": "Phase through the central pawns for a decisive blow." } },
+  { fen: "8/2p5/8/1P6/8/2K5/8/2k5 w - - 0 1", title: "Pawn Duel", matein: 5, par: 5, flavor: "Two pawns. Ancient rivals. One survives.", cardHints: {} },
+  { fen: "r3kb1r/ppp2ppp/2n5/3pp3/4P3/3P1N2/PPP2PPP/RNB1KB1R w KQkq - 0 7", title: "The Dragon Awakens", matein: 4, par: 4, flavor: "The sleeping dragon stirs beneath the queenside.", cardHints: { "MANGALA": "MANGALA strikes where knights cannot normally reach." } },
+  { fen: "8/8/8/8/2k5/2P5/2K5/8 w - - 0 1", title: "Zugzwang", matein: 5, par: 5, flavor: "Sometimes, the best move is to force theirs.", cardHints: {} },
+  { fen: "r1bq1rk1/pppp1ppp/2n2n2/8/1bB1P3/2N2N2/PPPP1PPP/R1BQ1RK1 w - - 4 6", title: "The Pin & The Fork", matein: 4, par: 4, flavor: "Two weapons. One moment.", cardHints: { "SHANI": "Freeze the bishop on b4 — break the pin!" } },
+  { fen: "5k2/8/4K3/5Q2/8/8/8/8 w - - 0 1", title: "Corner Persecution", matein: 3, par: 3, flavor: "The corner is no refuge — it is a cage.", cardHints: {} },
+  { fen: "r2r2k1/ppp2ppp/2n5/3Np3/8/2P5/PP3PPP/R3K2R w KQ - 0 14", title: "The Outpost Knight", matein: 4, par: 4, flavor: "Planted in the heart of the enemy.", cardHints: { "BUDHA": "Double move — the knight reaches d7 unstoppable." } },
+  { fen: "8/8/8/3k4/3P4/3K4/8/8 w - - 0 1", title: "Pawn Promotion Race", matein: 5, par: 5, flavor: "The last march. The longest mile.", cardHints: {} },
+  { fen: "r1bqkb1r/ppp2ppp/2n2n2/3pp3/2B1P3/2NP1N2/PPP2PPP/R1BQK2R w KQkq - 0 6", title: "The Cosmic Opening", matein: 5, par: 5, flavor: "All nine planets align. The position is ripe.", cardHints: { "RAHU": "RAHU breaks the central pin. Stars align.", "MANGALA": "MANGALA seizes the d5 outpost by force." } },
+];
+
+function seededRandom(seed) {
+  let s = seed;
+  return function () {
+    s = (s * 1664525 + 1013904223) & 0xffffffff;
+    return (s >>> 0) / 0xffffffff;
+  };
+}
+
+function getDailyPuzzle() {
+  const now = new Date();
+  const dayNum = Math.floor(now.getTime() / (1000 * 60 * 60 * 24));
+  const puzzle = DAILY_PUZZLES[dayNum % DAILY_PUZZLES.length];
+  const rng = seededRandom(dayNum * 31337);
+  const shuffled = [...SHARED_DECK].sort(() => rng() - 0.5);
+  const dailyCards = shuffled.slice(0, 3);
+  return { ...puzzle, dayNum, dailyCards };
+}
+
+function getDailyPuzzleNumber() {
+  const epoch = new Date("2025-01-01").getTime();
+  return Math.floor((Date.now() - epoch) / (1000 * 60 * 60 * 24)) + 1;
+}
+
+const CARD_EMOJI = {
+  RAHU: "🔮", KETU: "☄️", SURYA: "☀️",
+  CHANDRA: "🌙", GURU: "🪐", SHUKRA: "💫",
+  BUDHA: "⚡", MANGALA: "🔥", SHANI: "❄️",
+};
+
+// ────────────────────────────────────────────────────────────────────────────
+
 const SHARED_DECK = [
   { id: "RAHU", name: "Rahu", color: "#9333ea", radius: 3, tier: 1, cost: 7, description: "Pass through pieces for 2 moves", image: "/images/rahu.jpg" },
   { id: "KETU", name: "Ketu", color: "#f97316", radius: 3, tier: 1, cost: 8, description: "When captured: +12s you, -12s opponent", image: "/images/ketu.jpg" },
@@ -141,6 +207,334 @@ function MobileCardOverlay({
           );
         })}
       </div>
+    </div>
+  );
+}
+
+// ─── DAILY PUZZLE COMPONENT ─────────────────────────────────────────────────
+function DailyPuzzle({ onBack }) {
+  const dailyData = getDailyPuzzle();
+  const puzzleNum = getDailyPuzzleNumber();
+
+  const [game, setGame] = useState(() => { const g = new Chess(); g.load(dailyData.fen); return g; });
+  const [moveFrom, setMoveFrom] = useState("");
+  const [moveCount, setMoveCount] = useState(0);
+  const [cardsUsed, setCardsUsed] = useState([]);
+  const [availableCards, setAvailableCards] = useState(dailyData.dailyCards);
+  const [selectedCard, setSelectedCard] = useState(null);
+  const [poweredPieces, setPoweredPieces] = useState({});
+  const [activeTiles, setActiveTiles] = useState([]);
+  const [activationMode, setActivationMode] = useState(false);
+  const [frozenPieces, setFrozenPieces] = useState({});
+  const [puzzleOver, setPuzzleOver] = useState(null);
+  const [captureHistory, setCaptureHistory] = useState([]);
+  const [moveHistory, setMoveHistory] = useState([]);
+  const par = dailyData.par;
+
+  const [alreadyPlayed] = useState(() => {
+    try {
+      const s = localStorage.getItem("chessuranga_daily");
+      if (s) { const p = JSON.parse(s); if (p.dayNum === dailyData.dayNum) return p; }
+    } catch (e) {}
+    return null;
+  });
+
+  function sqsInRadius(center, radius) {
+    const files = ["a","b","c","d","e","f","g","h"];
+    const fi = files.indexOf(center[0]), r = parseInt(center[1]), out = [];
+    for (let f = fi - radius; f <= fi + radius; f++)
+      for (let rr = r - radius; rr <= r + radius; rr++)
+        if (f >= 0 && f < 8 && rr >= 1 && rr <= 8) out.push(files[f] + rr);
+    return out;
+  }
+
+  function getPiecesInZones() {
+    const result = [];
+    activeTiles.forEach(tile => {
+      sqsInRadius(tile.square, tile.radius).forEach(sq => {
+        const piece = game.get(sq);
+        if (piece && piece.color === "w" && !tile.whiteActivated && !poweredPieces[sq])
+          result.push({ square: sq, tileType: tile.type });
+      });
+    });
+    return result;
+  }
+
+  function placeTile(square) {
+    if (!selectedCard) return;
+    setActiveTiles(prev => [...prev, { square, type: selectedCard.id, name: selectedCard.name, color: selectedCard.color + "66", radius: selectedCard.radius, turnsRemaining: 4, whiteActivated: false, blackActivated: false, whiteActivatedPiece: null, blackActivatedPiece: null }]);
+    setCardsUsed(prev => [...prev, selectedCard.id]);
+    setAvailableCards(prev => prev.filter(c => c.id !== selectedCard.id));
+    setSelectedCard(null);
+  }
+
+  function activateTileForPiece(square) {
+    const piece = game.get(square); if (!piece) return;
+    let powerType = null;
+    setActiveTiles(prev => prev.map(tile => {
+      if (sqsInRadius(tile.square, tile.radius).includes(square) && !tile.whiteActivated) {
+        powerType = tile.type;
+        return { ...tile, whiteActivated: true, whiteActivatedPiece: square };
+      }
+      return tile;
+    }));
+    if (powerType) {
+      const usesLeft = { RAHU: 2, SURYA: 2, SHUKRA: 2, MANGALA: 3 }[powerType] || 1;
+      setPoweredPieces(prev => ({ ...prev, [square]: { power: powerType, usesLeft, color: piece.color } }));
+    }
+    setActivationMode(false);
+  }
+
+  function handleDailyMove(from, to, promotion = "q") {
+    if (puzzleOver || game.turn() !== "w") return null;
+    const piece = game.get(from); if (!piece || piece.color !== "w") return null;
+    if (frozenPieces[from]) return null;
+    const cp = game.get(to);
+    const power = poweredPieces[from];
+    let gc = new Chess(game.fen()); let moved = false;
+
+    if (power?.power === "RAHU" && power.usesLeft > 0) {
+      const files = ["a","b","c","d","e","f","g","h"];
+      const [ff, fr, tf, tr] = [files.indexOf(from[0]), parseInt(from[1]), files.indexOf(to[0]), parseInt(to[1])];
+      let ok = false;
+      if (piece.type === "n") { const fd = Math.abs(tf-ff), rd = Math.abs(tr-fr); ok = (fd===2&&rd===1)||(fd===1&&rd===2); }
+      else if (piece.type === "b") ok = Math.abs(tf-ff) === Math.abs(tr-fr);
+      else if (piece.type === "r") ok = ff===tf || fr===tr;
+      else if (piece.type === "q") ok = Math.abs(tf-ff)===Math.abs(tr-fr)||ff===tf||fr===tr;
+      else if (piece.type === "k") ok = Math.abs(tf-ff)<=1&&Math.abs(tr-fr)<=1;
+      if (ok && !(cp && cp.color === piece.color)) {
+        gc.remove(from); if (cp) gc.remove(to); gc.put({ type: piece.type, color: piece.color }, to);
+        const fp = gc.fen().split(" "); fp[1] = "b"; gc.load(fp.join(" ")); moved = true;
+      }
+    }
+    if (!moved && power?.power === "MANGALA" && power.usesLeft > 0) {
+      const files = ["a","b","c","d","e","f","g","h"];
+      const [ff, fr, tf, tr] = [files.indexOf(from[0]), parseInt(from[1]), files.indexOf(to[0]), parseInt(to[1])];
+      if (Math.abs(tf-ff)<=1&&Math.abs(tr-fr)<=1&&cp&&cp.color!==piece.color) {
+        gc.remove(from); gc.remove(to); gc.put({ type: piece.type, color: piece.color }, to);
+        const fp = gc.fen().split(" "); fp[1] = "b"; gc.load(fp.join(" ")); moved = true;
+      }
+    }
+    if (!moved) { const m = gc.move({ from, to, promotion }); if (!m) return null; }
+
+    const np = { ...poweredPieces };
+    if (cp && np[to]) delete np[to];
+    if (power) { delete np[from]; const nu = power.usesLeft - 1; if (nu > 0) np[to] = { ...power, usesLeft: nu }; }
+    setPoweredPieces(np);
+    if (cp) setCaptureHistory(prev => [...prev, { piece: cp.type, square: to, color: cp.color }]);
+
+    const newMoveCount = moveCount + 1;
+    setGame(gc);
+    setMoveCount(newMoveCount);
+    setMoveHistory(prev => [...prev, { from, to, cardUsed: power?.power || null }]);
+
+    if (gc.isCheckmate()) {
+      const total = newMoveCount + cardsUsed.length;
+      const score = total <= par ? "⭐⭐⭐" : total <= par + 2 ? "⭐⭐" : "⭐";
+      const result = { result: "won", moves: newMoveCount, cardsUsed: cardsUsed.length, totalMoves: total, par, score };
+      setPuzzleOver(result);
+      try { localStorage.setItem("chessuranga_daily", JSON.stringify({ dayNum: dailyData.dayNum, ...result })); } catch (e) {}
+      return gc;
+    }
+
+    // Bot reply
+    setTimeout(() => {
+      setGame(prev => {
+        if (prev.isGameOver()) return prev;
+        const bg = new Chess(prev.fen());
+        const moves = bg.moves({ verbose: true });
+        if (!moves.length) return prev;
+        bg.move(moves[Math.floor(Math.random() * moves.length)]);
+        setMoveHistory(mh => [...mh, { isBot: true }]);
+        if (bg.isCheckmate()) {
+          setPuzzleOver({ result: "failed", moves: newMoveCount });
+          try { localStorage.setItem("chessuranga_daily", JSON.stringify({ dayNum: dailyData.dayNum, result: "failed" })); } catch (e) {}
+        }
+        return bg;
+      });
+    }, 400);
+    return gc;
+  }
+
+  function onSquareClick(square) {
+    if (puzzleOver || game.turn() !== "w") return;
+    if (selectedCard) { placeTile(square); return; }
+    if (activationMode) { const piz = getPiecesInZones(); if (piz.find(p => p.square === square)) { activateTileForPiece(square); } return; }
+    if (!moveFrom) { const p = game.get(square); if (p && p.color === "w" && !frozenPieces[square]) setMoveFrom(square); return; }
+    const tapped = game.get(square);
+    if (tapped && tapped.color === "w") { setMoveFrom(square); return; }
+    handleDailyMove(moveFrom, square);
+    setMoveFrom("");
+  }
+
+  function onPieceDrop(src, tgt) {
+    if (puzzleOver || selectedCard || activationMode || game.turn() !== "w") return false;
+    const r = handleDailyMove(src, tgt); setMoveFrom(""); return r !== null;
+  }
+
+  function buildShareText() {
+    if (!puzzleOver || puzzleOver.result !== "won") return "";
+    const cardEmojis = cardsUsed.map(id => CARD_EMOJI[id] || "🌟").join("");
+    const moveEmojis = moveHistory.filter(m => !m.isBot).map((m, i) => m.cardUsed ? "🟣" : i < par ? "🟩" : "🟨").join("");
+    return `Chessuranga #${puzzleNum} ${puzzleOver.score}\n${dailyData.title}\nMate in ${puzzleOver.totalMoves} (par ${par})\nCards: ${cardEmojis || "none"}\n${moveEmojis}\nchessuranga.com`;
+  }
+
+  // Square styles
+  const customStyles = {};
+  const piecesInZones = getPiecesInZones();
+  activeTiles.forEach(tile => {
+    sqsInRadius(tile.square, tile.radius).forEach(sq => { customStyles[sq] = { backgroundColor: tile.color }; });
+    if (tile.whiteActivatedPiece) customStyles[tile.whiteActivatedPiece] = { ...(customStyles[tile.whiteActivatedPiece] || {}), border: "3px solid #4ecca3" };
+  });
+  Object.keys(poweredPieces).forEach(sq => {
+    const p = poweredPieces[sq]; if (!p?.power) return;
+    const card = SHARED_DECK.find(c => c.id === p.power);
+    if (card) customStyles[sq] = { ...(customStyles[sq] || {}), border: `4px solid ${card.color}`, boxShadow: `0 0 20px ${card.color}` };
+  });
+  if (activationMode) piecesInZones.forEach(p => { customStyles[p.square] = { ...(customStyles[p.square] || {}), border: "3px solid #ffd700", boxShadow: "0 0 15px #ffd700" }; });
+  if (moveFrom) customStyles[moveFrom] = { ...(customStyles[moveFrom] || {}), backgroundColor: "rgba(255,255,0,0.5)" };
+
+  const isMobile = window.innerWidth < 768;
+  const boardSize = isMobile ? Math.min(window.innerWidth - 32, 420) : 500;
+  const shareText = buildShareText();
+
+  if (alreadyPlayed) {
+    return (
+      <div style={{ minHeight: "100vh", backgroundColor: "#0a0510", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px", color: "#e8d5a3" }}>
+        <div style={{ maxWidth: "420px", textAlign: "center" }}>
+          <div style={{ fontSize: "56px", marginBottom: "12px" }}>🌟</div>
+          <h1 style={{ fontSize: "26px", color: "#ffd700", marginBottom: "6px" }}>Already completed today!</h1>
+          <p style={{ color: "#6b5080", marginBottom: "24px" }}>#{puzzleNum} · {dailyData.title}</p>
+          <div style={{ backgroundColor: "rgba(255,215,0,0.08)", border: "2px solid #ffd700", borderRadius: "16px", padding: "24px", marginBottom: "24px" }}>
+            <div style={{ fontSize: "36px", marginBottom: "8px" }}>{alreadyPlayed.score || "⭐"}</div>
+            {alreadyPlayed.result === "won" ? <>
+              <div style={{ fontSize: "17px", marginBottom: "4px" }}>Mate in {alreadyPlayed.totalMoves} moves</div>
+              <div style={{ fontSize: "13px", color: "#6b5080" }}>Par: {par} · Cards used: {alreadyPlayed.cardsUsed}</div>
+            </> : <div style={{ fontSize: "15px" }}>Better luck tomorrow.</div>}
+          </div>
+          <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+            <button onClick={onBack} style={{ padding: "12px 24px", backgroundColor: "transparent", border: "2px solid #4a3060", borderRadius: "10px", color: "#a88a5a", cursor: "pointer", fontSize: "14px" }}>← Menu</button>
+            <button onClick={() => { try { navigator.clipboard.writeText(`Chessuranga #${puzzleNum} — come play! chessuranga.com`); alert("Copied!"); } catch (e) {} }} style={{ padding: "12px 24px", backgroundColor: "#ffd700", border: "none", borderRadius: "10px", color: "#000", cursor: "pointer", fontSize: "14px", fontWeight: "bold" }}>Share 📤</button>
+          </div>
+          <p style={{ marginTop: "16px", fontSize: "11px", color: "#4a3060" }}>New puzzle daily at midnight UTC</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ minHeight: "100vh", backgroundColor: "#0a0510", display: "flex", flexDirection: "column", alignItems: "center", padding: "16px", color: "#e8d5a3" }}>
+      <style>{`@keyframes pulse{0%,100%{box-shadow:0 0 10px #ffd700;}50%{box-shadow:0 0 25px #ffd700;}} @keyframes starPop{0%{transform:scale(0);opacity:0;}60%{transform:scale(1.2);}100%{transform:scale(1);opacity:1;}}`}</style>
+
+      {/* Header */}
+      <div style={{ width: "100%", maxWidth: "860px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+        <button onClick={onBack} style={{ background: "none", border: "1px solid #4a3060", borderRadius: "8px", color: "#a88a5a", cursor: "pointer", padding: "8px 14px", fontSize: "13px" }}>← Menu</button>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: "11px", color: "#6b5080", letterSpacing: "3px", textTransform: "uppercase" }}>Daily Puzzle #{puzzleNum}</div>
+          <div style={{ fontSize: isMobile ? "16px" : "20px", fontWeight: "bold", color: "#ffd700" }}>{dailyData.title}</div>
+          <div style={{ fontSize: "11px", color: "#6b5080", fontStyle: "italic" }}>{dailyData.flavor}</div>
+        </div>
+        <div style={{ textAlign: "right", fontSize: "13px", color: "#a88a5a" }}>
+          <div>Par <strong style={{ color: "#ffd700" }}>{par}</strong></div>
+          <div>Moves <strong style={{ color: "#fff" }}>{moveCount}</strong></div>
+        </div>
+      </div>
+
+      <div style={{ display: "flex", gap: "20px", alignItems: "flex-start", justifyContent: "center", width: "100%", maxWidth: "860px", flexWrap: isMobile ? "wrap" : "nowrap" }}>
+
+        {/* Cards */}
+        <div style={{ width: isMobile ? "100%" : "170px", display: "flex", flexDirection: isMobile ? "row" : "column", gap: "10px", flexWrap: "wrap" }}>
+          <div style={{ width: "100%", fontSize: "11px", color: "#6b5080", textTransform: "uppercase", letterSpacing: "2px", textAlign: "center" }}>Today's Cards · +1 each</div>
+          {dailyData.dailyCards.map(card => {
+            const isUsed = cardsUsed.includes(card.id);
+            const isSelected = selectedCard?.id === card.id;
+            return (
+              <div key={card.id} onClick={() => { if (!isUsed && !puzzleOver) setSelectedCard(isSelected ? null : card); }}
+                style={{ flex: isMobile ? "1 1 120px" : "unset", backgroundColor: isSelected ? card.color + "44" : "rgba(255,255,255,0.04)", border: `2px solid ${isSelected ? "#fff" : card.color}`, borderRadius: "10px", padding: "10px", cursor: isUsed ? "default" : "pointer", opacity: isUsed ? 0.4 : 1, transition: "all 0.2s" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "3px" }}>
+                  <span style={{ fontSize: "16px" }}>{CARD_EMOJI[card.id]}</span>
+                  <span style={{ fontWeight: "bold", fontSize: "12px", color: "#e8d5a3" }}>{card.name}</span>
+                  {isUsed && <span style={{ fontSize: "9px", color: "#555" }}>used</span>}
+                </div>
+                <div style={{ fontSize: "10px", color: "#a88a5a", lineHeight: "1.3" }}>{card.description}</div>
+                {dailyData.cardHints?.[card.id] && !isUsed && <div style={{ fontSize: "9px", color: "#6b5080", fontStyle: "italic", marginTop: "4px" }}>💡 {dailyData.cardHints[card.id]}</div>}
+              </div>
+            );
+          })}
+          {selectedCard && <div style={{ width: "100%", fontSize: "11px", color: "#ffd700", textAlign: "center", padding: "6px", border: "1px solid #ffd700", borderRadius: "6px" }}>Click board to place {selectedCard.name}</div>}
+          {!selectedCard && getPiecesInZones().length > 0 && (
+            <button onClick={() => setActivationMode(!activationMode)} style={{ width: "100%", padding: "8px", backgroundColor: activationMode ? "#ffd700" : "transparent", border: "2px solid #ffd700", borderRadius: "8px", color: activationMode ? "#000" : "#ffd700", cursor: "pointer", fontSize: "12px", fontWeight: "bold" }}>
+              {activationMode ? "⚡ Click a piece" : `⚡ Activate (${getPiecesInZones().length})`}
+            </button>
+          )}
+        </div>
+
+        {/* Board */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          {/* Move tracker */}
+          <div style={{ display: "flex", gap: "5px", marginBottom: "10px", flexWrap: "wrap", justifyContent: "center" }}>
+            {Array.from({ length: Math.max(par + 3, moveCount + 1) }).map((_, i) => {
+              const pm = moveHistory.filter(m => !m.isBot)[i];
+              if (!pm) return <div key={i} style={{ width: "26px", height: "26px", border: i < par ? "2px solid #4a3060" : "2px dashed #2a1a30", borderRadius: "6px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", color: "#4a3060" }}>{i < par ? i + 1 : ""}</div>;
+              const bg = pm.cardUsed ? "#9333ea" : i < par ? "#22c55e" : "#f59e0b";
+              return <div key={i} style={{ width: "26px", height: "26px", backgroundColor: bg, borderRadius: "6px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px" }}>{pm.cardUsed ? CARD_EMOJI[pm.cardUsed] : "♟"}</div>;
+            })}
+          </div>
+
+          <Chessboard position={game.fen()} onPieceDrop={onPieceDrop} onSquareClick={onSquareClick} customSquareStyles={customStyles} customDarkSquareStyle={{ backgroundColor: "#4a3060" }} customLightSquareStyle={{ backgroundColor: "#d4c5e8" }} boardWidth={boardSize} arePiecesDraggable={!puzzleOver && game.turn() === "w"} />
+
+          <div style={{ marginTop: "10px", fontSize: "13px", color: "#6b5080", textAlign: "center" }}>
+            {!puzzleOver && (game.turn() === "w" ? "Your move — find checkmate!" : "⏳ Thinking...")}
+            {game.inCheck() && !puzzleOver && <span style={{ color: "#ff6b6b", marginLeft: "8px" }}>⚠️ Check!</span>}
+          </div>
+        </div>
+
+        {/* Info panel (desktop only) */}
+        {!isMobile && (
+          <div style={{ width: "170px", display: "flex", flexDirection: "column", gap: "10px" }}>
+            <div style={{ padding: "14px", backgroundColor: "rgba(255,215,0,0.05)", border: "1px solid #4a3060", borderRadius: "10px", fontSize: "12px", color: "#a88a5a", lineHeight: "1.7" }}>
+              <div style={{ fontWeight: "bold", color: "#ffd700", marginBottom: "6px" }}>🎯 Scoring</div>
+              <div>♟ Each move = 1pt</div>
+              <div>🌟 Each card = +1pt</div>
+              <div style={{ marginTop: "8px", borderTop: "1px solid #2a1a30", paddingTop: "8px", fontSize: "11px", color: "#6b5080" }}>
+                ⭐⭐⭐ = par or under<br />⭐⭐ = par+1 or +2<br />⭐ = par+3 or more
+              </div>
+            </div>
+            <div style={{ padding: "10px", backgroundColor: "rgba(255,215,0,0.03)", border: "1px solid #2a1a30", borderRadius: "10px", fontSize: "10px", color: "#4a3060", textAlign: "center" }}>
+              New puzzle daily at midnight UTC
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Result overlay */}
+      {puzzleOver && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.85)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000 }}>
+          <div style={{ backgroundColor: "#0f0a1a", border: `3px solid ${puzzleOver.result === "won" ? "#ffd700" : "#ff4444"}`, borderRadius: "20px", padding: "40px 32px", textAlign: "center", maxWidth: "400px", width: "90vw", animation: "starPop 0.4s ease-out", boxShadow: `0 0 60px ${puzzleOver.result === "won" ? "rgba(255,215,0,0.25)" : "rgba(255,68,68,0.25)"}` }}>
+            {puzzleOver.result === "won" ? <>
+              <div style={{ fontSize: "56px", marginBottom: "8px" }}>{puzzleOver.score}</div>
+              <h2 style={{ color: "#ffd700", fontSize: "24px", marginBottom: "8px" }}>Puzzle Solved!</h2>
+              <p style={{ color: "#a88a5a", fontSize: "14px", marginBottom: "16px" }}>
+                {puzzleOver.moves} move{puzzleOver.moves !== 1 ? "s" : ""}
+                {puzzleOver.cardsUsed > 0 ? ` + ${puzzleOver.cardsUsed} card${puzzleOver.cardsUsed > 1 ? "s" : ""}` : ""}
+                {" = "}<strong style={{ color: "#ffd700" }}>{puzzleOver.totalMoves}</strong> total &nbsp;(par {par})
+              </p>
+              <div style={{ backgroundColor: "rgba(255,215,0,0.07)", borderRadius: "10px", padding: "14px", marginBottom: "20px", fontFamily: "monospace", fontSize: "12px", color: "#e8d5a3", whiteSpace: "pre-wrap", textAlign: "left", lineHeight: "1.8" }}>
+                {shareText}
+              </div>
+              <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+                <button onClick={onBack} style={{ padding: "11px 20px", backgroundColor: "transparent", border: "2px solid #4a3060", borderRadius: "10px", color: "#a88a5a", cursor: "pointer", fontSize: "13px" }}>← Menu</button>
+                <button onClick={() => { try { navigator.clipboard.writeText(shareText); alert("Copied to clipboard!"); } catch (e) { alert(shareText); } }} style={{ padding: "11px 22px", backgroundColor: "#ffd700", border: "none", borderRadius: "10px", color: "#000", cursor: "pointer", fontSize: "14px", fontWeight: "bold" }}>Copy & Share 📤</button>
+              </div>
+            </> : <>
+              <div style={{ fontSize: "56px", marginBottom: "8px" }}>💫</div>
+              <h2 style={{ color: "#ff6b6b", fontSize: "22px", marginBottom: "8px" }}>{puzzleOver.result === "failed" ? "The Asuras prevail..." : "Stalemate!"}</h2>
+              <p style={{ color: "#a88a5a", fontSize: "13px", marginBottom: "20px" }}>The cosmos weeps. A new challenge awaits tomorrow.</p>
+              <button onClick={onBack} style={{ padding: "12px 28px", backgroundColor: "#e94560", border: "none", borderRadius: "10px", color: "#fff", cursor: "pointer", fontSize: "14px", fontWeight: "bold" }}>← Menu</button>
+            </>}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -286,9 +680,7 @@ function App() {
 
   function formatTime(s) { const m = Math.floor(s / 60); return `${m}:${(s % 60).toString().padStart(2, "0")}`; }
   function getPieceValue(p) { return ({ p: 2, n: 4, b: 4, r: 6, q: 8 }[p] || 0); }
-  function getMaterialValue(p) { return ({ p: 1, n: 3, b: 3, r: 5, q: 9 }[p] || 0); }
-  function calculateMaterialScore() { let w = 0, b = 0; whiteCaptured.forEach(p => w += getMaterialValue(p)); blackCaptured.forEach(p => b += getMaterialValue(p)); return { white: w, black: b }; }
-  function calculateFinalScore() { const m = calculateMaterialScore(); let w = m.white, b = m.black; if (winner === "white") w += 10; else if (winner === "black") b += 10; return { white: w, black: b }; } function addTime(player, seconds) { if (player === "w") setWhiteTime(p => Math.min(p + seconds, startingTime)); else setBlackTime(p => Math.min(p + seconds, startingTime)); }
+  function addTime(player, seconds) { if (player === "w") setWhiteTime(p => Math.min(p + seconds, startingTime)); else setBlackTime(p => Math.min(p + seconds, startingTime)); }
   function subtractTime(player, seconds) { if (player === "w") setWhiteTime(p => Math.max(p - seconds, 0)); else setBlackTime(p => Math.max(p - seconds, 0)); }
 
   function getCardCost(card) {
@@ -721,8 +1113,6 @@ function App() {
   if (activationMode) piecesInZones.forEach(pi => { customStyles[pi.square] = { ...(customStyles[pi.square] || {}), border: "3px solid #ffd700", boxShadow: "0 0 15px #ffd700, inset 0 0 10px rgba(255,215,0,0.3)", animation: "pulse 1.5s infinite" }; });
   if (moveFrom && !selectedCard) customStyles[moveFrom] = { ...(customStyles[moveFrom] || {}), backgroundColor: "rgba(255,255,0,0.5)" };
 
-  const finalScore = gameOver ? calculateFinalScore() : null;
-  const currentMaterial = calculateMaterialScore();
   const getPieceSymbol = p => ({ p: "♟", n: "♞", b: "♝", r: "♜", q: "♛", k: "♚" }[p] || p);
   const trulyDeadCount = gameMode === "asura" ? Object.values(asuraLives).filter(l => l === 0).length : 0;
 
@@ -736,6 +1126,9 @@ function App() {
         : shaniMode ? "🪐 Tap an enemy piece to freeze"
           : selectedCard ? `✨ ${selectedCard.name} selected — tap the board to place`
             : null;
+
+  // Route to daily puzzle
+  if (gameMode === "daily") return <DailyPuzzle onBack={() => setGameMode(null)} />;
 
   return (
     <>
@@ -794,6 +1187,13 @@ function App() {
               <div style={{ textAlign: "center", maxWidth: "200px" }}>
                 <button onClick={() => startGame("asura")} style={{ padding: "16px 24px", fontSize: "16px", backgroundColor: "#ff4444", color: "#fff", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px" }}>👹 Fight the Asura Horde</button>
                 <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>They are endless. They are relentless. Are you ready?</p>
+              </div>
+
+              {/* Daily Puzzle */}
+              <div style={{ textAlign: "center", maxWidth: "200px" }}>
+                <button onClick={() => setGameMode("daily")} style={{ padding: "16px 24px", fontSize: "16px", background: "linear-gradient(135deg, #ffd700, #f59e0b)", color: "#1a0a00", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px", boxShadow: "0 0 20px rgba(255,215,0,0.35)" }}>🌟 Daily Puzzle</button>
+                <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>New puzzle every day. Find mate with today's 3 cosmic cards. Share your score.</p>
+                <p style={{ fontSize: "10px", color: "#ffd700", margin: "4px 0 0 0" }}>#{getDailyPuzzleNumber()} today</p>
               </div>
             </div>
             <HowToPlay />
@@ -913,10 +1313,9 @@ function App() {
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
               <h1 style={{ marginBottom: "20px", fontSize: "32px" }}>{gameMode === "asura" ? "⚔️ ASURA HORDE ⚔️" : "Chessuranga"}</h1>
               {showChaosPopup && <div onClick={() => setShowChaosPopup(false)} style={{ position: "absolute", top: "10px", left: "50%", transform: "translateX(-50%)", backgroundColor: "#ff6b6b", padding: "12px 24px", borderRadius: "15px", zIndex: 1000, textAlign: "center", border: "3px solid #fff", boxShadow: "0 0 30px rgba(255,107,107,0.5)", cursor: "pointer" }}><h2 style={{ margin: 0, fontSize: "20px" }}>🔥 CHAOS MODE — All cards half price! 🔥</h2><p style={{ margin: "4px 0 0 0", fontSize: "11px", opacity: 0.8 }}>tap to dismiss</p></div>}
-              {gameOver && finalScore && !gameOverDismissed && (
+              {gameOver && !gameOverDismissed && (
                 <div onClick={() => setGameOverDismissed(true)} style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", backgroundColor: "#16213e", padding: "40px", borderRadius: "15px", zIndex: 1000, textAlign: "center", border: `3px solid ${theme.accent}` }}>
                   <h2 style={{ marginBottom: "20px", fontSize: "32px" }}>{gameMode === "asura" ? (winner === "white" ? "🌟 The Navagraha Prevail! 🌟" : "👹 The Asura Reign! 👹") : `${winner === "white" ? "White" : "Black"} Wins!`}</h2>
-                  {gameMode !== "asura" && <><p style={{ fontSize: "20px", marginBottom: "10px" }}>White Score: {finalScore.white}</p><p style={{ fontSize: "20px", marginBottom: "30px" }}>Black Score: {finalScore.black}</p></>}
                   <button onClick={resetGame} style={{ padding: "15px 30px", fontSize: "18px", backgroundColor: theme.accent, border: "none", borderRadius: "5px", cursor: "pointer", color: "#000", fontWeight: "bold" }}>Main Menu</button>
                   <p style={{ marginTop: "12px", fontSize: "11px", color: "#888", cursor: "pointer" }}>
                     or tap this popup to review the board
@@ -951,20 +1350,13 @@ function App() {
               {!gameOver && <button onClick={resetGame} style={{ marginTop: "15px", padding: "10px 20px", fontSize: "14px", backgroundColor: "#e94560", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer", fontWeight: "bold" }}>Main Menu</button>}
             </div>
 
-            {/* RIGHT: score + captures */}
+            {/* RIGHT: captures */}
             <div style={{ width: "180px", display: "flex", flexDirection: "column", gap: "15px" }}>
-              {gameMode === "asura" ? (
+              {gameMode === "asura" && (
                 <div style={{ padding: "15px", backgroundColor: "#16213e", borderRadius: "8px", border: "2px solid #ff4444" }}>
                   <div style={{ fontWeight: "bold", marginBottom: "10px", fontSize: "14px", color: "#ff4444", textAlign: "center" }}>👹 Asura Status</div>
                   <div style={{ textAlign: "center", fontSize: "24px", fontWeight: "bold", color: "#ff6b6b" }}>{trulyDeadCount}/16</div>
                   <div style={{ textAlign: "center", fontSize: "11px", color: "#aaa", marginTop: "5px" }}>Truly Slain</div>
-                </div>
-              ) : (
-                <div style={{ padding: "15px", backgroundColor: "#16213e", borderRadius: "8px", textAlign: "center" }}>
-                  <div style={{ fontSize: "14px", color: "#888", marginBottom: "10px" }}>Score</div>
-                  <div style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "5px" }}>{currentMaterial.white}</div>
-                  <div style={{ fontSize: "12px", color: "#888", marginBottom: "10px" }}>vs</div>
-                  <div style={{ fontSize: "24px", fontWeight: "bold" }}>{currentMaterial.black}</div>
                 </div>
               )}
               <div>
@@ -993,10 +1385,9 @@ function App() {
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%", maxWidth: "500px", margin: "0 auto", position: "relative" }}>
 
             {/* Game over overlay */}
-            {gameOver && finalScore && !gameOverDismissed && (
+            {gameOver && !gameOverDismissed && (
               <div onClick={() => setGameOverDismissed(true)} style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", backgroundColor: "#16213e", padding: "32px 24px", borderRadius: "15px", zIndex: 500, textAlign: "center", border: `3px solid ${theme.accent}`, width: "88vw", maxWidth: "380px" }}>
                 <h2 style={{ marginBottom: "16px", fontSize: "24px" }}>{gameMode === "asura" ? (winner === "white" ? "🌟 The Navagraha Prevail! 🌟" : "👹 The Asura Reign! 👹") : `${winner === "white" ? "White" : "Black"} Wins!`}</h2>
-                {gameMode !== "asura" && <><p style={{ fontSize: "18px", marginBottom: "8px" }}>White: {finalScore.white}</p><p style={{ fontSize: "18px", marginBottom: "20px" }}>Black: {finalScore.black}</p></>}
                 <button onClick={resetGame} style={{ padding: "14px 28px", fontSize: "16px", backgroundColor: theme.accent, border: "none", borderRadius: "8px", cursor: "pointer", color: "#000", fontWeight: "bold" }}>Main Menu</button>
                 <p style={{ marginTop: "12px", fontSize: "11px", color: "#888", cursor: "pointer" }}>
                   or tap this popup to review the board
@@ -1044,7 +1435,6 @@ function App() {
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 {gameMode === "asura" && <span style={{ fontSize: "11px", color: "#ff6b6b" }}>{trulyDeadCount}/16 slain</span>}
-                {gameMode !== "asura" && <span style={{ fontSize: "11px", color: "#888" }}>⚔️{currentMaterial.black}</span>}
                 <div style={{ fontSize: "22px", fontWeight: "bold", color: blackTime < 30 ? "#ff6b6b" : theme.text, minWidth: "52px", textAlign: "right" }}>{formatTime(blackTime)}</div>
               </div>
             </div>
@@ -1070,7 +1460,6 @@ function App() {
                 <span style={{ marginLeft: "6px", fontSize: "11px" }}>{whiteCaptured.slice(-6).map((p, i) => <span key={i}>{getPieceSymbol(p)}</span>)}</span>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                {gameMode !== "asura" && <span style={{ fontSize: "11px", color: "#888" }}>⚔️{currentMaterial.white}</span>}
                 <div style={{ fontSize: "22px", fontWeight: "bold", color: whiteTime < 30 ? "#ff6b6b" : theme.text, minWidth: "52px", textAlign: "right" }}>{formatTime(whiteTime)}</div>
               </div>
             </div>
