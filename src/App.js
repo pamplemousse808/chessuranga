@@ -578,7 +578,7 @@ function App() {
           setGame(ng); setMoveCount(p => p + 1); if (ng.isCheckmate()) { setGameOver(true); setWinner("white"); }
         }
         setWaitingForBot(false);
-      }, 500); return;
+      }, 1200); return;
     }
     const depthMap = { shishya: 5, acharya: 8, guru: 12 };
     const depth = gameMode === "shukracharya" ? (depthMap[shukraDifficulty] || 8) : 3;
@@ -598,7 +598,7 @@ function App() {
         setWaitingForBot(false);
       }
     }, 50);
-    setTimeout(() => { clearInterval(poll); if (waitingForBot) setWaitingForBot(false); }, 5000);
+    setTimeout(() => { clearInterval(poll); if (waitingForBot) setWaitingForBot(false); }, 8000);
   }
 
   function onSquareClick(square) {
@@ -937,7 +937,7 @@ function App() {
               )}
 
               <div style={{ width: "600px", height: "600px", flexShrink: 0 }}>
-                <Chessboard position={game.fen()} onPieceDrop={onPieceDrop} onSquareClick={onSquareClick} customSquareStyles={customStyles} customDarkSquareStyle={{ backgroundColor: theme.darkSquare }} customLightSquareStyle={{ backgroundColor: theme.lightSquare }} boardWidth={600} />
+                <Chessboard position={game.fen()} onPieceDrop={onPieceDrop} onSquareClick={onSquareClick} animationDuration={300} customSquareStyles={customStyles} customDarkSquareStyle={{ backgroundColor: theme.darkSquare }} customLightSquareStyle={{ backgroundColor: theme.lightSquare }} boardWidth={600} />
               </div>
               <div style={{ fontSize: "32px", fontWeight: "bold", marginTop: "10px", color: whiteTime < 30 ? "#ff6b6b" : theme.text }}>🌟 You: {formatTime(whiteTime)}</div>
               {!gameOver && <p style={{ marginTop: "15px", fontSize: "16px" }}>Turn: {game.turn() === "w" ? (gameMode === "asura" ? "You" : "White") : (gameMode === "asura" ? "Asura" : "Black")}{activationMode && <span style={{ color: "#ffd700", marginLeft: "10px" }}>⚡ ACTIVATION</span>}{chandraPlacementMode && <span style={{ color: "#e5e7eb", marginLeft: "10px" }}>🌙 CLONES</span>}{guruMode && <span style={{ color: "#a855f7", marginLeft: "10px" }}>🪐 RESURRECT</span>}{shaniMode && <span style={{ color: "#94a3b8", marginLeft: "10px" }}>🪐 FREEZE</span>}{waitingForBot && <span style={{ color: "#ff6b6b", marginLeft: "10px" }}>👹 Thinking...</span>}</p>}
@@ -1048,6 +1048,7 @@ function App() {
                 position={game.fen()}
                 onPieceDrop={onPieceDrop}
                 onSquareClick={onSquareClick}
+                animationDuration={300}
                 customSquareStyles={customStyles}
                 customDarkSquareStyle={{ backgroundColor: theme.darkSquare }}
                 customLightSquareStyle={{ backgroundColor: theme.lightSquare }}
@@ -1100,7 +1101,7 @@ function App() {
                 Celestial powers unlock as you capture pieces
               </div>
             </div>
-      
+
 
             {/* Activate power button */}
             {!selectedCard && !chandraPlacementMode && !guruMode && !shaniMode && piecesInZones.length > 0 && game.turn() === "w" && (
