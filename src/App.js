@@ -575,7 +575,10 @@ function App() {
         const ng = new Chess(game.fen()); const rcp = ng.get(rm.to); const res = ng.move({ from: rm.from, to: rm.to, promotion: "q" });
         if (res) {
           if (rcp) { setCaptureHistory(p => [...p, { piece: rcp.type, square: rm.to, color: rcp.color }]); if (rcp.color === "w") setWhiteCaptured(p => [...p, rcp.type]); checkTierUnlocks(rcp.type); }
-          setGame(ng); setMoveCount(p => p + 1); if (ng.isCheckmate()) { setGameOver(true); setWinner("white"); }
+          setTimeout(() => {
+            setGame(ng); setMoveCount(p => p + 1); if (ng.isCheckmate()) { setGameOver(true); setWinner("white"); }
+            setWaitingForBot(false);
+          }, 800);
         }
         setWaitingForBot(false);
       }, 1200); return;
@@ -593,9 +596,13 @@ function App() {
         const scp = ng.get(fm.to); const res = ng.move(fm);
         if (res) {
           if (scp) { setCaptureHistory(p => [...p, { piece: scp.type, square: ms.slice(2, 4), color: scp.color }]); if (scp.color === "w") setWhiteCaptured(p => [...p, scp.type]); checkTierUnlocks(scp.type); }
-          setGame(ng); setMoveCount(p => p + 1); if (ng.isCheckmate()) { setGameOver(true); setWinner("white"); }
+          setTimeout(() => {
+            setGame(ng); setMoveCount(p => p + 1); if (ng.isCheckmate()) { setGameOver(true); setWinner("white"); }
+            setWaitingForBot(false);
+          }, 800);
+        } else {
+          setWaitingForBot(false);
         }
-        setWaitingForBot(false);
       }
     }, 50);
     setTimeout(() => { clearInterval(poll); if (waitingForBot) setWaitingForBot(false); }, 8000);
