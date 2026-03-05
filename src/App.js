@@ -1055,7 +1055,7 @@ function App() {
                 position={game.fen()}
                 onPieceDrop={onPieceDrop}
                 onSquareClick={onSquareClick}
-                animationDuration={300}
+                animationDuration={225}
                 customSquareStyles={customStyles}
                 customDarkSquareStyle={{ backgroundColor: theme.darkSquare }}
                 customLightSquareStyle={{ backgroundColor: theme.lightSquare }}
