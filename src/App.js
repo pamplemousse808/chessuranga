@@ -192,7 +192,9 @@ function DailyPuzzle({ onBack }) {
 
         // Apply the first move (opponent's move that sets up the puzzle)
         const firstMove = data.puzzle.solution[0];
-        g.move(firstMove.slice(0, 4));
+        const move = { from: firstMove.slice(0, 2), to: firstMove.slice(2, 4) };
+        if (firstMove[4]) move.promotion = firstMove[4];
+        g.move(move);
         const dayNum = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
         const rng = seededRandom(dayNum * 31337);
         const dailyCards = [...SHARED_DECK].sort(() => rng() - 0.5).slice(0, 3);
