@@ -848,7 +848,8 @@ function App() {
           if (type === "p") { for (let rank of ["7", "6", "5"]) { const s = files[index] + rank; if (!ng.get(s)) { sq = s; break; } } }
           else { for (let rank of ["8", "7", "6"]) { for (let file of files) { const s = file + rank; if (!ng.get(s)) { sq = s; break; } } if (sq && !ng.get(sq)) break; } }
         }
-        if (sq && !ng.get(sq)) ng.put({ type: pieceType, color: "b" }, sq); return ng;
+        if (sq && !ng.get(sq)) ng.put({ type: pieceType, color: "b" }, sq);
+        return ng;
       });
     }, 2000);
   }
