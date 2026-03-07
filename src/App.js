@@ -189,11 +189,10 @@ function DailyPuzzle({ onBack }) {
         console.log('Position after replay:', g.fen());
         console.log('Moves replayed:', data.puzzle.initialPly, 'of', moves.length);
         console.log('First solution move:', data.puzzle.solution[0]);
-        
+
         // Apply the first move (opponent's move that sets up the puzzle)
         const firstMove = data.puzzle.solution[0];
-        g.move({ from: firstMove.slice(0, 2), to: firstMove.slice(2, 4), promotion: firstMove[4] || 'q' });
-
+        g.move(firstMove.slice(0, 4));
         const dayNum = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
         const rng = seededRandom(dayNum * 31337);
         const dailyCards = [...SHARED_DECK].sort(() => rng() - 0.5).slice(0, 3);
