@@ -214,8 +214,8 @@ function DailyPuzzle({ onBack }) {
         const g = new Chess();
         g.load(data.puzzle.initialFen);
         const firstMove = data.puzzle.solution[0];
-        g.move({ from: firstMove.slice(0,2), to: firstMove.slice(2,4) });
-        const dayNum = Math.floor(Date.now() / (1000*60*60*24));
+        g.move({ from: firstMove.slice(0, 2), to: firstMove.slice(2, 4) });
+        const dayNum = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
         const rng = seededRandom(dayNum * 31337);
         const dailyCards = [...SHARED_DECK].sort(() => rng() - 0.5).slice(0, 3);
         setDailyData({
@@ -231,11 +231,6 @@ function DailyPuzzle({ onBack }) {
       });
   }, []);
 
-  if (loading) return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#0a0510", display: "flex", alignItems: "center", justifyContent: "center", color: "#ffd700", fontSize: "20px" }}>
-      ✨ Summoning today's puzzle...
-    </div>
-  );
   const [game, setGame] = useState(() => { const g = new Chess(); g.load(dailyData.fen); return g; });
   const [moveFrom, setMoveFrom] = useState("");
   const [moveCount, setMoveCount] = useState(0);
@@ -418,6 +413,12 @@ function DailyPuzzle({ onBack }) {
   const boardSize = isMobile ? Math.min(window.innerWidth - 32, 420) : 500;
   const shareText = buildShareText();
 
+  if (loading || !dailyData) return (
+    <div style={{ minHeight: "100vh", backgroundColor: "#0a0510", display: "flex", alignItems: "center", justifyContent: "center", color: "#ffd700", fontSize: "20px" }}>
+      ✨ Summoning today's puzzle...
+    </div>
+  );
+  
   if (alreadyPlayed) {
     return (
       <div style={{ minHeight: "100vh", backgroundColor: "#0a0510", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px", color: "#e8d5a3" }}>
