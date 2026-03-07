@@ -252,7 +252,7 @@ function DailyPuzzle({ onBack }) {
     activeTiles.forEach(tile => {
       sqsInRadius(tile.square, tile.radius).forEach(sq => {
         const piece = game.get(sq);
-        if (piece && piece.color === "w" && !tile.whiteActivated && !poweredPieces[sq])
+        if (piece && piece.color === (dailyData?.playerColor || "w") && !tile.whiteActivated && !poweredPieces[sq])
           result.push({ square: sq, tileType: tile.type });
       });
     });
@@ -286,7 +286,8 @@ function DailyPuzzle({ onBack }) {
 
   function handleDailyMove(from, to, promotion = "q") {
     if (puzzleOver || game.turn() !== dailyData?.playerColor) return null;
-    const piece = game.get(from); if (!piece || piece.color !== "w") return null;
+    const pc = dailyData?.playerColor || "w";
+    const piece = game.get(from); if (!piece || piece.color !== pc) return null;
     if (frozenPieces[from]) return null;
     const cp = game.get(to);
     const power = poweredPieces[from];
@@ -303,7 +304,7 @@ function DailyPuzzle({ onBack }) {
       else if (piece.type === "k") ok = Math.abs(tf - ff) <= 1 && Math.abs(tr - fr) <= 1;
       if (ok && !(cp && cp.color === piece.color)) {
         gc.remove(from); if (cp) gc.remove(to); gc.put({ type: piece.type, color: piece.color }, to);
-        const fp = gc.fen().split(" "); fp[1] = "b"; gc.load(fp.join(" ")); moved = true;
+        const fp = gc.fen().split(" "); fp[1] = pc === "w" ? "b" : "w"; gc.load(fp.join(" ")); moved = true;
       }
     }
     if (!moved && power?.power === "MANGALA" && power.usesLeft > 0) {
@@ -311,7 +312,7 @@ function DailyPuzzle({ onBack }) {
       const [ff, fr, tf, tr] = [files.indexOf(from[0]), parseInt(from[1]), files.indexOf(to[0]), parseInt(to[1])];
       if (Math.abs(tf - ff) <= 1 && Math.abs(tr - fr) <= 1 && cp && cp.color !== piece.color) {
         gc.remove(from); gc.remove(to); gc.put({ type: piece.type, color: piece.color }, to);
-        const fp = gc.fen().split(" "); fp[1] = "b"; gc.load(fp.join(" ")); moved = true;
+        const fp = gc.fen().split(" "); fp[1] = pc === "w" ? "b" : "w"; gc.load(fp.join(" ")); moved = true;
       }
     }
     if (!moved) { const m = gc.move({ from, to, promotion }); if (!m) return null; }
@@ -359,9 +360,9 @@ function DailyPuzzle({ onBack }) {
     if (puzzleOver || game.turn() !== dailyData?.playerColor) return;
     if (selectedCard) { placeTile(square); return; }
     if (activationMode) { const piz = getPiecesInZones(); if (piz.find(p => p.square === square)) { activateTileForPiece(square); } return; }
-    if (!moveFrom) { const p = game.get(square); if (p && p.color === "w" && !frozenPieces[square]) setMoveFrom(square); return; }
+    if (!moveFrom) { const p = game.get(square); if (p && p.color === dailyData?.playerColor && !frozenPieces[square]) setMoveFrom(square); return; }
     const tapped = game.get(square);
-    if (tapped && tapped.color === "w") { setMoveFrom(square); return; }
+    if (tapped && tapped.color === dailyData?.playerColor) { setMoveFrom(square); return; }
     handleDailyMove(moveFrom, square);
     setMoveFrom("");
   }
