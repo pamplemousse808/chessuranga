@@ -177,26 +177,33 @@ function DailyPuzzle({ onBack }) {
     fetch('/api/daily-puzzle')
       .then(r => r.json())
       .then(data => {
-        console.log('Lichess response:', data);
+        // Replay PGN to the starting position
         const g = new Chess();
-        g.load(data.puzzle.initialFen);
+        const moves = data.game.pgn.split(' ');
+        for (let i = 0; i < data.puzzle.initialPly; i++) {
+          g.move(moves[i]);
+        }
+        // Apply the first move (opponent's move that sets up the puzzle)
         const firstMove = data.puzzle.solution[0];
-        g.move({ from: firstMove.slice(0, 2), to: firstMove.slice(2, 4) });
+        g.move({ from: firstMove.slice(0, 2), to: firstMove.slice(2, 4), promotion: firstMove[4] || 'q' });
+
         const dayNum = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
         const rng = seededRandom(dayNum * 31337);
         const dailyCards = [...SHARED_DECK].sort(() => rng() - 0.5).slice(0, 3);
+
         setDailyData({
           fen: g.fen(),
-          title: data.game.opening?.name || 'Daily Puzzle',
-          par: Math.ceil(data.puzzle.solution.length / 2),
-          flavor: `Rated ${data.puzzle.rating} · ${data.puzzle.themes.join(', ')}`,
+          title: data.puzzle.themes.join(', '),
+          par: Math.ceil((data.puzzle.solution.length - 1) / 2),
+          flavor: `Rated ${data.puzzle.rating}`,
           dailyCards,
           dayNum,
           cardHints: {}
         });
         setGame(g);
         setLoading(false);
-      });
+      })
+      .catch(err => console.error('Puzzle fetch failed:', err));
   }, []);
 
   const [game, setGame] = useState(() => new Chess());
