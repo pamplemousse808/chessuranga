@@ -1005,7 +1005,7 @@ function App() {
             }
           }
           setTimeout(() => {
-            setGame(ng); setMoveCount(p => p + 1); if (ng.isCheckmate()) { setGameOver(true); setWinner("white"); }
+            setGame(ng); setMoveCount(p => p + 1); if (ng.isCheckmate()) { setGameOver(true); setWinner("black"); }
             setWaitingForBot(false);
           }, 800);
         }
@@ -1038,7 +1038,7 @@ function App() {
             }
           }
           setTimeout(() => {
-            setGame(ng); setMoveCount(p => p + 1); if (ng.isCheckmate()) { setGameOver(true); setWinner("white"); }
+            setGame(ng); setMoveCount(p => p + 1); if (ng.isCheckmate()) { setGameOver(true); setWinner("black"); }
             setWaitingForBot(false);
           }, 800);
         } else {
