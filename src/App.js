@@ -193,8 +193,8 @@ function DailyPuzzle({ onBack }) {
           dayNum,
           cardHints: {}
         });
-         setGame(g);
-         setLoading(false);
+        setGame(g);
+        setLoading(false);
       });
   }, []);
 
@@ -202,7 +202,7 @@ function DailyPuzzle({ onBack }) {
   const [moveFrom, setMoveFrom] = useState("");
   const [moveCount, setMoveCount] = useState(0);
   const [cardsUsed, setCardsUsed] = useState([]);
-  const [, setAvailableCards] = useState(dailyData.dailyCards);
+  const [, setAvailableCards] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
   const [poweredPieces, setPoweredPieces] = useState({});
   const [activeTiles, setActiveTiles] = useState([]);
