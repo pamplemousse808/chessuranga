@@ -177,34 +177,28 @@ function DailyPuzzle({ onBack }) {
     fetch('/api/daily-puzzle')
       .then(r => r.json())
       .then(data => {
-        // Replay PGN to the starting position
-        const g = new Chess();
-        const moves = data.game.pgn
-          .split(' ')
-          .filter(m => m && !m.includes('.') && !m.startsWith('{') && !m.startsWith('*'));
-
-        for (let i = 0; i <= data.puzzle.initialPly; i++) {
-          g.move(moves[i]);
-        }
-        console.log('Position after replay:', g.fen());
-        console.log('Moves replayed:', data.puzzle.initialPly, 'of', moves.length);
-        console.log('First solution move:', data.puzzle.solution[0]);
+        // data shape: { id, fen, moves, rating, themes, title }
+        // moves[0] = opponent's setup move (UCI), moves[1+] = solution
+        const g = new Chess(data.fen);
 
         // Apply the first move (opponent's move that sets up the puzzle)
-        const firstMove = data.puzzle.solution[0];
+        const firstMove = data.moves[0];
         const move = { from: firstMove.slice(0, 2), to: firstMove.slice(2, 4) };
         if (firstMove[4]) move.promotion = firstMove[4];
         g.move(move);
+
         const dayNum = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
         const rng = seededRandom(dayNum * 31337);
-        const dailyCards = [...SHARED_DECK].sort(() => rng() - 0.5).slice(0, 3);
+        const PUZZLE_CARDS = ["RAHU", "SURYA", "GURU", "BUDHA", "MANGALA", "SHANI"];
+        const deckSubset = SHARED_DECK.filter(c => PUZZLE_CARDS.includes(c.id));
+        const dailyCards = [...deckSubset].sort(() => rng() - 0.5).slice(0, 3);
 
         setDailyData({
           fen: g.fen(),
-          playerColor: g.turn(), // whoever's turn it is after opponent's first move
-          title: data.puzzle.themes.join(', '),
-          par: Math.ceil((data.puzzle.solution.length - 1) / 2),
-          flavor: `Rated ${data.puzzle.rating}`,
+          playerColor: g.turn(),
+          title: data.title,
+          par: Math.ceil((data.moves.length - 1) / 2),
+          flavor: `Rated ${data.rating}`,
           dailyCards,
           dayNum,
           cardHints: {}
@@ -490,7 +484,7 @@ function DailyPuzzle({ onBack }) {
           <Chessboard position={game.fen()} onPieceDrop={onPieceDrop} onSquareClick={onSquareClick} customSquareStyles={customStyles} customDarkSquareStyle={{ backgroundColor: "#4a3060" }} customLightSquareStyle={{ backgroundColor: "#d4c5e8" }} boardWidth={boardSize} boardOrientation={dailyData?.playerColor === 'b' ? 'black' : 'white'} arePiecesDraggable={!puzzleOver && game.turn() === dailyData?.playerColor} />
 
           <div style={{ marginTop: "10px", fontSize: "13px", color: "#6b5080", textAlign: "center" }}>
-            {!puzzleOver && (game.turn() === dailyData?.playerColor? "Your move — find checkmate!" : "⏳ Thinking...")}
+            {!puzzleOver && (game.turn() === dailyData?.playerColor ? "Your move — find checkmate!" : "⏳ Thinking...")}
             {game.inCheck() && !puzzleOver && <span style={{ color: "#ff6b6b", marginLeft: "8px" }}>⚠️ Check!</span>}
           </div>
         </div>
