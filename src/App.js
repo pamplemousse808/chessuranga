@@ -193,11 +193,12 @@ function DailyPuzzle({ onBack }) {
           dayNum,
           cardHints: {}
         });
-        setLoading(false);
+         setGame(g);
+         setLoading(false);
       });
   }, []);
 
-  const [game, setGame] = useState(() => { const g = new Chess(); g.load(dailyData.fen); return g; });
+  const [game, setGame] = useState(() => new Chess());
   const [moveFrom, setMoveFrom] = useState("");
   const [moveCount, setMoveCount] = useState(0);
   const [cardsUsed, setCardsUsed] = useState([]);
