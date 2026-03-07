@@ -244,6 +244,7 @@ function DailyPuzzle({ onBack }) {
   const [puzzleOver, setPuzzleOver] = useState(null);
   const [, setCaptureHistory] = useState([]);
   const [moveHistory, setMoveHistory] = useState([]);
+  const [attempts, setAttempts] = useState(1);
   const par = dailyData.par;
 
   const [alreadyPlayed] = useState(() => {
@@ -391,7 +392,7 @@ function DailyPuzzle({ onBack }) {
     if (!puzzleOver || puzzleOver.result !== "won") return "";
     const cardEmojis = cardsUsed.map(id => CARD_EMOJI[id] || "🌟").join("");
     const moveEmojis = moveHistory.filter(m => !m.isBot).map((m, i) => m.cardUsed ? "🟣" : i < par ? "🟩" : "🟨").join("");
-    return `Chessuranga #${puzzleNum} ${puzzleOver.score}\n${dailyData.title}\nMate in ${puzzleOver.totalMoves} (par ${par})\nCards: ${cardEmojis || "none"}\n${moveEmojis}\nchessuranga.com`;
+    return `Chessuranga #${puzzleNum} ${puzzleOver.score}\n${dailyData.title}\nMate in ${puzzleOver.totalMoves} (par ${par})\nCards: ${cardEmojis || "none"}\n${moveEmojis}${attempts > 1 ? `\n${attempts} attempts` : ""}\nchessuranga.com`;
   }
 
   // Square styles
@@ -418,7 +419,7 @@ function DailyPuzzle({ onBack }) {
       ✨ Summoning today's puzzle...
     </div>
   );
-  
+
   if (alreadyPlayed) {
     return (
       <div style={{ minHeight: "100vh", backgroundColor: "#0a0510", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px", color: "#e8d5a3" }}>
@@ -537,6 +538,7 @@ function DailyPuzzle({ onBack }) {
               <h2 style={{ color: "#ffd700", fontSize: "24px", marginBottom: "8px" }}>Puzzle Solved!</h2>
               <p style={{ color: "#a88a5a", fontSize: "14px", marginBottom: "16px" }}>
                 {puzzleOver.moves} move{puzzleOver.moves !== 1 ? "s" : ""}
+                {attempts > 1 && <span style={{ color: "#a88a5a" }}> · {attempts} attempts</span>}
                 {puzzleOver.cardsUsed > 0 ? ` + ${puzzleOver.cardsUsed} card${puzzleOver.cardsUsed > 1 ? "s" : ""}` : ""}
                 {" = "}<strong style={{ color: "#ffd700" }}>{puzzleOver.totalMoves}</strong> total &nbsp;(par {par})
               </p>
@@ -549,7 +551,33 @@ function DailyPuzzle({ onBack }) {
               </div>
             </> : <>
               <div style={{ fontSize: "56px", marginBottom: "8px" }}>💫</div>
-              <h2 style={{ color: "#ff6b6b", fontSize: "22px", marginBottom: "8px" }}>{puzzleOver.result === "failed" ? "The Asuras prevail..." : "Stalemate!"}</h2>
+              <h2 style={{ color: "#ff6b6b", fontSize: "22px", marginBottom: "8px" }}>
+                {puzzleOver.result === "failed" ? "The Asuras prevail..." : "Stalemate!"}
+              </h2>
+              <p style={{ color: "#a88a5a", fontSize: "13px", marginBottom: "20px" }}>
+                Attempt {attempts}. The cosmos believes in you.
+              </p>
+              <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+                <button onClick={onBack} style={{ padding: "12px 20px", backgroundColor: "transparent", border: "2px solid #4a3060", borderRadius: "10px", color: "#a88a5a", cursor: "pointer", fontSize: "13px" }}>← Menu</button>
+                <button onClick={() => {
+                  const g = new Chess();
+                  g.load(dailyData.fen);
+                  setGame(g);
+                  setMoveFrom("");
+                  setMoveCount(0);
+                  setCardsUsed([]);
+                  setAvailableCards(dailyData.dailyCards);
+                  setSelectedCard(null);
+                  setPoweredPieces({});
+                  setActiveTiles([]);
+                  setActivationMode(false);
+                  setPuzzleOver(null);
+                  setMoveHistory([]);
+                  setAttempts(a => a + 1);
+                }} style={{ padding: "12px 22px", backgroundColor: "#e94560", border: "none", borderRadius: "10px", color: "#fff", cursor: "pointer", fontSize: "14px", fontWeight: "bold" }}>
+                  Try Again 🔄
+                </button>
+              </div>
               <p style={{ color: "#a88a5a", fontSize: "13px", marginBottom: "20px" }}>The cosmos weeps. A new challenge awaits tomorrow.</p>
               <button onClick={onBack} style={{ padding: "12px 28px", backgroundColor: "#e94560", border: "none", borderRadius: "10px", color: "#fff", cursor: "pointer", fontSize: "14px", fontWeight: "bold" }}>← Menu</button>
             </>}
