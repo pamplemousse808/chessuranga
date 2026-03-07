@@ -183,7 +183,7 @@ function DailyPuzzle({ onBack }) {
           .split(' ')
           .filter(m => m && !m.includes('.') && !m.startsWith('{') && !m.startsWith('*'));
 
-        for (let i = 0; i < data.puzzle.initialPly; i++) {
+        for (let i = 0; i <= data.puzzle.initialPly; i++) {
           g.move(moves[i]);
         }
         console.log('Position after replay:', g.fen());
