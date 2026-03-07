@@ -56,16 +56,6 @@ function seededRandom(seed) {
   };
 }
 
-function getDailyPuzzle() {
-  const now = new Date();
-  const dayNum = Math.floor(now.getTime() / (1000 * 60 * 60 * 24));
-  const puzzle = DAILY_PUZZLES[dayNum % DAILY_PUZZLES.length];
-  const rng = seededRandom(dayNum * 31337);
-  const shuffled = [...SHARED_DECK].sort(() => rng() - 0.5);
-  const dailyCards = shuffled.slice(0, 3);
-  return { ...puzzle, dayNum, dailyCards };
-}
-
 function getDailyPuzzleNumber() {
   const epoch = new Date("2025-01-01").getTime();
   return Math.floor((Date.now() - epoch) / (1000 * 60 * 60 * 24)) + 1;
@@ -213,9 +203,39 @@ function MobileCardOverlay({
 
 // ─── DAILY PUZZLE COMPONENT ─────────────────────────────────────────────────
 function DailyPuzzle({ onBack }) {
-  const dailyData = getDailyPuzzle();
   const puzzleNum = getDailyPuzzleNumber();
+  const [dailyData, setDailyData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    fetch('/api/daily-puzzle')
+      .then(r => r.json())
+      .then(data => {
+        const g = new Chess();
+        g.load(data.puzzle.initialFen);
+        const firstMove = data.puzzle.solution[0];
+        g.move({ from: firstMove.slice(0,2), to: firstMove.slice(2,4) });
+        const dayNum = Math.floor(Date.now() / (1000*60*60*24));
+        const rng = seededRandom(dayNum * 31337);
+        const dailyCards = [...SHARED_DECK].sort(() => rng() - 0.5).slice(0, 3);
+        setDailyData({
+          fen: g.fen(),
+          title: data.game.opening?.name || 'Daily Puzzle',
+          par: Math.ceil(data.puzzle.solution.length / 2),
+          flavor: `Rated ${data.puzzle.rating} · ${data.puzzle.themes.join(', ')}`,
+          dailyCards,
+          dayNum,
+          cardHints: {}
+        });
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) return (
+    <div style={{ minHeight: "100vh", backgroundColor: "#0a0510", display: "flex", alignItems: "center", justifyContent: "center", color: "#ffd700", fontSize: "20px" }}>
+      ✨ Summoning today's puzzle...
+    </div>
+  );
   const [game, setGame] = useState(() => { const g = new Chess(); g.load(dailyData.fen); return g; });
   const [moveFrom, setMoveFrom] = useState("");
   const [moveCount, setMoveCount] = useState(0);
