@@ -14,40 +14,6 @@ function useIsMobile() {
 }
 
 // ─── DAILY PUZZLE SYSTEM ────────────────────────────────────────────────────
-
-const DAILY_PUZZLES = [
-  { fen: "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4", title: "The Scholar's Gambit", matein: 4, par: 4, flavor: "The oldest trap in the cosmos.", cardHints: { "MANGALA": "Use MANGALA to reach the f7 square!", "RAHU": "RAHU can slide past the defender on e5." } },
-  { fen: "r1b1kb1r/pppp1ppp/2n5/4p3/2BPP3/8/PPP2PPP/RNBQK1nR w KQkq - 0 6", title: "Knight's Folly", matein: 3, par: 3, flavor: "The knight dares to enter the lion's den.", cardHints: { "MANGALA": "MANGALA removes the guard instantly." } },
-  { fen: "6k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1", title: "The Rook's Sermon", matein: 3, par: 3, flavor: "One rook. One truth. Inevitable.", cardHints: { "SURYA": "SURYA protects your rook from counterplay." } },
-  { fen: "4k3/4Q3/4K3/8/8/8/8/8 w - - 0 1", title: "Queen's Meditation", matein: 2, par: 2, flavor: "She circles. He cannot escape.", cardHints: {} },
-  { fen: "r3k2r/ppp2ppp/2n5/3pp3/1b2P3/2NP1N2/PPP2PPP/R1BQK2R w KQkq - 0 8", title: "The Demon's Fork", matein: 5, par: 5, flavor: "Two paths. Both lead to ruin.", cardHints: { "BUDHA": "BUDHA's double move breaks the stalemate threat." } },
-  { fen: "2bqkb1r/rpp2ppp/p1np1n2/4p3/2B1P3/2NP1N2/PPP2PPP/R1BQK2R w KQkq - 2 7", title: "The Open Diagonal", matein: 4, par: 4, flavor: "Bishops speak in slanted truths.", cardHints: { "RAHU": "RAHU lets your bishop phase through the pawn screen." } },
-  { fen: "5rk1/5ppp/8/3Q4/8/8/5PPP/5RK1 w - - 0 1", title: "Rook & Queen's Dance", matein: 3, par: 3, flavor: "They move as one. The king has nowhere to hide.", cardHints: {} },
-  { fen: "r1bq1rk1/pppp1ppp/2n2n2/2b1p3/2B1P3/2NP1N2/PPP2PPP/R1BQK2R w KQ - 4 6", title: "Symmetry's Illusion", matein: 5, par: 5, flavor: "Mirrors lie. One side will shatter.", cardHints: { "SHANI": "Freeze the knight on f6 — it's the key defender." } },
-  { fen: "3k4/3Q4/3K4/8/8/8/8/8 w - - 0 1", title: "Triangle of Fate", matein: 3, par: 3, flavor: "The ancient triangle. The king cannot escape geometry.", cardHints: {} },
-  { fen: "r1bqkbnr/pppp1ppp/8/4p3/4P3/8/PPPPKPPP/RNBQ1BNR w kq - 2 3", title: "The King's Walk", matein: 5, par: 5, flavor: "Dangerous is he who walks without fear.", cardHints: { "BUDHA": "Double move secures the center before they can react." } },
-  { fen: "8/8/8/4k3/8/4K3/4R3/8 w - - 0 1", title: "Rook's Verdict", matein: 4, par: 4, flavor: "Patience is a rook's greatest weapon.", cardHints: {} },
-  { fen: "r1b1r1k1/ppp2ppp/2n5/3pN3/3P4/2PB4/PP3PPP/R3K2R w KQ - 0 12", title: "The Sacrificial Knight", matein: 4, par: 4, flavor: "Give to receive. The oldest bargain.", cardHints: { "MANGALA": "MANGALA on Ne5 captures without needing line of sight." } },
-  { fen: "6k1/6pp/5p2/8/2B5/8/8/6K1 w - - 0 1", title: "Bishop's Sermon", matein: 3, par: 3, flavor: "Diagonal truth cuts through all defenses.", cardHints: {} },
-  { fen: "r2qkb1r/ppp1pppp/2n5/3pP3/3P4/5N2/PPP2PPP/RNBQKB1R w KQkq d6 0 5", title: "The En Passant Prophecy", matein: 4, par: 4, flavor: "The ghost capture. They never see it coming.", cardHints: { "RAHU": "RAHU makes your pawn unstoppable through the blockade." } },
-  { fen: "8/8/8/2k5/2pP4/8/8/4K3 w - - 0 1", title: "Pawn's Ascension", matein: 5, par: 5, flavor: "The humble pawn walks the longest road.", cardHints: {} },
-  { fen: "r1bqk2r/pppp1ppp/2n2n2/4p3/2B1P3/3P1N2/PPP2PPP/RNBQK2R w KQkq - 0 5", title: "The Fried Liver", matein: 4, par: 4, flavor: "Bold is the player who sacrifices for the attack.", cardHints: { "MANGALA": "MANGALA crashes through the f7 barrier instantly." } },
-  { fen: "8/8/8/8/3k4/8/3PK3/8 w - - 0 1", title: "Pawn Endgame", matein: 5, par: 5, flavor: "One pawn. One dream. One destiny.", cardHints: {} },
-  { fen: "r1b1kbnr/pppp1ppp/8/4p3/2BnP3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4", title: "The Knight Infiltrates", matein: 3, par: 3, flavor: "Into the heart of the enemy.", cardHints: { "SHANI": "Freeze the knight on d4 and the position opens." } },
-  { fen: "6k1/8/6K1/5Q2/8/8/8/8 w - - 0 1", title: "Queen's Waltz", matein: 3, par: 3, flavor: "She dances, and kings fall.", cardHints: {} },
-  { fen: "r2qkbnr/ppp1pppp/2n5/3pP3/8/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 4", title: "The French Defense Breaks", matein: 4, par: 4, flavor: "Every wall has a door.", cardHints: { "BUDHA": "Two moves in a row — the center collapses." } },
-  { fen: "8/8/1k6/8/8/1K6/1R6/8 w - - 0 1", title: "The Rook Barrier", matein: 4, par: 4, flavor: "A wall of rank. A wall of file.", cardHints: {} },
-  { fen: "r1bqkb1r/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3", title: "Open Game", matein: 5, par: 5, flavor: "When pawns clear, destiny beckons.", cardHints: { "RAHU": "Phase through the central pawns for a decisive blow." } },
-  { fen: "8/2p5/8/1P6/8/2K5/8/2k5 w - - 0 1", title: "Pawn Duel", matein: 5, par: 5, flavor: "Two pawns. Ancient rivals. One survives.", cardHints: {} },
-  { fen: "r3kb1r/ppp2ppp/2n5/3pp3/4P3/3P1N2/PPP2PPP/RNB1KB1R w KQkq - 0 7", title: "The Dragon Awakens", matein: 4, par: 4, flavor: "The sleeping dragon stirs beneath the queenside.", cardHints: { "MANGALA": "MANGALA strikes where knights cannot normally reach." } },
-  { fen: "8/8/8/8/2k5/2P5/2K5/8 w - - 0 1", title: "Zugzwang", matein: 5, par: 5, flavor: "Sometimes, the best move is to force theirs.", cardHints: {} },
-  { fen: "r1bq1rk1/pppp1ppp/2n2n2/8/1bB1P3/2N2N2/PPPP1PPP/R1BQ1RK1 w - - 4 6", title: "The Pin & The Fork", matein: 4, par: 4, flavor: "Two weapons. One moment.", cardHints: { "SHANI": "Freeze the bishop on b4 — break the pin!" } },
-  { fen: "5k2/8/4K3/5Q2/8/8/8/8 w - - 0 1", title: "Corner Persecution", matein: 3, par: 3, flavor: "The corner is no refuge — it is a cage.", cardHints: {} },
-  { fen: "r2r2k1/ppp2ppp/2n5/3Np3/8/2P5/PP3PPP/R3K2R w KQ - 0 14", title: "The Outpost Knight", matein: 4, par: 4, flavor: "Planted in the heart of the enemy.", cardHints: { "BUDHA": "Double move — the knight reaches d7 unstoppable." } },
-  { fen: "8/8/8/3k4/3P4/3K4/8/8 w - - 0 1", title: "Pawn Promotion Race", matein: 5, par: 5, flavor: "The last march. The longest mile.", cardHints: {} },
-  { fen: "r1bqkb1r/ppp2ppp/2n2n2/3pp3/2B1P3/2NP1N2/PPP2PPP/R1BQK2R w KQkq - 0 6", title: "The Cosmic Opening", matein: 5, par: 5, flavor: "All nine planets align. The position is ripe.", cardHints: { "RAHU": "RAHU breaks the central pin. Stars align.", "MANGALA": "MANGALA seizes the d5 outpost by force." } },
-];
-
 function seededRandom(seed) {
   let s = seed;
   return function () {
