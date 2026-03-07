@@ -986,31 +986,39 @@ function App() {
     const sf = stockfishRef.current;
     if (!sf || sf.random) {
       setTimeout(() => {
-        const cg = new Chess(game.fen()); const moves = cg.moves({ verbose: true }); if (!moves.length) { setWaitingForBot(false); return; }
-        const safe = moves.filter(m => !(poweredPiecesRef.current[m.to]?.power === "SURYA" && poweredPiecesRef.current[m.to].usesLeft > 0));
-        const mu = safe.length > 0 ? safe : moves; const rm = mu[Math.floor(Math.random() * mu.length)];
-        const ng = new Chess(game.fen()); const rcp = ng.get(rm.to);
-        // ✅ Check KETU before the move removes the piece from the board
-        const rcpHadKetu = poweredPiecesRef.current[rm.to]?.power === "KETU";
-        const res = ng.move({ from: rm.from, to: rm.to, promotion: "q" });
-        if (res) {
+        const currentGame = new Chess(game.fen());
+        const moves = currentGame.moves({ verbose: true });
+        if (!moves.length) { setWaitingForBot(false); return; }
+
+        const safeMoves = moves.filter(m =>
+          !(poweredPiecesRef.current[m.to]?.power === "SURYA" &&
+            poweredPiecesRef.current[m.to].usesLeft > 0)
+        );
+        const movesToUse = safeMoves.length > 0 ? safeMoves : moves;
+        const randomMove = movesToUse[Math.floor(Math.random() * movesToUse.length)];
+        const ng = new Chess(game.fen());
+        const rcp = ng.get(randomMove.to);
+        const rcpHadKetu = poweredPiecesRef.current[randomMove.to]?.power === "KETU";
+        const result = ng.move({ from: randomMove.from, to: randomMove.to, promotion: "q" });
+
+        if (result) {
           if (rcp) {
-            setCaptureHistory(p => [...p, { piece: rcp.type, square: rm.to, color: rcp.color }]);
+            setCaptureHistory(p => [...p, { piece: rcp.type, square: randomMove.to, color: rcp.color }]);
             if (rcp.color === "w") setWhiteCaptured(p => [...p, rcp.type]);
             checkTierUnlocks(rcp.type);
-            // ✅ Apply KETU: white gains 12s, bot loses 12s
-            if (rcpHadKetu) {
-              addTime("w", 12);
-              subtractTime("b", 12);
-            }
+            if (rcpHadKetu) { addTime("w", 12); subtractTime("b", 12); }
           }
           setTimeout(() => {
-            setGame(ng); setMoveCount(p => p + 1); if (ng.isCheckmate()) { setGameOver(true); setWinner("black"); }
-            setWaitingForBot(false);
+            setGame(ng);
+            setMoveCount(p => p + 1);
+            if (ng.isCheckmate()) { setGameOver(true); setWinner("black"); }
+            setWaitingForBot(false); 
           }, 800);
+        } else {
+          setWaitingForBot(false); 
         }
-        setWaitingForBot(false);
-      }, 1200); return;
+      }, 1200);
+      return; 
     }
     const depthMap = { shishya: 5, acharya: 8, guru: 12 };
     const depth = gameMode === "shukracharya" ? (depthMap[shukraDifficulty] || 8) : 3;
