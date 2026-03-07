@@ -848,8 +848,7 @@ function App() {
           if (type === "p") { for (let rank of ["7", "6", "5"]) { const s = files[index] + rank; if (!ng.get(s)) { sq = s; break; } } }
           else { for (let rank of ["8", "7", "6"]) { for (let file of files) { const s = file + rank; if (!ng.get(s)) { sq = s; break; } } if (sq && !ng.get(sq)) break; } }
         }
-        if (sq && !ng.get(sq) && ng.turn() === "w") ng.put({ type: pieceType, color: "b" }, sq);
-        return ng;
+        if (sq && !ng.get(sq)) ng.put({ type: pieceType, color: "b" }, sq); return ng;
       });
     }, 2000);
   }
@@ -1012,13 +1011,13 @@ function App() {
             setGame(ng);
             setMoveCount(p => p + 1);
             if (ng.isCheckmate()) { setGameOver(true); setWinner("black"); }
-            setWaitingForBot(false); 
+            setWaitingForBot(false);
           }, 800);
         } else {
-          setWaitingForBot(false); 
+          setWaitingForBot(false);
         }
       }, 1200);
-      return; 
+      return;
     }
     const depthMap = { shishya: 5, acharya: 8, guru: 12 };
     const depth = gameMode === "shukracharya" ? (depthMap[shukraDifficulty] || 8) : 3;
