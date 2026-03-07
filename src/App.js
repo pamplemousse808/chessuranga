@@ -23,7 +23,7 @@ function seededRandom(seed) {
 }
 
 function getDailyPuzzleNumber() {
-  const epoch = new Date("2025-01-01").getTime();
+  const epoch = new Date("2026-03-07").getTime();
   return Math.floor((Date.now() - epoch) / (1000 * 60 * 60 * 24)) + 1;
 }
 
@@ -556,8 +556,6 @@ function DailyPuzzle({ onBack }) {
                   Try Again 🔄
                 </button>
               </div>
-              <p style={{ color: "#a88a5a", fontSize: "13px", marginBottom: "20px" }}>The cosmos weeps. A new challenge awaits tomorrow.</p>
-              <button onClick={onBack} style={{ padding: "12px 28px", backgroundColor: "#e94560", border: "none", borderRadius: "10px", color: "#fff", cursor: "pointer", fontSize: "14px", fontWeight: "bold" }}>← Menu</button>
             </>}
           </div>
         </div>
