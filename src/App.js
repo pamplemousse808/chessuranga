@@ -177,6 +177,7 @@ function DailyPuzzle({ onBack }) {
     fetch('/api/daily-puzzle')
       .then(r => r.json())
       .then(data => {
+        console.log('Lichess response:', data);
         const g = new Chess();
         g.load(data.puzzle.initialFen);
         const firstMove = data.puzzle.solution[0];
