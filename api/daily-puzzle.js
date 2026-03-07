@@ -6,7 +6,7 @@
 // Place this file at: /api/daily-puzzle.js (project root, same level as /src)
 // Place puzzle bank at: /public/chessuranga_puzzles.json
 
-import puzzles from "../public/chessuranga_puzzles.json" assert { type: "json" };
+import puzzles from "../public/chessuranga_puzzles.json" with { type: "json" };
 
 export default function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
