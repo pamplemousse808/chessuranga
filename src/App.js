@@ -179,14 +179,17 @@ function DailyPuzzle({ onBack }) {
       .then(data => {
         // Replay PGN to the starting position
         const g = new Chess();
-        const moves = data.game.pgn.split(' ');
+        const moves = data.game.pgn
+          .split(' ')
+          .filter(m => m && !m.includes('.') && !m.startsWith('{') && !m.startsWith('*'));
+
         for (let i = 0; i < data.puzzle.initialPly; i++) {
-          try {
-            g.move(moves[i]);
-          } catch (e) {
-            // skip annotations like move numbers "1." "2." etc
-          }
+          g.move(moves[i]);
         }
+        console.log('Position after replay:', g.fen());
+        console.log('Moves replayed:', data.puzzle.initialPly, 'of', moves.length);
+        console.log('First solution move:', data.puzzle.solution[0]);
+        
         // Apply the first move (opponent's move that sets up the puzzle)
         const firstMove = data.puzzle.solution[0];
         g.move({ from: firstMove.slice(0, 2), to: firstMove.slice(2, 4), promotion: firstMove[4] || 'q' });
