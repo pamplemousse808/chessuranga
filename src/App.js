@@ -989,9 +989,21 @@ function App() {
         const cg = new Chess(game.fen()); const moves = cg.moves({ verbose: true }); if (!moves.length) { setWaitingForBot(false); return; }
         const safe = moves.filter(m => !(poweredPiecesRef.current[m.to]?.power === "SURYA" && poweredPiecesRef.current[m.to].usesLeft > 0));
         const mu = safe.length > 0 ? safe : moves; const rm = mu[Math.floor(Math.random() * mu.length)];
-        const ng = new Chess(game.fen()); const rcp = ng.get(rm.to); const res = ng.move({ from: rm.from, to: rm.to, promotion: "q" });
+        const ng = new Chess(game.fen()); const rcp = ng.get(rm.to);
+        // ✅ Check KETU before the move removes the piece from the board
+        const rcpHadKetu = poweredPiecesRef.current[rm.to]?.power === "KETU";
+        const res = ng.move({ from: rm.from, to: rm.to, promotion: "q" });
         if (res) {
-          if (rcp) { setCaptureHistory(p => [...p, { piece: rcp.type, square: rm.to, color: rcp.color }]); if (rcp.color === "w") setWhiteCaptured(p => [...p, rcp.type]); checkTierUnlocks(rcp.type); }
+          if (rcp) {
+            setCaptureHistory(p => [...p, { piece: rcp.type, square: rm.to, color: rcp.color }]);
+            if (rcp.color === "w") setWhiteCaptured(p => [...p, rcp.type]);
+            checkTierUnlocks(rcp.type);
+            // ✅ Apply KETU: white gains 12s, bot loses 12s
+            if (rcpHadKetu) {
+              addTime("w", 12);
+              subtractTime("b", 12);
+            }
+          }
           setTimeout(() => {
             setGame(ng); setMoveCount(p => p + 1); if (ng.isCheckmate()) { setGameOver(true); setWinner("white"); }
             setWaitingForBot(false);
@@ -1010,9 +1022,21 @@ function App() {
         const isSP = poweredPiecesRef.current[ms.slice(2, 4)]?.power === "SURYA" && poweredPiecesRef.current[ms.slice(2, 4)].usesLeft > 0;
         let fm = { from: ms.slice(0, 2), to: ms.slice(2, 4), promotion: ms[4] || "q" };
         if (isSP) { const cg2 = new Chess(game.fen()); const mv2 = cg2.moves({ verbose: true }); const sf2 = mv2.filter(m => !(poweredPiecesRef.current[m.to]?.power === "SURYA" && poweredPiecesRef.current[m.to].usesLeft > 0)); const fb = sf2.length > 0 ? sf2 : mv2; const alt = fb[Math.floor(Math.random() * fb.length)]; fm = { from: alt.from, to: alt.to, promotion: alt.promotion || "q" }; }
-        const scp = ng.get(fm.to); const res = ng.move(fm);
+        // ✅ Check KETU before the move removes the piece from the board
+        const scp = ng.get(fm.to);
+        const scpHadKetu = poweredPiecesRef.current[fm.to]?.power === "KETU";
+        const res = ng.move(fm);
         if (res) {
-          if (scp) { setCaptureHistory(p => [...p, { piece: scp.type, square: ms.slice(2, 4), color: scp.color }]); if (scp.color === "w") setWhiteCaptured(p => [...p, scp.type]); checkTierUnlocks(scp.type); }
+          if (scp) {
+            setCaptureHistory(p => [...p, { piece: scp.type, square: fm.to, color: scp.color }]);
+            if (scp.color === "w") setWhiteCaptured(p => [...p, scp.type]);
+            checkTierUnlocks(scp.type);
+            // ✅ Apply KETU: white gains 12s, bot loses 12s
+            if (scpHadKetu) {
+              addTime("w", 12);
+              subtractTime("b", 12);
+            }
+          }
           setTimeout(() => {
             setGame(ng); setMoveCount(p => p + 1); if (ng.isCheckmate()) { setGameOver(true); setWinner("white"); }
             setWaitingForBot(false);
