@@ -220,14 +220,14 @@ function DailyPuzzle({ onBack }) {
   const [moveFrom, setMoveFrom] = useState("");
   const [moveCount, setMoveCount] = useState(0);
   const [cardsUsed, setCardsUsed] = useState([]);
-  const [_availableCards, setAvailableCards] = useState(dailyData.dailyCards);
+  const [, setAvailableCards] = useState(dailyData.dailyCards);
   const [selectedCard, setSelectedCard] = useState(null);
   const [poweredPieces, setPoweredPieces] = useState({});
   const [activeTiles, setActiveTiles] = useState([]);
   const [activationMode, setActivationMode] = useState(false);
   const [frozenPieces] = useState({});
   const [puzzleOver, setPuzzleOver] = useState(null);
-  const [_captureHistory, setCaptureHistory] = useState([]);
+  const [, setCaptureHistory] = useState([]);
   const [moveHistory, setMoveHistory] = useState([]);
   const par = dailyData.par;
 
