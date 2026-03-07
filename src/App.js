@@ -201,6 +201,7 @@ function DailyPuzzle({ onBack }) {
 
         setDailyData({
           fen: g.fen(),
+          playerColor: g.turn(), // whoever's turn it is after opponent's first move
           title: data.puzzle.themes.join(', '),
           par: Math.ceil((data.puzzle.solution.length - 1) / 2),
           flavor: `Rated ${data.puzzle.rating}`,
@@ -284,7 +285,7 @@ function DailyPuzzle({ onBack }) {
   }
 
   function handleDailyMove(from, to, promotion = "q") {
-    if (puzzleOver || game.turn() !== "w") return null;
+    if (puzzleOver || game.turn() !== dailyData?.playerColor) return null;
     const piece = game.get(from); if (!piece || piece.color !== "w") return null;
     if (frozenPieces[from]) return null;
     const cp = game.get(to);
@@ -355,7 +356,7 @@ function DailyPuzzle({ onBack }) {
   }
 
   function onSquareClick(square) {
-    if (puzzleOver || game.turn() !== "w") return;
+    if (puzzleOver || game.turn() !== dailyData?.playerColor) return;
     if (selectedCard) { placeTile(square); return; }
     if (activationMode) { const piz = getPiecesInZones(); if (piz.find(p => p.square === square)) { activateTileForPiece(square); } return; }
     if (!moveFrom) { const p = game.get(square); if (p && p.color === "w" && !frozenPieces[square]) setMoveFrom(square); return; }
@@ -366,7 +367,7 @@ function DailyPuzzle({ onBack }) {
   }
 
   function onPieceDrop(src, tgt) {
-    if (puzzleOver || selectedCard || activationMode || game.turn() !== "w") return false;
+    if (puzzleOver || selectedCard || activationMode || game.turn() !== dailyData?.playerColor) return false;
     const r = handleDailyMove(src, tgt); setMoveFrom(""); return r !== null;
   }
 
@@ -485,10 +486,10 @@ function DailyPuzzle({ onBack }) {
             })}
           </div>
 
-          <Chessboard position={game.fen()} onPieceDrop={onPieceDrop} onSquareClick={onSquareClick} customSquareStyles={customStyles} customDarkSquareStyle={{ backgroundColor: "#4a3060" }} customLightSquareStyle={{ backgroundColor: "#d4c5e8" }} boardWidth={boardSize} arePiecesDraggable={!puzzleOver && game.turn() === "w"} />
+          <Chessboard position={game.fen()} onPieceDrop={onPieceDrop} onSquareClick={onSquareClick} customSquareStyles={customStyles} customDarkSquareStyle={{ backgroundColor: "#4a3060" }} customLightSquareStyle={{ backgroundColor: "#d4c5e8" }} boardWidth={boardSize} boardOrientation={dailyData?.playerColor === 'b' ? 'black' : 'white'} arePiecesDraggable={!puzzleOver && game.turn() === dailyData?.playerColor} />
 
           <div style={{ marginTop: "10px", fontSize: "13px", color: "#6b5080", textAlign: "center" }}>
-            {!puzzleOver && (game.turn() === "w" ? "Your move — find checkmate!" : "⏳ Thinking...")}
+            {!puzzleOver && (game.turn() === dailyData?.playerColor? "Your move — find checkmate!" : "⏳ Thinking...")}
             {game.inCheck() && !puzzleOver && <span style={{ color: "#ff6b6b", marginLeft: "8px" }}>⚠️ Check!</span>}
           </div>
         </div>
