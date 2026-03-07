@@ -181,7 +181,11 @@ function DailyPuzzle({ onBack }) {
         const g = new Chess();
         const moves = data.game.pgn.split(' ');
         for (let i = 0; i < data.puzzle.initialPly; i++) {
-          g.move(moves[i]);
+          try {
+            g.move(moves[i]);
+          } catch (e) {
+            // skip annotations like move numbers "1." "2." etc
+          }
         }
         // Apply the first move (opponent's move that sets up the puzzle)
         const firstMove = data.puzzle.solution[0];
