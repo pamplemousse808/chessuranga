@@ -212,8 +212,7 @@ function DailyPuzzle({ onBack }) {
   const [, setCaptureHistory] = useState([]);
   const [moveHistory, setMoveHistory] = useState([]);
   const [attempts, setAttempts] = useState(1);
-  const par = dailyData.par;
-
+  const par = dailyData?.par || 3;
   const [alreadyPlayed] = useState(() => {
     try {
       const s = localStorage.getItem("chessuranga_daily");
