@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Chessboard } from "react-chessboard";
 import { Chess } from "chess.js";
+import AboutPage from "./AboutPage";
 
 // ── Mobile detection ──────────────────────────────────────────────────────────
 function useIsMobile() {
@@ -608,6 +609,7 @@ function App() {
   const poweredPiecesRef = useRef(poweredPieces);
   const [waitingForBot, setWaitingForBot] = useState(false);
   const [gameOverDismissed, setGameOverDismissed] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
   // Mobile UI state
   const [showCardOverlay, setShowCardOverlay] = useState(false);
 
@@ -1184,6 +1186,9 @@ function App() {
           : selectedCard ? `✨ ${selectedCard.name} selected — tap the board to place`
             : null;
 
+  if (showAbout) return <AboutPage onBack={() => setShowAbout(false)} />;
+  if (gameMode === "daily") return <DailyPuzzle onBack={() => setGameMode(null)} />;
+
   // Route to daily puzzle
   if (gameMode === "daily") return <DailyPuzzle onBack={() => setGameMode(null)} />;
 
@@ -1251,6 +1256,16 @@ function App() {
                 <button onClick={() => setGameMode("daily")} style={{ padding: "16px 24px", fontSize: "16px", background: "linear-gradient(135deg, #ffd700, #f59e0b)", color: "#1a0a00", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px", boxShadow: "0 0 20px rgba(255,215,0,0.35)" }}>🌟 Daily Puzzle</button>
                 <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>New puzzle every day. Find mate with today's 3 cosmic cards. Share your score.</p>
                 <p style={{ fontSize: "10px", color: "#ffd700", margin: "4px 0 0 0" }}>#{getDailyPuzzleNumber()} today</p>
+              </div>
+            
+              <div style={{ textAlign: "center", maxWidth: "200px" }}>
+                <button
+                  onClick={() => setShowAbout(true)}
+                  style={{ padding: "16px 24px", fontSize: "16px", backgroundColor: "#1e293b", color: "#e2e8f0", border: "1px solid #334155", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px" }}
+                >
+                  📖 About
+                </button>
+                <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>The story behind the game — and the cosmic forces within it.</p>
               </div>
             </div>
             <HowToPlay />
