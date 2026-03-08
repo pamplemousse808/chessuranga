@@ -812,7 +812,7 @@ function App() {
     });
     setActiveTiles(updatedTiles);
     if (powerType) {
-      if (powerType === "CHANDRA") { setChandraPlacementMode({ square, piece, rank: parseInt(square[1]), mirages: [] }); setActivationMode(false); return; }
+      if (powerType === "CHANDRA") { setChandraPlacementMode({ square, piece, rank: parseInt(square[1]), mirages: [], teleportTo: null }); setActivationMode(false); return; }
       if (powerType === "GURU") {
         const tr = SHARED_DECK.find(c => c.id === "GURU").radius;
         const sir = getSquaresInRadius(tileSquare, tr);
@@ -1155,14 +1155,40 @@ function App() {
 
   function confirmChandraPlacement() {
     if (!chandraPlacementMode || chandraPlacementMode.mirages.length === 0) return;
-    const cost = 10 + (chandraPlacementMode.mirages.length === 2 ? 5 : 0);
-    subtractTime(game.turn(), cost);
-    const gc = new Chess(game.fen());
-    if (wouldGiveCheck(gc, chandraPlacementMode.square)) { alert("CHANDRA cannot give check! Power auto-revealed."); setChandraPlacementMode(null); return; }
+    const { square: originalSquare, piece, mirages, teleportTo } = chandraPlacementMode;
+    const realSquare = teleportTo || originalSquare;
+
+    // Build candidate board: move real piece to teleportTo (if chosen), place mirages
     const ng = new Chess(game.fen());
-    chandraPlacementMode.mirages.forEach(sq => ng.put({ type: chandraPlacementMode.piece.type, color: chandraPlacementMode.piece.color }, sq));
+    if (teleportTo && teleportTo !== originalSquare) {
+      ng.remove(originalSquare);
+      ng.put({ type: piece.type, color: piece.color }, teleportTo);
+    }
+    mirages.forEach(sq => ng.put({ type: piece.type, color: piece.color }, sq));
+
+    // Check our own king is not left in check after the rearrangement
+    const selfTest = new Chess(ng.fen());
+    if (selfTest.inCheck()) {
+      alert("That move would leave your king in check!");
+      return;
+    }
+
+    // Check the arrangement does not give check to the opponent
+    const oppTest = new Chess(ng.fen());
+    const fp = oppTest.fen().split(" ");
+    fp[1] = fp[1] === "w" ? "b" : "w";
+    oppTest.load(fp.join(" "));
+    if (oppTest.inCheck()) {
+      alert("CHANDRA cannot give check! Power auto-revealed.");
+      setChandraPlacementMode(null);
+      return;
+    }
+
+    const cost = 10 + (mirages.length === 2 ? 5 : 0);
+    subtractTime(game.turn(), cost);
+
     setGame(ng);
-    setChandraMode({ realSquare: chandraPlacementMode.square, piece: chandraPlacementMode.piece, mirages: chandraPlacementMode.mirages, turnsLeft: 4, color: chandraPlacementMode.piece.color });
+    setChandraMode({ realSquare, piece, mirages, turnsLeft: 4, color: piece.color });
     setChandraPlacementMode(null);
   }
 
@@ -1214,6 +1240,7 @@ function App() {
     files.forEach(f => { const sq = f + chandraPlacementMode.rank; if (!game.get(sq) && sq !== chandraPlacementMode.square) customStyles[sq] = { ...(customStyles[sq] || {}), backgroundColor: "rgba(229,231,235,0.3)", border: "2px dashed #e5e7eb" }; });
     chandraPlacementMode.mirages.forEach(ms => { customStyles[ms] = { ...(customStyles[ms] || {}), backgroundColor: "rgba(229,231,235,0.6)", border: "3px solid #e5e7eb", boxShadow: "0 0 15px #e5e7eb" }; });
     customStyles[chandraPlacementMode.square] = { ...(customStyles[chandraPlacementMode.square] || {}), border: "3px solid #ffd700", boxShadow: "0 0 20px #ffd700" };
+    if (chandraPlacementMode.teleportTo) customStyles[chandraPlacementMode.teleportTo] = { ...(customStyles[chandraPlacementMode.teleportTo] || {}), backgroundColor: "rgba(255,215,0,0.4)", border: "3px solid #ffd700", boxShadow: "0 0 20px #ffd700" };
   }
   if (chandraMode) chandraMode.mirages.forEach(ms => { customStyles[ms] = { ...(customStyles[ms] || {}), boxShadow: "0 0 10px rgba(229,231,235,0.6)" }; });
   if (activationMode) piecesInZones.forEach(pi => { customStyles[pi.square] = { ...(customStyles[pi.square] || {}), border: "3px solid #ffd700", boxShadow: "0 0 15px #ffd700, inset 0 0 10px rgba(255,215,0,0.3)", animation: "pulse 1.5s infinite" }; });
@@ -1385,6 +1412,50 @@ function App() {
                   <div style={{ fontSize: "12px", color: "#aaa", marginBottom: "10px" }}>Click empty squares on rank {chandraPlacementMode.rank} to place {chandraPlacementMode.mirages.length}/2 clones</div>
                   <div style={{ fontSize: "11px", color: "#888", marginBottom: "10px" }}>Real piece: {chandraPlacementMode.square}</div>
                   {chandraPlacementMode.mirages.length === 2 && <div style={{ fontSize: "11px", color: "#ffd700", marginBottom: "10px" }}>+5s penalty for 2nd clone</div>}
+
+                  <div style={{ fontSize: "11px", color: "#aaa", marginBottom: "5px", marginTop: "10px" }}>
+                    Teleport real piece to: <span style={{ color: "#ffd700" }}>{chandraPlacementMode.teleportTo ? chandraPlacementMode.teleportTo : "(stay)"}</span>
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "3px", marginBottom: "10px" }}>
+                    {['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map(file => {
+                      const sq = file + chandraPlacementMode.rank;
+                      const isCurrentReal = sq === chandraPlacementMode.square;
+                      const isSelected = sq === chandraPlacementMode.teleportTo;
+                      const isMirage = chandraPlacementMode.mirages.includes(sq);
+                      const hasOtherPiece = game.get(sq) && !isCurrentReal;
+                      // Bishop colour constraint
+                      if (chandraPlacementMode.piece.type === 'b') {
+                        const files2 = ["a","b","c","d","e","f","g","h"];
+                        const of2 = files2.indexOf(chandraPlacementMode.square[0]);
+                        const or2 = chandraPlacementMode.rank;
+                        const oLight = (of2 + or2) % 2 === 0;
+                        const cf2 = files2.indexOf(file);
+                        if (oLight !== ((cf2 + chandraPlacementMode.rank) % 2 === 0)) return null;
+                      }
+                      const disabled = isCurrentReal || isMirage || hasOtherPiece;
+                      return (
+                        <button key={file} onClick={() => {
+                          if (!disabled) {
+                            setChandraPlacementMode(prev => ({
+                              ...prev,
+                              teleportTo: prev.teleportTo === sq ? null : sq
+                            }));
+                          }
+                        }} style={{
+                          padding: "4px 6px", fontSize: "11px",
+                          backgroundColor: isSelected ? "#ffd700" : (disabled ? "#333" : "#555"),
+                          color: isSelected ? "#000" : "#fff",
+                          border: isCurrentReal ? "1px solid #ffd700" : "none",
+                          borderRadius: "3px",
+                          cursor: disabled ? "not-allowed" : "pointer",
+                          opacity: disabled ? 0.4 : 1
+                        }}>
+                          {file}{chandraPlacementMode.rank}
+                        </button>
+                      );
+                    })}
+                  </div>
+
                   <div style={{ display: "flex", gap: "5px" }}>
                     <button onClick={confirmChandraPlacement} disabled={chandraPlacementMode.mirages.length === 0} style={{ flex: 1, padding: "8px", fontSize: "12px", backgroundColor: chandraPlacementMode.mirages.length > 0 ? "#4ecca3" : "#555", color: chandraPlacementMode.mirages.length > 0 ? "#000" : "#888", border: "none", borderRadius: "5px", cursor: chandraPlacementMode.mirages.length > 0 ? "pointer" : "not-allowed", fontWeight: "bold" }}>Confirm</button>
                     <button onClick={() => setChandraPlacementMode(null)} style={{ flex: 1, padding: "8px", fontSize: "12px", backgroundColor: "#e94560", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer" }}>Cancel</button>
@@ -1538,11 +1609,50 @@ function App() {
               </div>
             )}
 
-            {/* Chandra confirm on mobile */}
+            {/* Chandra placement UI on mobile */}
             {chandraPlacementMode && (
-              <div style={{ width: "100%", display: "flex", gap: "8px", marginBottom: "6px" }}>
-                <button onClick={confirmChandraPlacement} disabled={chandraPlacementMode.mirages.length === 0} style={{ flex: 1, padding: "10px", fontSize: "13px", backgroundColor: chandraPlacementMode.mirages.length > 0 ? "#4ecca3" : "#555", color: chandraPlacementMode.mirages.length > 0 ? "#000" : "#888", border: "none", borderRadius: "8px", cursor: chandraPlacementMode.mirages.length > 0 ? "pointer" : "not-allowed", fontWeight: "bold" }}>
-                  ✓ Confirm Clones ({chandraPlacementMode.mirages.length}/2){chandraPlacementMode.mirages.length === 2 ? " +5s" : ""}
+              <div style={{ width: "100%", backgroundColor: "#16213e", borderRadius: "10px", padding: "10px", marginBottom: "6px" }}>
+                <div style={{ fontSize: "12px", color: "#aaa", marginBottom: "6px" }}>
+                  🌙 Clones placed: <strong style={{ color: "#e5e7eb" }}>{chandraPlacementMode.mirages.length}/2</strong>
+                  {chandraPlacementMode.mirages.length === 2 && <span style={{ color: "#ffd700", marginLeft: "6px" }}>+5s</span>}
+                </div>
+                <div style={{ fontSize: "11px", color: "#aaa", marginBottom: "4px" }}>
+                  Teleport to: <span style={{ color: "#ffd700" }}>{chandraPlacementMode.teleportTo || "(stay)"}</span>
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginBottom: "8px" }}>
+                  {['a','b','c','d','e','f','g','h'].map(file => {
+                    const sq = file + chandraPlacementMode.rank;
+                    const isCurrentReal = sq === chandraPlacementMode.square;
+                    const isSelected = sq === chandraPlacementMode.teleportTo;
+                    const isMirage = chandraPlacementMode.mirages.includes(sq);
+                    const hasOtherPiece = game.get(sq) && !isCurrentReal;
+                    if (chandraPlacementMode.piece.type === 'b') {
+                      const files2 = ["a","b","c","d","e","f","g","h"];
+                      const of2 = files2.indexOf(chandraPlacementMode.square[0]);
+                      const oLight = (of2 + chandraPlacementMode.rank) % 2 === 0;
+                      const cf2 = files2.indexOf(file);
+                      if (oLight !== ((cf2 + chandraPlacementMode.rank) % 2 === 0)) return null;
+                    }
+                    const disabled = isCurrentReal || isMirage || hasOtherPiece;
+                    return (
+                      <button key={file} onClick={() => {
+                        if (!disabled) setChandraPlacementMode(prev => ({ ...prev, teleportTo: prev.teleportTo === sq ? null : sq }));
+                      }} style={{
+                        padding: "5px 8px", fontSize: "12px",
+                        backgroundColor: isSelected ? "#ffd700" : (disabled ? "#2a2a3a" : "#3a3a5a"),
+                        color: isSelected ? "#000" : "#fff",
+                        border: isCurrentReal ? "1px solid #ffd700" : "none",
+                        borderRadius: "5px",
+                        cursor: disabled ? "not-allowed" : "pointer",
+                        opacity: disabled ? 0.4 : 1
+                      }}>
+                        {file}{chandraPlacementMode.rank}
+                      </button>
+                    );
+                  })}
+                </div>
+                <button onClick={confirmChandraPlacement} disabled={chandraPlacementMode.mirages.length === 0} style={{ width: "100%", padding: "10px", fontSize: "13px", backgroundColor: chandraPlacementMode.mirages.length > 0 ? "#4ecca3" : "#555", color: chandraPlacementMode.mirages.length > 0 ? "#000" : "#888", border: "none", borderRadius: "8px", cursor: chandraPlacementMode.mirages.length > 0 ? "pointer" : "not-allowed", fontWeight: "bold" }}>
+                  ✓ Confirm{chandraPlacementMode.teleportTo ? ` (teleport → ${chandraPlacementMode.teleportTo})` : " (stay)"}
                 </button>
               </div>
             )}
