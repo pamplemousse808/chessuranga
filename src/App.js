@@ -1085,7 +1085,8 @@ function App() {
         if (res) {
           if (scp) {
             setCaptureHistory(p => [...p, { piece: scp.type, square: fm.to, color: scp.color }]);
-            if (scp.color === "w") setWhiteCaptured(p => [...p, scp.type]);
+            if (scp.color === "w") setBlackCaptured(p => [...p, scp.type]);
+            else setWhiteCaptured(p => [...p, scp.type]);
             checkTierUnlocks(scp.type);
             // ✅ Apply KETU: white gains 12s, bot loses 12s
             if (scpHadKetu) {
