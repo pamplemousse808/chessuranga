@@ -484,7 +484,7 @@ function DailyPuzzle({ onBack }) {
 
           <Chessboard position={game.fen()} onPieceDrop={onPieceDrop} onSquareClick={onSquareClick} customSquareStyles={customStyles} customDarkSquareStyle={{ backgroundColor: "#4a3060" }} customLightSquareStyle={{ backgroundColor: "#d4c5e8" }} boardWidth={boardSize} boardOrientation={dailyData?.playerColor === 'b' ? 'black' : 'white'} arePiecesDraggable={!puzzleOver && game.turn() === dailyData?.playerColor} />
 
-          <div style={{ marginTop: "10px", fontSize: "13px", color: "#6b5080", textAlign: "center" }}>
+          <div style={{ marginTop: "10px", fontSize: "13px", color: "#d4ccda", textAlign: "center" }}>
             {!puzzleOver && (game.turn() === dailyData?.playerColor ? "Your move — find checkmate!" : "⏳ Thinking...")}
             {game.inCheck() && !puzzleOver && <span style={{ color: "#ff6b6b", marginLeft: "8px" }}>⚠️ Check!</span>}
           </div>
@@ -503,7 +503,7 @@ function DailyPuzzle({ onBack }) {
               setActivationMode(false);
               setMoveHistory([]);
               setAttempts(a => a + 1);
-            }} style={{ marginTop: "8px", padding: "6px 14px", backgroundColor: "transparent", border: "1px solid #2a1a30", borderRadius: "8px", color: "#4a3060", cursor: "pointer", fontSize: "11px" }}>
+            }} style={{ marginTop: "8px", padding: "6px 14px", backgroundColor: "transparent", border: "1px solid #2a1a30", borderRadius: "8px", color: "#e5dfeb", cursor: "pointer", fontSize: "11px" }}>
               ↩ Restart puzzle
             </button>
           )}
@@ -659,7 +659,13 @@ function App() {
           const url = URL.createObjectURL(blob);
           worker = new Worker(url);
           worker.postMessage("uci");
-          if (gameMode === "asura") worker.postMessage("setoption name Skill Level value 4");
+          if (gameMode === 'asura') {
+            worker.postMessage('setoption name Skill Level value 4');
+          } else if (gameMode === 'shukracharya') {
+            const skillMap = { initiate: 0, shishya: 5, acharya: 12, guru: 20 };
+            const skill = skillMap[difficulty] ?? 10;
+            worker.postMessage(`setoption name Skill Level value ${skill}`);
+          }
           worker.postMessage("isready");
           worker.onmessage = (e) => {
             if (typeof e.data === "string" && e.data.startsWith("bestmove")) {
@@ -1058,7 +1064,7 @@ function App() {
       }, 1200);
       return;
     }
-    const depthMap = { shishya: 5, acharya: 8, guru: 12 };
+    const depthMap = { initiate: 2, shishya: 5, acharya: 8, guru: 12 };
     const depth = gameMode === "shukracharya" ? (depthMap[shukraDifficulty] || 8) : 3;
     sf.postMessage(`position fen ${game.fen()}`); sf.postMessage(`go depth ${depth}`);
     const poll = setInterval(() => {
@@ -1265,11 +1271,10 @@ function App() {
                 ) : (
                   <div style={{ backgroundColor: "rgba(232,213,163,0.15)", border: "2px solid #e8d5a3", borderRadius: "12px", padding: "16px", textAlign: "center" }}>
                     <p style={{ color: "#e8d5a3", fontWeight: "bold", fontSize: "13px", marginBottom: "12px", marginTop: 0 }}>Choose your challenge:</p>
-                    {[{ key: "shishya", label: "🌱 Shishya", sub: "Student · ~1400 ELO" }, { key: "acharya", label: "📚 Acharya", sub: "Teacher · ~1700 ELO" }, { key: "guru", label: "🔱 Guru", sub: "Master · ~2000 ELO" }].map(({ key, label, sub }) => (
-                      <div key={key} style={{ marginBottom: "8px" }}>
-                        <button onClick={() => startGame("shukracharya", key)} style={{ padding: "10px 16px", fontSize: "14px", backgroundColor: "#e8d5a3", color: "#1a0a00", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "2px" }}>{label}</button>
-                        <p style={{ fontSize: "13px", color: "#ddd", margin: 0 }}>{sub}</p>
-                      </div>
+                    {[{ key: "initiate", label: "🌿 Initiate", sub: "Beginner · ~800 ELO" }, { key: "shishya", label: "🌱 Shishya", sub: "Student · ~1200 ELO" }, { key: "acharya", label: "📚 Acharya", sub: "Teacher · ~1500 ELO" }, { key: "guru", label: "🔱 Guru", sub: "Master · ~2000 ELO" }].map(({ key, label, sub }) => (<div key={key} style={{ marginBottom: "8px" }}>
+                      <button onClick={() => startGame("shukracharya", key)} style={{ padding: "10px 16px", fontSize: "14px", backgroundColor: "#e8d5a3", color: "#1a0a00", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "2px" }}>{label}</button>
+                      <p style={{ fontSize: "13px", color: "#ddd", margin: 0 }}>{sub}</p>
+                    </div>
                     ))}
                     <button onClick={() => setShowShukraSelect(false)} style={{ marginTop: "6px", fontSize: "11px", background: "none", border: "none", color: "#aaa", cursor: "pointer", textDecoration: "underline" }}>← back</button>
                   </div>
