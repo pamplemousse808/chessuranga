@@ -663,7 +663,7 @@ function App() {
             worker.postMessage('setoption name Skill Level value 4');
           } else if (gameMode === 'shukracharya') {
             const skillMap = { initiate: 0, shishya: 5, acharya: 12, guru: 20 };
-            const skill = skillMap[difficulty] ?? 10;
+            const skill = skillMap[shukraDifficulty] ?? 10;
             worker.postMessage(`setoption name Skill Level value ${skill}`);
           }
           worker.postMessage("isready");
