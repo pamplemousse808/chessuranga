@@ -219,11 +219,12 @@ function DailyPuzzle({ onBack }) {
   const [poweredPieces, setPoweredPieces] = useState({});
   const [activeTiles, setActiveTiles] = useState([]);
   const [activationMode, setActivationMode] = useState(false);
-  const [frozenPieces] = useState({});
+  const [frozenPieces, setFrozenPieces] = useState({});
   const [puzzleOver, setPuzzleOver] = useState(null);
   const [, setCaptureHistory] = useState([]);
   const [moveHistory, setMoveHistory] = useState([]);
   const [attempts, setAttempts] = useState(1);
+  const [shaniMode, setShaniMode] = useState(null);
   const par = dailyData?.par || 3;
   const [alreadyPlayed] = useState(() => {
     try {
@@ -289,6 +290,18 @@ function DailyPuzzle({ onBack }) {
       setPoweredPieces(prev => ({ ...prev, [square]: { power: powerType, usesLeft, color: piece.color } }));
     }
     setActivationMode(false);
+    if (powerType === "SHANI") {
+      const enemyColor = piece.color === "w" ? "b" : "w";
+      const enemyPieces = [];
+      sqsInRadius(square, 1).forEach(sq => {
+        const tp = game.get(sq);
+        if (tp && tp.color === enemyColor) enemyPieces.push({ square: sq, piece: tp });
+      });
+      if (enemyPieces.length === 0) { alert("No enemy pieces in range!"); setActivationMode(false); return; }
+      setShaniMode({ enemyPieces });
+      setActivationMode(false);
+      return;
+    }
   }
 
   function handleDailyMove(from, to, promotion = "q") {
@@ -323,6 +336,12 @@ function DailyPuzzle({ onBack }) {
       }
     }
     if (!moved) { const m = gc.move({ from, to, promotion }); if (!m) return null; }
+
+    if (power?.power === "BUDHA" && !cp && power.usesLeft === 1) {
+      const fp = gc.fen().split(" ");
+      fp[1] = fp[1] === "w" ? "b" : "w";
+      gc.load(fp.join(" "));
+    }
 
     const np = { ...poweredPieces };
     if (cp && np[to]) delete np[to];
@@ -366,6 +385,14 @@ function DailyPuzzle({ onBack }) {
   function onSquareClick(square) {
     if (puzzleOver || game.turn() !== dailyData?.playerColor) return;
     if (selectedCard) { placeTile(square); return; }
+    if (shaniMode) {
+      const target = shaniMode.enemyPieces.find(p => p.square === square);
+      if (target) {
+        setFrozenPieces(prev => ({ ...prev, [square]: { turnsLeft: 4 } }));
+        setShaniMode(null);
+      }
+      return;
+    }
     if (activationMode) { const piz = getPiecesInZones(); if (piz.find(p => p.square === square)) { activateTileForPiece(square); } return; }
     if (!moveFrom) { const p = game.get(square); if (p && p.color === dailyData?.playerColor && !frozenPieces[square]) setMoveFrom(square); return; }
     const tapped = game.get(square);
