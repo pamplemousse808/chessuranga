@@ -324,7 +324,7 @@ function DailyPuzzle({ onBack }) {
     setMoveHistory(prev => [...prev, { from, to, cardUsed: power?.power || null }]);
 
     if (gc.isCheckmate()) {
-      const total = newMoveCount + cardsUsed.length;
+      const total = newMoveCount;
       const score = total <= par ? "⭐⭐⭐" : total <= par + 2 ? "⭐⭐" : "⭐";
       const result = { result: "won", moves: newMoveCount, cardsUsed: cardsUsed.length, totalMoves: total, par, score };
       setPuzzleOver(result);
@@ -496,7 +496,7 @@ function DailyPuzzle({ onBack }) {
             <div style={{ padding: "14px", backgroundColor: "rgba(255,215,0,0.05)", border: "1px solid #4a3060", borderRadius: "10px", fontSize: "12px", color: "#a88a5a", lineHeight: "1.7" }}>
               <div style={{ fontWeight: "bold", color: "#ffd700", marginBottom: "6px" }}>🎯 Scoring</div>
               <div>♟ Each move = 1pt</div>
-              <div>🌟 Each card = +1pt</div>
+              <div>🌟 Cards are free!</div>
               <div style={{ marginTop: "8px", borderTop: "1px solid #2a1a30", paddingTop: "8px", fontSize: "11px", color: "#6b5080" }}>
                 ⭐⭐⭐ = par or under<br />⭐⭐ = par+1 or +2<br />⭐ = par+3 or more
               </div>
