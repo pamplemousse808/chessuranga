@@ -1216,13 +1216,8 @@ function App() {
         {!gameStarted && (
           <div style={{ textAlign: "center", maxWidth: isMobile ? "100%" : "900px", margin: "0 auto", padding: isMobile ? "0 8px" : "0" }}>
             <img src="/images/chessuranga.jpg" alt="Chessuranga" style={{ width: "100%", borderRadius: "16px", display: "block", marginBottom: "24px", boxShadow: "0 0 60px rgba(100,60,255,0.4)" }} />
-            <div style={{ display: "flex", gap: isMobile ? "12px" : "20px", justifyContent: "center", flexWrap: "wrap", marginBottom: "40px", alignItems: "flex-start" }}>
-
-              {/* PvP */}
-              <div style={{ textAlign: "center", maxWidth: "200px" }}>
-                <button onClick={() => startGame("pvp")} style={{ padding: "16px 24px", fontSize: "16px", backgroundColor: "#4ecca3", color: "#000", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px" }}>🌟 Play vs Friend</button>
-                <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>100-second bullet chess with celestial powers</p>
-              </div>
+            {/* Row 1: Shukracharya, Daily Puzzle, Asura */}
+            <div style={{ display: "flex", gap: isMobile ? "12px" : "20px", justifyContent: "center", flexWrap: "wrap", marginBottom: "16px", alignItems: "flex-start" }}>
 
               {/* Shukracharya */}
               <div style={{ textAlign: "center", maxWidth: "200px" }}>
@@ -1245,28 +1240,36 @@ function App() {
                 )}
               </div>
 
-              {/* Asura */}
-              <div style={{ textAlign: "center", maxWidth: "200px" }}>
-                <button onClick={() => startGame("asura")} style={{ padding: "16px 24px", fontSize: "16px", backgroundColor: "#ff4444", color: "#fff", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px" }}>👹 Fight the Asura Horde</button>
-                <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>They are endless. They are relentless. Are you ready?</p>
-              </div>
-
               {/* Daily Puzzle */}
               <div style={{ textAlign: "center", maxWidth: "200px" }}>
                 <button onClick={() => setGameMode("daily")} style={{ padding: "16px 24px", fontSize: "16px", background: "linear-gradient(135deg, #ffd700, #f59e0b)", color: "#1a0a00", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px", boxShadow: "0 0 20px rgba(255,215,0,0.35)" }}>🌟 Daily Puzzle</button>
                 <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>New puzzle every day. Find mate with today's 3 cosmic cards. Share your score.</p>
                 <p style={{ fontSize: "10px", color: "#ffd700", margin: "4px 0 0 0" }}>#{getDailyPuzzleNumber()} today</p>
               </div>
-            
+
+              {/* Asura */}
               <div style={{ textAlign: "center", maxWidth: "200px" }}>
-                <button
-                  onClick={() => setShowAbout(true)}
-                  style={{ padding: "16px 24px", fontSize: "16px", backgroundColor: "#1e293b", color: "#e2e8f0", border: "1px solid #334155", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px" }}
-                >
-                  📖 About
-                </button>
+                <button onClick={() => startGame("asura")} style={{ padding: "16px 24px", fontSize: "16px", backgroundColor: "#ff4444", color: "#fff", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px" }}>👹 Fight the Asura Horde</button>
+                <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>They are endless. They are relentless. Are you ready?</p>
+              </div>
+
+            </div>
+
+            {/* Row 2: vs Friend, About */}
+            <div style={{ display: "flex", gap: isMobile ? "12px" : "20px", justifyContent: "center", flexWrap: "wrap", marginBottom: "40px", alignItems: "flex-start" }}>
+
+              {/* PvP */}
+              <div style={{ textAlign: "center", maxWidth: "200px" }}>
+                <button onClick={() => startGame("pvp")} style={{ padding: "16px 24px", fontSize: "16px", backgroundColor: "#4ecca3", color: "#000", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px" }}>🌟 Play vs Friend</button>
+                <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>100-second bullet chess with celestial powers</p>
+              </div>
+
+              {/* About */}
+              <div style={{ textAlign: "center", maxWidth: "200px" }}>
+                <button onClick={() => setShowAbout(true)} style={{ padding: "16px 24px", fontSize: "16px", backgroundColor: "#1e293b", color: "#e2e8f0", border: "1px solid #334155", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px" }}>📖 About</button>
                 <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>The story behind the game — and the cosmic forces within it.</p>
               </div>
+
             </div>
             <HowToPlay />
           </div>
