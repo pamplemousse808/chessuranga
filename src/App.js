@@ -995,9 +995,9 @@ function App() {
         }
         setCaptureHistory(p => [...p, { piece: cp.type, square: to, color: cp.color }]);
         if (capturedPiece.color === 'b') {
-          setWhiteCaptured([...whiteCaptured, capturedPiece.type]);
+          setWhiteCaptured([...whiteCaptured, cp.type]);
         } else {
-          setBlackCaptured([...blackCaptured, capturedPiece.type]);
+          setBlackCaptured([...blackCaptured, cp.type]);
         } checkTierUnlocks(cp.type);
       }
 
