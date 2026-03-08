@@ -859,16 +859,7 @@ function App() {
     });
     setActiveTiles(updated);
   }
-
-  function wouldGiveCheck(gameCopy, square) {
-    const piece = gameCopy.get(square); if (!piece) return false;
-    const ec = piece.color === "w" ? "b" : "w"; let ks = null;
-    for (let f of ["a", "b", "c", "d", "e", "f", "g", "h"]) { for (let r = 1; r <= 8; r++) { const sq = f + r; const p = gameCopy.get(sq); if (p && p.type === "k" && p.color === ec) { ks = sq; break; } } if (ks) break; }
-    if (!ks) return false;
-    try { const m = gameCopy.move({ from: square, to: ks }); if (m) { gameCopy.undo(); return true; } } catch { return false; }
-    return false;
-  }
-
+  
   function getPieceId(square, piece) {
     const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
     if (piece.type === "p") return `${piece.color}_p_${files.indexOf(square[0])}`;
