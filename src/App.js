@@ -1271,7 +1271,7 @@ function App() {
                 ) : (
                   <div style={{ backgroundColor: "rgba(232,213,163,0.15)", border: "2px solid #e8d5a3", borderRadius: "12px", padding: "16px", textAlign: "center" }}>
                     <p style={{ color: "#e8d5a3", fontWeight: "bold", fontSize: "13px", marginBottom: "12px", marginTop: 0 }}>Choose your challenge:</p>
-                    {[{ key: "initiate", label: "🌿 Initiate", sub: "Beginner · ~800 ELO" }, { key: "shishya", label: "🌱 Shishya", sub: "Student · ~1200 ELO" }, { key: "acharya", label: "📚 Acharya", sub: "Teacher · ~1500 ELO" }, { key: "guru", label: "🔱 Guru", sub: "Master · ~2000 ELO" }].map(({ key, label, sub }) => (<div key={key} style={{ marginBottom: "8px" }}>
+                    {[{ key: "initiate", label: "🌿 Sadhak", sub: "Initiate · ~800 ELO" }, { key: "shishya", label: "🌱 Shishya", sub: "Student · ~1200 ELO" }, { key: "acharya", label: "📚 Acharya", sub: "Teacher · ~1500 ELO" }, { key: "guru", label: "🔱 Guru", sub: "Master · ~2000 ELO" }].map(({ key, label, sub }) => (<div key={key} style={{ marginBottom: "8px" }}>
                       <button onClick={() => startGame("shukracharya", key)} style={{ padding: "10px 16px", fontSize: "14px", backgroundColor: "#e8d5a3", color: "#1a0a00", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "2px" }}>{label}</button>
                       <p style={{ fontSize: "13px", color: "#ddd", margin: 0 }}>{sub}</p>
                     </div>
