@@ -682,7 +682,7 @@ function App() {
         });
       return () => { if (worker) { worker.terminate(); stockfishRef.current = null; } };
     }
-  }, [gameMode, gameStarted]);
+  }, [gameMode, gameStarted, shukraDifficulty]);
 
   useEffect(() => {
     if (gameMode === "asura" && gameStarted && Object.keys(asuraLives).length === 0) {
