@@ -41,7 +41,7 @@ const SHARED_DECK = [
   { id: "KETU", name: "Ketu", color: "#f97316", radius: 3, tier: 1, cost: 8, description: "When captured: +12s you, -12s opponent", image: "/images/ketu.jpg" },
   { id: "SURYA", name: "Surya", color: "#fbbf24", radius: 2, tier: 1, cost: 8, description: "Can't be captured for 2 moves", image: "/images/surya.jpg" },
   { id: "CHANDRA", name: "Chandra", color: "#e5e7eb", radius: 2, tier: 2, cost: 10, description: "Place 1-2 clones on rank (2nd = +5s)", image: "/images/chandra.jpg" },
-  { id: "GURU", name: "Guru", color: "#a855f7", radius: 2, tier: 2, cost: 9, description: "Resurrect your piece where it died", image: "/images/guru.jpg" },
+  { id: "GURU", name: "Guru", color: "#a855f7", radius: 2, tier: 2, cost: 9, description: "Resurrect a piece where it died, but it can't move immediately", image: "/images/guru.jpg" },
   { id: "SHUKRA", name: "Shukra", color: "#ec4899", radius: 2, tier: 2, cost: 11, description: "Triple time on next 2 captures", image: "/images/shukra.jpg" },
   { id: "BUDHA", name: "Budha", color: "#3b82f6", radius: 1, tier: 3, cost: 10, description: "Two moves (not if first captures)", image: "/images/budha.jpg" },
   { id: "MANGALA", name: "Mangala", color: "#ef4444", radius: 1, tier: 3, cost: 12, description: "Capture any adjacent piece", image: "/images/mangala.jpg" },
@@ -733,7 +733,7 @@ function App() {
     const updatedRes = {};
     Object.keys(resurrectedPieces).forEach(sq => { const tl = resurrectedPieces[sq].turnsLeft - 0.5; if (tl > 0) updatedRes[sq] = { ...resurrectedPieces[sq], turnsLeft: tl }; });
     setResurrectedPieces(updatedRes);
-    if (gameMode === "asura") {
+    if (gameMode === "asura" || gameMode === "shukracharya") {
       setCardCooldowns(prev => { const u = { ...prev }; Object.keys(u).forEach(id => { u[id] -= 1; if (u[id] <= 0) delete u[id]; }); return u; });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
