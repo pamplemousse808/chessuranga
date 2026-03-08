@@ -1051,7 +1051,8 @@ function App() {
         if (result) {
           if (rcp) {
             setCaptureHistory(p => [...p, { piece: rcp.type, square: randomMove.to, color: rcp.color }]);
-            if (rcp.color === "w") setWhiteCaptured(p => [...p, rcp.type]);
+            if (rcp.color === "w") setBlackCaptured(p => [...p, rcp.type]);
+            else setWhiteCaptured(p => [...p, rcp.type]);
             checkTierUnlocks(rcp.type);
             if (rcpHadKetu) { addTime("w", 12); subtractTime("b", 12); }
           }
