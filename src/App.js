@@ -390,7 +390,7 @@ function DailyPuzzle({ onBack }) {
   if (moveFrom) customStyles[moveFrom] = { ...(customStyles[moveFrom] || {}), backgroundColor: "rgba(255,255,0,0.5)" };
 
   const isMobile = window.innerWidth < 768;
-  const boardSize = isMobile ? Math.min(window.innerWidth - 32, 420) : 500;
+  const boardSize = isMobile ? Math.min(window.innerWidth - 32, 420) : 600;
   const shareText = buildShareText();
 
   if (loading || !dailyData) return (
@@ -859,7 +859,7 @@ function App() {
     });
     setActiveTiles(updated);
   }
-  
+
   function getPieceId(square, piece) {
     const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
     if (piece.type === "p") return `${piece.color}_p_${files.indexOf(square[0])}`;
