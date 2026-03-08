@@ -256,22 +256,34 @@ function DailyPuzzle({ onBack }) {
 
   function placeTile(square) {
     if (!selectedCard) return;
-    setActiveTiles(prev => [...prev, { square, type: selectedCard.id, name: selectedCard.name, color: selectedCard.color + "66", radius: selectedCard.radius, turnsRemaining: 4, whiteActivated: false, blackActivated: false, whiteActivatedPiece: null, blackActivatedPiece: null }]);
+    setActiveTiles(prev => [...prev, {
+      square, type: selectedCard.id, name: selectedCard.name,
+      color: selectedCard.color + "66", radius: selectedCard.radius,
+      turnsRemaining: 4, whiteActivated: false, blackActivated: false,
+      whiteActivatedPiece: null, blackActivatedPiece: null
+    }]);
     setCardsUsed(prev => [...prev, selectedCard.id]);
     setAvailableCards(prev => prev.filter(c => c.id !== selectedCard.id));
+    setMoveHistory(prev => [...prev, { isBot: false, cardUsed: selectedCard.id }]);
+    setMoveCount(prev => prev + 1);
     setSelectedCard(null);
   }
 
   function activateTileForPiece(square) {
     const piece = game.get(square); if (!piece) return;
+
+    // Find powerType synchronously first
     let powerType = null;
-    setActiveTiles(prev => prev.map(tile => {
+    const updatedTiles = activeTiles.map(tile => {
       if (sqsInRadius(tile.square, tile.radius).includes(square) && !tile.whiteActivated) {
         powerType = tile.type;
         return { ...tile, whiteActivated: true, whiteActivatedPiece: square };
       }
       return tile;
-    }));
+    });
+
+    // Now set both states with powerType correctly resolved
+    setActiveTiles(updatedTiles);
     if (powerType) {
       const usesLeft = { RAHU: 2, SURYA: 2, SHUKRA: 2, MANGALA: 3 }[powerType] || 1;
       setPoweredPieces(prev => ({ ...prev, [square]: { power: powerType, usesLeft, color: piece.color } }));
@@ -1416,7 +1428,7 @@ function App() {
                       const hasOtherPiece = game.get(sq) && !isCurrentReal;
                       // Bishop colour constraint
                       if (chandraPlacementMode.piece.type === 'b') {
-                        const files2 = ["a","b","c","d","e","f","g","h"];
+                        const files2 = ["a", "b", "c", "d", "e", "f", "g", "h"];
                         const of2 = files2.indexOf(chandraPlacementMode.square[0]);
                         const or2 = chandraPlacementMode.rank;
                         const oLight = (of2 + or2) % 2 === 0;
@@ -1611,14 +1623,14 @@ function App() {
                   Teleport to: <span style={{ color: "#ffd700" }}>{chandraPlacementMode.teleportTo || "(stay)"}</span>
                 </div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginBottom: "8px" }}>
-                  {['a','b','c','d','e','f','g','h'].map(file => {
+                  {['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map(file => {
                     const sq = file + chandraPlacementMode.rank;
                     const isCurrentReal = sq === chandraPlacementMode.square;
                     const isSelected = sq === chandraPlacementMode.teleportTo;
                     const isMirage = chandraPlacementMode.mirages.includes(sq);
                     const hasOtherPiece = game.get(sq) && !isCurrentReal;
                     if (chandraPlacementMode.piece.type === 'b') {
-                      const files2 = ["a","b","c","d","e","f","g","h"];
+                      const files2 = ["a", "b", "c", "d", "e", "f", "g", "h"];
                       const of2 = files2.indexOf(chandraPlacementMode.square[0]);
                       const oLight = (of2 + chandraPlacementMode.rank) % 2 === 0;
                       const cf2 = files2.indexOf(file);
