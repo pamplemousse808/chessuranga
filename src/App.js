@@ -273,35 +273,38 @@ function DailyPuzzle({ onBack }) {
   function activateTileForPiece(square) {
     const piece = game.get(square); if (!piece) return;
 
-    // Find powerType synchronously first
     let powerType = null;
+    let tileSquare = null;
     const updatedTiles = activeTiles.map(tile => {
       if (sqsInRadius(tile.square, tile.radius).includes(square) && !tile.whiteActivated) {
         powerType = tile.type;
+        tileSquare = tile.square;
         return { ...tile, whiteActivated: true, whiteActivatedPiece: square };
       }
       return tile;
     });
 
-    // Now set both states with powerType correctly resolved
     setActiveTiles(updatedTiles);
-    if (powerType) {
-      const usesLeft = { RAHU: 2, SURYA: 2, SHUKRA: 2, MANGALA: 3 }[powerType] || 1;
-      setPoweredPieces(prev => ({ ...prev, [square]: { power: powerType, usesLeft, color: piece.color } }));
-    }
     setActivationMode(false);
+
+    if (!powerType) return;
+
     if (powerType === "SHANI") {
+      const shaniCard = SHARED_DECK.find(c => c.id === "SHANI");
+      const radius = shaniCard?.radius || 1;
       const enemyColor = piece.color === "w" ? "b" : "w";
       const enemyPieces = [];
-      sqsInRadius(square, 1).forEach(sq => {
+      sqsInRadius(tileSquare, radius).forEach(sq => {
         const tp = game.get(sq);
         if (tp && tp.color === enemyColor) enemyPieces.push({ square: sq, piece: tp });
       });
-      if (enemyPieces.length === 0) { alert("No enemy pieces in range!"); setActivationMode(false); return; }
+      if (enemyPieces.length === 0) { alert("No enemy pieces in range!"); return; }
       setShaniMode({ enemyPieces });
-      setActivationMode(false);
       return;
     }
+
+    const usesLeft = { RAHU: 2, SURYA: 2, SHUKRA: 2, MANGALA: 3, BUDHA: 2 }[powerType] || 1;
+    setPoweredPieces(prev => ({ ...prev, [square]: { power: powerType, usesLeft, color: piece.color } }));
   }
 
   function handleDailyMove(from, to, promotion = "q") {
@@ -337,22 +340,28 @@ function DailyPuzzle({ onBack }) {
     }
     if (!moved) { const m = gc.move({ from, to, promotion }); if (!m) return null; }
 
-    if (power?.power === "BUDHA" && !cp && power.usesLeft === 1) {
+    // BUDHA: if first move (usesLeft === 2), flip back to player for second move
+    const isBudhaFirstMove = power?.power === "BUDHA" && power.usesLeft === 2 && !cp;
+    if (isBudhaFirstMove) {
       const fp = gc.fen().split(" ");
-      fp[1] = fp[1] === "w" ? "b" : "w";
+      fp[1] = pc; // flip back to player
       gc.load(fp.join(" "));
     }
 
     const np = { ...poweredPieces };
     if (cp && np[to]) delete np[to];
-    if (power) { delete np[from]; const nu = power.usesLeft - 1; if (nu > 0) np[to] = { ...power, usesLeft: nu }; }
+    if (power) {
+      delete np[from];
+      const nu = power.usesLeft - 1;
+      if (nu > 0) np[to] = { ...power, usesLeft: nu };
+    }
     setPoweredPieces(np);
     if (cp) setCaptureHistory(prev => [...prev, { piece: cp.type, square: to, color: cp.color }]);
 
     const newMoveCount = moveCount + 1;
     setGame(gc);
     setMoveCount(newMoveCount);
-    setMoveHistory(prev => [...prev, { from, to, cardUsed: power?.power || null }]);
+    setMoveHistory(prev => [...prev, { from, to, cardUsed: power?.power || null, isBot: false }]);
 
     if (gc.isCheckmate()) {
       const total = newMoveCount;
@@ -363,22 +372,25 @@ function DailyPuzzle({ onBack }) {
       return gc;
     }
 
-    // Bot reply
-    setTimeout(() => {
-      setGame(prev => {
-        if (prev.isGameOver()) return prev;
-        const bg = new Chess(prev.fen());
-        const moves = bg.moves({ verbose: true });
-        if (!moves.length) return prev;
-        bg.move(moves[Math.floor(Math.random() * moves.length)]);
-        setMoveHistory(mh => [...mh, { isBot: true }]);
-        if (bg.isCheckmate()) {
-          setPuzzleOver({ result: "failed", moves: newMoveCount });
-          try { localStorage.setItem("chessuranga_daily", JSON.stringify({ dayNum: dailyData.dayNum, result: "failed" })); } catch (e) { }
-        }
-        return bg;
-      });
-    }, 400);
+    // Only fire bot reply if it's NOT a Budha first move
+    if (!isBudhaFirstMove) {
+      setTimeout(() => {
+        setGame(prev => {
+          if (prev.isGameOver()) return prev;
+          const bg = new Chess(prev.fen());
+          const moves = bg.moves({ verbose: true });
+          if (!moves.length) return prev;
+          bg.move(moves[Math.floor(Math.random() * moves.length)]);
+          setMoveHistory(mh => [...mh, { isBot: true }]);
+          if (bg.isCheckmate()) {
+            setPuzzleOver({ result: "failed", moves: newMoveCount });
+            try { localStorage.setItem("chessuranga_daily", JSON.stringify({ dayNum: dailyData.dayNum, result: "failed" })); } catch (e) { }
+          }
+          return bg;
+        });
+      }, 400);
+    }
+
     return gc;
   }
 
