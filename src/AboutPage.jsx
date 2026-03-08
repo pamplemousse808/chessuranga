@@ -343,7 +343,6 @@ export default function AboutPage({ onBack }) {
 
                     {/* Hero */}
                     <header className={`hero fade-up ${visible ? "show" : ""}`}>
-                        <div className="hero-eyebrow">The Story Behind the Game</div>
                         <h1 className="hero-title">Chessuranga</h1>
                         <p className="hero-sub">Where the cosmos plays chess</p>
                         <div className="hero-divider" />
@@ -355,21 +354,18 @@ export default function AboutPage({ onBack }) {
                         <h2 className="section-title">Chess was born in India.<br />We brought it home.</h2>
                         <div className="section-body">
                             <p>
-                                Around the 6th century CE, in the courts of the Gupta Empire, a game called
-                                <em> Chaturanga</em> — meaning <em>"four divisions"</em>, after the four branches of the
-                                ancient Indian army — was played on an 8×8 board called the <em>Ashtāpada</em>.
-                                Infantry, cavalry, elephants, chariots. It spread westward through Persia as
+                                Around the 6th century, in the courts of the Gupta Empire, a game called <em> Chaturanga</em> was played on an 8×8 board called an <em>Ashtāpada</em>.
+                                It encompassed the four branches of the ancient Indian army; the infantry, cavalry, elephants and chariots. And because it was a banger of a game, it spread westward through Persia as
                                 Shatranj, then into Europe, becoming the chess we know today.
                             </p>
                             <p>
-                                Somewhere along the way, its Indian soul got lost.
+                                When I was thinking about chess with special moves, why not go back to the start, and add an entire pantheon of gods.
                             </p>
 
                             <div className="pull-quote">
                                 <p>
                                     "The nine celestial bodies of Hindu cosmology — the <strong>Navagraha</strong> —
-                                    each govern a domain of existence: time, fate, war, wisdom, fortune. What
-                                    better allies for a game decided by all of those things?"
+                                    each govern a domain of existence: time, fate, war, wisdom, fortune. All the aspects that decides whether you win or lose."
                                 </p>
                             </div>
 
@@ -378,11 +374,10 @@ export default function AboutPage({ onBack }) {
                                 forces in Hindu astronomy and astrology: Surya the Sun, Chandra the Moon,
                                 Mangala (Mars), Budha (Mercury), Guru (Jupiter), Shukra (Venus), Shani (Saturn),
                                 and the shadow planets Rahu and Ketu. Each carries its own domain of influence —
-                                light, time, war, wisdom, fortune, discipline, illusion. They don't just observe
-                                human life. They shape it.
+                                light, time, war, wisdom, fortune, discipline, illusion. Together, they shape existence.
                             </p>
                             <p>
-                                Chessuranga asks: what if you could call on them?
+                                Chessuranga lets you call on their powers to overcome your oppoenent.
                             </p>
                         </div>
                     </section>
@@ -409,24 +404,10 @@ export default function AboutPage({ onBack }) {
                         <h2 className="section-title">Two games, one idea, a few sleepless weeks.</h2>
                         <div className="section-body">
                             <p>
-                                I've always been obsessed with games — not just playing them, but pulling them
-                                apart and imagining what they could be. I was deep into a phase of playing
-                                <em> Marvel Snap</em> and bullet chess simultaneously, and the thought kept nagging
-                                at me: what if chess had cards? Special powers with real strategic weight,
-                                not just cosmetics?
+                                I've always been obsessed with games, thinking about wouldn't it be cool if you could do this or that. About 18 months ago, I was playing a lot of <em> Marvel Snap</em> and bullet chess, and thought it would amazing if you could combine the two.
                             </p>
                             <p>
-                                Then I remembered something: chess is Indian. And India has these
-                                extraordinary cosmic beings with clearly defined powers and personalities.
-                                The Navagraha weren't just thematically fitting — their traits mapped
-                                almost perfectly onto chess mechanics. Shani's discipline becomes a freeze.
-                                Rahu's illusory nature becomes phase-walking through pieces. Guru the
-                                teacher resurrects fallen pieces. It clicked.
-                            </p>
-                            <p>
-                                Over a few weeks, I built it — and I'd be lying if I said I did it alone.
-                                Claude helped a lot with the code. But the ideas, the lore, the game design — that
-                                was a proper collaboration with the cosmos. I hope you feel it when you play.
+                                But I can't code at all, so it was just a pipe dream. And then Claude Code dropped and here we are.
                             </p>
                         </div>
                     </section>
@@ -456,14 +437,12 @@ export default function AboutPage({ onBack }) {
 
                     {/* Ko-fi */}
                     <section className={`kofi-section fade-up delay-5 ${visible ? "show" : ""}`}>
-                        <h2 className="kofi-title">Support the Cosmic Project</h2>
+                        <h2 className="kofi-title">Realtime bullet chess amabitions</h2>
                         <p className="kofi-body">
-                            Chessuranga is free, made with love, and — honestly — I'd love to make it
-                            real-time multiplayer one day. If you enjoyed it, a small offering to the cosmos goes a long way.
-                        </p>
+                            I initially wanted to make Chessuranga a 1v1, 100 second multiplayer game. But the coding and resources for that is bananas, and way beyond me. But if you know a way to make this happen, let me know!</p>
                         {/* Replace YOUR_KOFI_USERNAME below */}
                         <a
-                            href="https://ko-fi.com/YOUR_KOFI_USERNAME"
+                            href="https://ko-fi.com/chessuranga"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="kofi-btn"
@@ -477,15 +456,15 @@ export default function AboutPage({ onBack }) {
                         <div className="section-label">Stay in Touch</div>
                         <div className="section-body" style={{ maxWidth: "480px", margin: "0 auto" }}>
                             <p>
-                                Got ideas? Spotted a bug? Want to tell me Shani is broken (he probably is)?
+                                Got ideas? Spotted a bug? Want to tell me Guru is broken (he probably is)?
                                 I want to hear it. The game will only get better with your help.
                             </p>
                             <p style={{ marginTop: "20px" }}>
                                 <a
-                                    href="mailto:hello@chessuranga.com"
+                                    href="https://www.linkedin.com/in/jmewhyte/"
                                     style={{ color: "#c8973a", textDecoration: "none", fontStyle: "italic", fontSize: "18px" }}
                                 >
-                                    hello@chessuranga.com
+                                    hello!
                                 </a>
                             </p>
                         </div>
