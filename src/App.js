@@ -994,8 +994,11 @@ function App() {
           if (lr > 0) { setAsuraLives({ ...asuraLives, [pid]: lr - 1 }); respawnAsuraPiece(pid, cp.type); }
         }
         setCaptureHistory(p => [...p, { piece: cp.type, square: to, color: cp.color }]);
-        if (game.turn() === "w") setWhiteCaptured(p => [...p, cp.type]); else setBlackCaptured(p => [...p, cp.type]);
-        checkTierUnlocks(cp.type);
+        if (capturedPiece.color === 'b') {
+          setWhiteCaptured([...whiteCaptured, capturedPiece.type]);
+        } else {
+          setBlackCaptured([...blackCaptured, capturedPiece.type]);
+        } checkTierUnlocks(cp.type);
       }
 
       const np3 = { ...poweredPieces };
