@@ -488,6 +488,25 @@ function DailyPuzzle({ onBack }) {
             {!puzzleOver && (game.turn() === dailyData?.playerColor ? "Your move — find checkmate!" : "⏳ Thinking...")}
             {game.inCheck() && !puzzleOver && <span style={{ color: "#ff6b6b", marginLeft: "8px" }}>⚠️ Check!</span>}
           </div>
+          {!puzzleOver && moveCount > 0 && (
+            <button onClick={() => {
+              const g = new Chess();
+              g.load(dailyData.fen);
+              setGame(g);
+              setMoveFrom("");
+              setMoveCount(0);
+              setCardsUsed([]);
+              setAvailableCards(dailyData.dailyCards);
+              setSelectedCard(null);
+              setPoweredPieces({});
+              setActiveTiles([]);
+              setActivationMode(false);
+              setMoveHistory([]);
+              setAttempts(a => a + 1);
+            }} style={{ marginTop: "8px", padding: "6px 14px", backgroundColor: "transparent", border: "1px solid #2a1a30", borderRadius: "8px", color: "#4a3060", cursor: "pointer", fontSize: "11px" }}>
+              ↩ Restart puzzle
+            </button>
+          )}
         </div>
 
         {/* Info panel (desktop only) */}
@@ -527,6 +546,22 @@ function DailyPuzzle({ onBack }) {
               <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
                 <button onClick={onBack} style={{ padding: "11px 20px", backgroundColor: "transparent", border: "2px solid #4a3060", borderRadius: "10px", color: "#a88a5a", cursor: "pointer", fontSize: "13px" }}>← Menu</button>
                 <button onClick={() => { try { navigator.clipboard.writeText(shareText); alert("Copied to clipboard!"); } catch (e) { alert(shareText); } }} style={{ padding: "11px 22px", backgroundColor: "#ffd700", border: "none", borderRadius: "10px", color: "#000", cursor: "pointer", fontSize: "14px", fontWeight: "bold" }}>Copy & Share 📤</button>
+                <button onClick={() => {
+                  const g = new Chess();
+                  g.load(dailyData.fen);
+                  setGame(g);
+                  setMoveFrom("");
+                  setMoveCount(0);
+                  setCardsUsed([]);
+                  setAvailableCards(dailyData.dailyCards);
+                  setSelectedCard(null);
+                  setPoweredPieces({});
+                  setActiveTiles([]);
+                  setActivationMode(false);
+                  setPuzzleOver(null);
+                  setMoveHistory([]);
+                  setAttempts(a => a + 1);
+                }} style={{ padding: "11px 20px", backgroundColor: "transparent", border: "2px solid #4a3060", borderRadius: "10px", color: "#a88a5a", cursor: "pointer", fontSize: "13px" }}>Try Again 🔄</button>
               </div>
             </> : <>
               <div style={{ fontSize: "56px", marginBottom: "8px" }}>💫</div>
@@ -560,8 +595,9 @@ function DailyPuzzle({ onBack }) {
             </>}
           </div>
         </div>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 }
 
