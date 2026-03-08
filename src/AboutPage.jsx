@@ -351,7 +351,6 @@ export default function AboutPage({ onBack }) {
                     {/* Origins */}
                     <section className={`section fade-up delay-1 ${visible ? "show" : ""}`}>
                         <div className="section-label">Origins</div>
-                        <h2 className="section-title">Chess was born in India.<br />We brought it home.</h2>
                         <div className="section-body">
                             <p>
                                 Around the 6th century, in the courts of the Gupta Empire, a game called <em> Chaturanga</em> was played on an 8×8 board called an <em>Ashtāpada</em>.
@@ -401,7 +400,7 @@ export default function AboutPage({ onBack }) {
                     {/* How it was made */}
                     <section className={`section fade-up delay-3 ${visible ? "show" : ""}`}>
                         <div className="section-label">The Making</div>
-                        <h2 className="section-title">Two games, one idea, a few sleepless weeks.</h2>
+                        <h2 className="section-title">Two games, one idea and a few weeks of wtf is vercel.</h2>
                         <div className="section-body">
                             <p>
                                 I've always been obsessed with games, thinking about wouldn't it be cool if you could do this or that. About 18 months ago, I was playing a lot of <em> Marvel Snap</em> and bullet chess, and thought it would amazing if you could combine the two.
