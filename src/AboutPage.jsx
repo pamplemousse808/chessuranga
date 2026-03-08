@@ -1,28 +1,28 @@
 import { useEffect, useState } from "react";
 
 const NAVAGRAHA = [
-    { emoji: "☀️", name: "Surya", role: "The Sun", power: "Invincibility" },
-    { emoji: "🌙", name: "Chandra", role: "The Moon", power: "Clones" },
-    { emoji: "🔥", name: "Mangala", role: "Mars", power: "Smite" },
-    { emoji: "⚡", name: "Budha", role: "Mercury", power: "Double Move" },
-    { emoji: "🪐", name: "Guru", role: "Jupiter", power: "Resurrection" },
-    { emoji: "💫", name: "Shukra", role: "Venus", power: "Time Harvest" },
-    { emoji: "❄️", name: "Shani", role: "Saturn", power: "Freeze" },
-    { emoji: "🔮", name: "Rahu", role: "North Node", power: "Phase Walk" },
-    { emoji: "☄️", name: "Ketu", role: "South Node", power: "Martyr's Curse" },
+  { emoji: "☀️", name: "Surya", role: "The Sun", power: "Invincibility" },
+  { emoji: "🌙", name: "Chandra", role: "The Moon", power: "Clones" },
+  { emoji: "🔥", name: "Mangala", role: "Mars", power: "Smite" },
+  { emoji: "⚡", name: "Budha", role: "Mercury", power: "Double Move" },
+  { emoji: "🪐", name: "Guru", role: "Jupiter", power: "Resurrection" },
+  { emoji: "💫", name: "Shukra", role: "Venus", power: "Time Harvest" },
+  { emoji: "❄️", name: "Shani", role: "Saturn", power: "Freeze" },
+  { emoji: "🔮", name: "Rahu", role: "North Node", power: "Phase Walk" },
+  { emoji: "☄️", name: "Ketu", role: "South Node", power: "Martyr's Curse" },
 ];
 
 export default function AboutPage({ onBack }) {
-    const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false);
 
-    useEffect(() => {
-        const t = setTimeout(() => setVisible(true), 80);
-        return () => clearTimeout(t);
-    }, []);
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 80);
+    return () => clearTimeout(t);
+  }, []);
 
-    return (
-        <>
-            <style>{`
+  return (
+    <>
+      <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap');
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -327,154 +327,152 @@ export default function AboutPage({ onBack }) {
         }
       `}</style>
 
-            <div className="about-root">
-                <div className="stars" />
+      <div className="about-root">
+        <div className="stars" />
 
-                <nav className="top-nav">
-                    <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'Cinzel', serif", fontSize: "16px", color: "#c8973a", letterSpacing: "0.08em" }}>
-                        ♟ CHESSURANGA
-                    </button>
-                    <button onClick={onBack} className="nav-play">
-                        ← Back
-                    </button>
-                </nav>
+        <nav className="top-nav">
+          <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'Cinzel', serif", fontSize: "16px", color: "#c8973a", letterSpacing: "0.08em" }}>
+            ♟ CHESSURANGA
+          </button>
+          <button onClick={onBack} className="nav-play">
+            ← Back
+          </button>
+        </nav>
 
-                <div className="content">
+        <div className="content">
 
-                    {/* Hero */}
-                    <header className={`hero fade-up ${visible ? "show" : ""}`}>
-                        <h1 className="hero-title">Chessuranga</h1>
-                        <p className="hero-sub">Where the cosmos plays chess</p>
-                        <div className="hero-divider" />
-                    </header>
+          {/* Hero */}
+          <header className={`hero fade-up ${visible ? "show" : ""}`}>
+            <h1 className="hero-title">Chessuranga</h1>
+            <p className="hero-sub">Where the cosmos plays chess</p>
+            <div className="hero-divider" />
+          </header>
 
-                    {/* Origins */}
-                    <section className={`section fade-up delay-1 ${visible ? "show" : ""}`}>
-                        <div className="section-label">Origins</div>
-                        <div className="section-body">
-                            <p>
-                                Around the 6th century, in the courts of the Gupta Empire, a game called <em> Chaturanga</em> was played on an 8×8 board called an <em>Ashtāpada</em>.
-                                It encompassed the four branches of the ancient Indian army; the infantry, cavalry, elephants and chariots. And because it was a banger of a game, it spread westward through Persia as
-                                Shatranj, then into Europe, becoming the chess we know today.
-                            </p>
-                            <p>
-                                When I was thinking about chess with special moves, why not go back to the start, and add an entire pantheon of gods.
-                            </p>
+          {/* Origins */}
+          <section className={`section fade-up delay-1 ${visible ? "show" : ""}`}>
+            <div className="section-label">Origins</div>
+            <div className="section-body">
+              <p>
+                Around the 6th century, in the courts of the Gupta Empire, <em> Chaturanga</em> was played on an 8×8 board called an <em>Ashtāpada</em>.
+                It encompassed the four branches of the ancient Indian army; the infantry, cavalry, elephants and chariots. And because it was a banger of a game, it spread westward through Persia as
+                Shatranj, then into Europe, becoming the chess we know today.
+              </p>
+              <p>
+                When I was thinking about chess with special moves, why not go back to the start, and add an entire pantheon of gods.
+              </p>
 
-                            <div className="pull-quote">
-                                <p>
-                                    "The nine celestial bodies of Hindu cosmology — the <strong>Navagraha</strong> —
-                                    each govern a domain of existence: time, fate, war, wisdom, fortune. All the aspects that decides whether you win or lose."
-                                </p>
-                            </div>
+              <div className="pull-quote">
+                <p>
+                  "The nine celestial bodies of Hindu cosmology — the <strong>Navagraha</strong> —
+                  each govern a domain of existence: time, fate, war, wisdom, fortune. All the aspects that decides whether you win or lose."
+                </p>
+              </div>
 
-                            <p>
-                                The <strong>Navagraha</strong> (नवग्रह, "nine celestial bodies") are the cosmic
-                                forces in Hindu astronomy and astrology: Surya the Sun, Chandra the Moon,
-                                Mangala (Mars), Budha (Mercury), Guru (Jupiter), Shukra (Venus), Shani (Saturn),
-                                and the shadow planets Rahu and Ketu. Each carries its own domain of influence —
-                                light, time, war, wisdom, fortune, discipline, illusion. Together, they shape existence.
-                            </p>
-                            <p>
-                                Chessuranga lets you call on their powers to overcome your oppoenent.
-                            </p>
-                        </div>
-                    </section>
-
-                    {/* The Nine */}
-                    <section className={`section fade-up delay-2 ${visible ? "show" : ""}`}>
-                        <div className="section-label">The Powers</div>
-                        <h2 className="section-title">The Nine Grahas</h2>
-                        <div className="graha-grid">
-                            {NAVAGRAHA.map(g => (
-                                <div className="graha-card" key={g.name}>
-                                    <div className="graha-emoji">{g.emoji}</div>
-                                    <div className="graha-name">{g.name}</div>
-                                    <div className="graha-role">{g.role}</div>
-                                    <div className="graha-power">{g.power}</div>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-
-                    {/* How it was made */}
-                    <section className={`section fade-up delay-3 ${visible ? "show" : ""}`}>
-                        <div className="section-label">The Making</div>
-                        <h2 className="section-title">Two games, one idea and a few weeks of wtf is vercel.</h2>
-                        <div className="section-body">
-                            <p>
-                                I've always been obsessed with games, thinking about wouldn't it be cool if you could do this or that. About 18 months ago, I was playing a lot of <em> Marvel Snap</em> and bullet chess, and thought it would amazing if you could combine the two.
-                            </p>
-                            <p>
-                                But I can't code at all, so it was just a pipe dream. And then Claude Code dropped and here we are.
-                            </p>
-                        </div>
-                    </section>
-
-                    {/* Modes */}
-                    <section className={`section fade-up delay-4 ${visible ? "show" : ""}`}>
-                        <div className="section-label">The Game</div>
-                        <h2 className="section-title">Three ways to play</h2>
-                        <div className="modes">
-                            <div className="mode-card">
-                                <div className="mode-icon">👹</div>
-                                <div className="mode-name">Asura Horde</div>
-                                <div className="mode-desc">Face an endless demon army that regenerates with every capture. Survive long enough to overwhelm them completely.</div>
-                            </div>
-                            <div className="mode-card">
-                                <div className="mode-icon">☄️</div>
-                                <div className="mode-name">Shukracharya</div>
-                                <div className="mode-desc">A 1v1 duel against Shukracharya, Guru of the Asuras — the mastermind behind the horde. Your toughest test.</div>
-                            </div>
-                            <div className="mode-card">
-                                <div className="mode-icon">🌟</div>
-                                <div className="mode-name">Daily Puzzle</div>
-                                <div className="mode-desc">A new Navagraha-powered chess puzzle every day. Solve it in as few moves as possible.</div>
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* Ko-fi */}
-                    <section className={`kofi-section fade-up delay-5 ${visible ? "show" : ""}`}>
-                        <h2 className="kofi-title">Realtime bullet chess amabitions</h2>
-                        <p className="kofi-body">
-                            I initially wanted to make Chessuranga a 1v1, 100 second multiplayer game. But the coding and resources for that is bananas, and way beyond me. But if you know a way to make this happen, let me know!</p>
-                        {/* Replace YOUR_KOFI_USERNAME below */}
-                        <a
-                            href="https://ko-fi.com/chessuranga"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="kofi-btn"
-                        >
-                            ☕ Fuel the Navagraha
-                        </a>
-                    </section>
-
-                    {/* Feedback */}
-                    <section className={`section fade-up delay-6 ${visible ? "show" : ""}`} style={{ textAlign: "center", borderBottom: "none" }}>
-                        <div className="section-label">Stay in Touch</div>
-                        <div className="section-body" style={{ maxWidth: "480px", margin: "0 auto" }}>
-                            <p>
-                                Got ideas? Spotted a bug? Want to tell me Guru is broken (he probably is)?
-                                I want to hear it. The game will only get better with your help.
-                            </p>
-                            <p style={{ marginTop: "20px" }}>
-                                <a
-                                    href="https://www.linkedin.com/in/jmewhyte/"
-                                    style={{ color: "#c8973a", textDecoration: "none", fontStyle: "italic", fontSize: "18px" }}
-                                >
-                                    hello!
-                                </a>
-                            </p>
-                        </div>
-                    </section>
-
-                </div>
-
-                <footer className="footer">
-                    ♟ CHESSURANGA — May the Navagraha guide your moves
-                </footer>
+              <p>
+                The <strong>Navagraha</strong> (नवग्रह, "nine celestial bodies") are the cosmic
+                forces in Hindu astronomy and astrology: Surya the Sun, Chandra the Moon,
+                Mangala (Mars), Budha (Mercury), Guru (Jupiter), Shukra (Venus), Shani (Saturn),
+                and the shadow planets Rahu and Ketu. Each carries its own domain of influence —
+                light, time, war, wisdom, fortune, discipline, illusion. Together, they shape existence.
+              </p>
+              <p>
+                Chessuranga lets you call on their powers to overcome your oppoenent.
+              </p>
             </div>
-        </>
-    );
+          </section>
+
+          {/* The Nine */}
+          <section className={`section fade-up delay-2 ${visible ? "show" : ""}`}>
+            <div className="section-label">The Powers</div>
+            <h2 className="section-title">The Nine Grahas</h2>
+            <div className="graha-grid">
+              {NAVAGRAHA.map(g => (
+                <div className="graha-card" key={g.name}>
+                  <div className="graha-emoji">{g.emoji}</div>
+                  <div className="graha-name">{g.name}</div>
+                  <div className="graha-role">{g.role}</div>
+                  <div className="graha-power">{g.power}</div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* How it was made */}
+          <section className={`section fade-up delay-3 ${visible ? "show" : ""}`}>
+            <div className="section-label">The Making</div>
+            <h2 className="section-title">Two games, one idea and a few weeks of wtf is vercel.</h2>
+            <div className="section-body">
+              <p>
+                I've always been obsessed with games, thinking about wouldn't it be cool if you could do this or that. About 18 months ago, I was playing a lot of <em> Marvel Snap</em> and bullet chess, and thought it would amazing if you could combine the two.
+              </p>
+              <p>
+                But I can't code at all, so it was just a pipe dream. Then Claude Code dropped and here we are.
+              </p>
+            </div>
+          </section>
+
+          {/* Modes */}
+          <section className={`section fade-up delay-4 ${visible ? "show" : ""}`}>
+            <div className="section-label">The Game</div>
+            <h2 className="section-title">Three ways to play</h2>
+            <div className="modes">
+              <div className="mode-card">
+                <div className="mode-icon">👹</div>
+                <div className="mode-name">Asura Horde</div>
+                <div className="mode-desc">Face an endless demon army that regenerates with every capture. Survive long enough to overwhelm them completely.</div>
+              </div>
+              <div className="mode-card">
+                <div className="mode-icon">☄️</div>
+                <div className="mode-name">Shukracharya</div>
+                <div className="mode-desc">A 1v1 duel against Shukracharya, Guru of the Asuras — the mastermind behind the horde. Your toughest test.</div>
+              </div>
+              <div className="mode-card">
+                <div className="mode-icon">🌟</div>
+                <div className="mode-name">Daily Puzzle</div>
+                <div className="mode-desc">A new Navagraha-powered chess puzzle every day. Solve it in as few moves as possible.</div>
+              </div>
+            </div>
+          </section>
+
+          {/* Feedback */}
+          <section className={`section fade-up delay-6 ${visible ? "show" : ""}`} style={{ textAlign: "center", borderBottom: "none" }}>
+            <div className="section-label">Stay in Touch</div>
+            <div className="section-body" style={{ maxWidth: "480px", margin: "0 auto" }}>
+              <p>
+                I initially wanted to make Chessuranga a 1v1, 100 second multiplayer game. But the coding and resources for that is bananas, and way beyond me. But if you know a way to make this happen, let me know!
+                Also do get in touch if you've spotted a bug or just want to tell me Guru is OP.
+              </p>
+              <p style={{ marginTop: "20px" }}>
+                <a
+                  href="https://www.linkedin.com/in/jmewhyte/"
+                  style={{ color: "#c8973a", textDecoration: "none", fontStyle: "italic", fontSize: "24px" }}
+                >
+                  Say hi!
+                </a>
+              </p>
+            </div>
+          </section>
+          
+          <section className={`kofi-section fade-up delay-5 ${visible ? "show" : ""}`}>
+            <h2 className="kofi-title">Realtime bullet chess amabitions</h2>
+            <p className="kofi-body">
+              And if you like the game and want to help fund the servers, or help me make the multiplayer and hire a designer for actual art, here's a button...</p>
+            { }
+            <a
+              href="https://ko-fi.com/chessuranga"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="kofi-btn"
+            >
+              ☕ Fuel the Navagraha
+            </a>
+          </section>
+        </div>
+
+        <footer className="footer">
+          ♟ CHESSURANGA — May the Navagraha guide your moves
+        </footer>
+      </div>
+    </>
+  );
 }
