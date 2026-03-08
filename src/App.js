@@ -994,7 +994,7 @@ function App() {
           if (lr > 0) { setAsuraLives({ ...asuraLives, [pid]: lr - 1 }); respawnAsuraPiece(pid, cp.type); }
         }
         setCaptureHistory(p => [...p, { piece: cp.type, square: to, color: cp.color }]);
-        if (capturedPiece.color === 'b') {
+        if (cp.color === 'b') {
           setWhiteCaptured([...whiteCaptured, cp.type]);
         } else {
           setBlackCaptured([...blackCaptured, cp.type]);
