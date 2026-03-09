@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Chessboard } from "react-chessboard";
 import { Chess } from "chess.js";
 import AboutPage from "./AboutPage";
+import { Analytics } from '@vercel/analytics/react';
 
 // ── Mobile detection ──────────────────────────────────────────────────────────
 function useIsMobile() {
@@ -1844,6 +1845,7 @@ function App() {
           </div>
         )}
       </div >
+      <Analytics /> 
     </>
   );
 }
