@@ -452,7 +452,7 @@ export default function AboutPage({ onBack }) {
               </p>
             </div>
           </section>
-          
+
           <section className={`kofi-section fade-up delay-5 ${visible ? "show" : ""}`}>
             <h2 className="kofi-title">Realtime bullet chess amabitions</h2>
             <p className="kofi-body">
@@ -471,6 +471,8 @@ export default function AboutPage({ onBack }) {
 
         <footer className="footer">
           ♟ CHESSURANGA — May the Navagraha guide your moves
+          <br />
+          <span style={{ fontSize: "11px", opacity: 0.5 }}>© {new Date().getFullYear()} Chessuranga. All rights reserved.</span>
         </footer>
       </div>
     </>
