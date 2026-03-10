@@ -696,9 +696,6 @@ function PvpTabletLayout({ game, gameOver, gameOverDismissed, setGameOverDismiss
   const tabletBoard = Math.min(window.innerWidth - 24, 560);
   return (
     <>
-      <style>{`
-       #pvp-board [data-piece^="b"] { transform: rotate(180deg); }
-      `}</style>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", minHeight: "100vh", width: "100%", backgroundColor: theme.background, color: theme.text, userSelect: "none", overscrollBehavior: "none" }}>
 
         {showChaosPopup && (
@@ -769,8 +766,7 @@ function PvpTabletLayout({ game, gameOver, gameOverDismissed, setGameOverDismiss
           </div>
 
           <div id="pvp-board" style={{ width: tabletBoard, height: tabletBoard, flexShrink: 0 }}>
-            <Chessboard position={game.fen()} onPieceDrop={onPieceDrop} onSquareClick={onSquareClick} animationDuration={225} customSquareStyles={customStyles} customDarkSquareStyle={{ backgroundColor: theme.darkSquare }} customLightSquareStyle={{ backgroundColor: theme.lightSquare }} boardWidth={tabletBoard} />
-          </div>
+            <Chessboard position={game.fen()} onPieceDrop={onPieceDrop} onSquareClick={onSquareClick} animationDuration={225} customSquareStyles={customStyles} customDarkSquareStyle={{ backgroundColor: theme.darkSquare }} customLightSquareStyle={{ backgroundColor: theme.lightSquare }} boardWidth={tabletBoard} boardOrientation={game.turn() === "w" ? "white" : "black"} />          </div>
 
           <button onClick={resetGame} style={{ marginTop: "8px", padding: "8px 20px", fontSize: "12px", backgroundColor: "transparent", color: "#555", border: "1px solid #333", borderRadius: "20px", cursor: "pointer" }}>✕ Menu</button>
         </div>
