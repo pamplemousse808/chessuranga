@@ -795,9 +795,9 @@ function App() {
 
   const [game, setGame] = useState(new Chess());
   const [moveFrom, setMoveFrom] = useState("");
-  const [whiteTime, setWhiteTime] = useState(100);
-  const [blackTime, setBlackTime] = useState(100);
-  const [startingTime, setStartingTime] = useState(100);
+  const [whiteTime, setWhiteTime] = useState(180);
+  const [blackTime, setBlackTime] = useState(180);
+  const [startingTime, setStartingTime] = useState(180);
   const [gameOver, setGameOver] = useState(false);
   const [winner, setWinner] = useState(null);
   const [gameStarted, setGameStarted] = useState(false);
@@ -1372,7 +1372,7 @@ function App() {
   }
 
   function startGame(mode, difficulty = null) {
-    const time = (mode === "asura" || mode === "shukracharya") ? 300 : 100;
+    const time = (mode === "asura" || mode === "shukracharya") ? 300 : 180;
     setStartingTime(time); setWhiteTime(time); setBlackTime(time);
     setGameMode(mode); setGameStarted(true); setShowShukraSelect(false);
     if (difficulty) setShukraDifficulty(difficulty);
@@ -1512,8 +1512,8 @@ function App() {
 
               {/* PvP */}
               <div style={{ textAlign: "center", maxWidth: "200px" }}>
-                <button onClick={() => startGame("pvp")} style={{ padding: "16px 24px", fontSize: "16px", backgroundColor: "#4ecca3", color: "#000", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px" }}>🌟 Play vs Friend</button>
-                <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>100-second bullet chess with celestial powers</p>
+                <button onClick={() => startGame("pvp")} style={{ padding: "16px 24px", fontSize: "16px", backgroundColor: "#4ecca3", color: "#000", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px" }}>🌟 Tablet Mode VS Friend</button>
+                <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>180-second bullet chess with celestial powers</p>
               </div>
 
               {/* About */}
