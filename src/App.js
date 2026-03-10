@@ -696,7 +696,9 @@ function PvpTabletLayout({ game, gameOver, gameOverDismissed, setGameOverDismiss
   const tabletBoard = Math.min(window.innerWidth - 24, 560);
   return (
     <>
-      <style>{`#pvp-board img[alt^="b"] { transform: rotate(180deg); }`}</style>
+      <style>{`
+       #pvp-board [data-piece^="b"] { transform: rotate(180deg); }
+      `}</style>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", minHeight: "100vh", width: "100%", backgroundColor: theme.background, color: theme.text, userSelect: "none", overscrollBehavior: "none" }}>
 
         {showChaosPopup && (
