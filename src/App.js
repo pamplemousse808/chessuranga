@@ -1953,12 +1953,13 @@ function App() {
 
 
             {/* Activate power button */}
-            {!selectedCard && !chandraPlacementMode && !guruMode && !shaniMode && piecesInZones.length > 0 && (
-              <div style={{ transform: currentTurn === "b" ? "rotate(180deg)" : "none", width: tabletBoard, marginBottom: "6px" }}>
-                <button onClick={() => setActivationMode(a => !a)} style={{ width: "100%", padding: "10px", fontSize: "14px", backgroundColor: activationMode ? "#e94560" : "#ffd700", color: "#000", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "bold" }}>
-                  {activationMode ? "✕ Cancel Activation" : `⚡ Activate Power (${piecesInZones.length} available)`}
-                </button>
-              </div>
+            {!selectedCard && !chandraPlacementMode && !guruMode && !shaniMode && piecesInZones.length > 0 && game.turn() === "w" && (
+              <button
+                onClick={() => setActivationMode(a => !a)}
+                style={{ width: "100%", marginTop: "8px", padding: "12px", fontSize: "14px", backgroundColor: activationMode ? "#e94560" : "#ffd700", color: "#000", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold" }}
+              >
+                {activationMode ? "✕ Cancel Activation" : `⚡ Activate Power (${piecesInZones.length} available)`}
+              </button>
             )}
 
             {/* Guru picker modal */}
