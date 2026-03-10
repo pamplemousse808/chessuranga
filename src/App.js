@@ -766,8 +766,8 @@ function PvpTabletLayout({ game, gameOver, gameOverDismissed, setGameOverDismiss
           </div>
 
           <div id="pvp-board" style={{ width: tabletBoard, height: tabletBoard, flexShrink: 0 }}>
-            <Chessboard position={game.fen()} onPieceDrop={onPieceDrop} onSquareClick={onSquareClick} animationDuration={225} customSquareStyles={customStyles} customDarkSquareStyle={{ backgroundColor: theme.darkSquare }} customLightSquareStyle={{ backgroundColor: theme.lightSquare }} boardWidth={tabletBoard} boardOrientation={game.turn() === "w" ? "white" : "black"} />          </div>
-
+            <Chessboard position={game.fen()} onPieceDrop={onPieceDrop} onSquareClick={onSquareClick} animationDuration={225} customSquareStyles={customStyles} customDarkSquareStyle={{ backgroundColor: theme.darkSquare }} customLightSquareStyle={{ backgroundColor: theme.lightSquare }} boardWidth={tabletBoard} boardOrientation="white" />
+          </div>
           <button onClick={resetGame} style={{ marginTop: "8px", padding: "8px 20px", fontSize: "12px", backgroundColor: "transparent", color: "#555", border: "1px solid #333", borderRadius: "20px", cursor: "pointer" }}>✕ Menu</button>
         </div>
 
