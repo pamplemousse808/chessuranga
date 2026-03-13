@@ -4,7 +4,7 @@ import { Chess } from "chess.js";
 import AboutPage from "./AboutPage";
 import { Analytics } from '@vercel/analytics/react';
 import { SHARED_DECK, getTheme } from "./gameConstants";
-import { formatTime, getPieceValue, getPieceSymbol, getSquaresInRadius, getPieceId } from "./gameUtils";
+import { formatTime, getPieceValue, getPieceSymbol, getSquaresInRadius, getPieceId, getDailyPuzzleNumber } from "./gameUtils";
 import { useStockfish } from "./useStockfish";
 import HowToPlay from "./HowToPlay";
 import MobileCardOverlay from "./MobileCardOverlay";
