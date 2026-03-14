@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { SHARED_DECK } from "./gameConstants";
 
-// Short punchy descriptions for the tray (no room for full text on mobile)
 const TRAY_INFO = {
   RAHU:    { emoji: "🔮", power: "Phase Walk",      detail: "Pass through blocking pieces for 2 moves. An unstoppable ghost on the board." },
   KETU:    { emoji: "☄️", power: "Martyr's Curse",  detail: "If this piece is captured: you gain +12s, opponent loses 12s. A trap in disguise." },
@@ -20,40 +19,38 @@ export default function MobileCardOverlay({
   selectedCard, onSelectCard, gameMode, getCardCost, currentTurn,
   usedCards, cardCooldowns
 }) {
-  // Track which card is previewed in the tray (defaults to selectedCard if set)
   const [previewId, setPreviewId] = useState(null);
 
   if (!show) return null;
 
-  // The card shown in the tray: explicit preview > already-selected card > null
   const trayCardId = previewId || selectedCard?.id || null;
   const trayCard = trayCardId ? SHARED_DECK.find(c => c.id === trayCardId) : null;
   const trayInfo = trayCardId ? TRAY_INFO[trayCardId] : null;
 
-  function handleCardTap(card, canUse, isSelected) {
-    // Always show in tray on tap
+  const canUseTray = trayCard
+    ? (() => {
+        const isUsed = (gameMode === "asura" || gameMode === "shukracharya")
+          ? !!cardCooldowns[trayCard.id]
+          : usedCards.includes(trayCard.id);
+        const isUnlocked = trayCard.tier === 1 ? tier1Unlocked
+          : trayCard.tier === 2 ? tier2Unlocked
+          : tier3Unlocked;
+        return isUnlocked && !isUsed && currentTurn === "w";
+      })()
+    : false;
+
+  function handleCardTap(card) {
     setPreviewId(card.id);
-    // If usable, also select/deselect it
-    if (canUse) {
-      onSelectCard(isSelected ? null : card);
-      if (!isSelected) {
-        // Short delay so user sees the tray update, then close overlay
-        setTimeout(() => onClose(), 320);
-      }
-    }
   }
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 300, display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
-      {/* Backdrop */}
       <div onClick={() => { onClose(); setPreviewId(null); }} style={{ position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)" }} />
 
       <div style={{ position: "relative", backgroundColor: "#0f172a", borderRadius: "24px 24px 0 0", maxHeight: "80vh", overflowY: "auto", boxShadow: "0 -8px 40px rgba(0,0,0,0.8)" }}>
 
-        {/* Drag handle */}
         <div style={{ width: "40px", height: "4px", backgroundColor: "#334155", borderRadius: "2px", margin: "12px auto 0" }} />
 
-        {/* Header */}
         <h3 style={{ color: "#e2e8f0", textAlign: "center", margin: "10px 0 12px", fontSize: "15px", fontFamily: "inherit" }}>
           ✨ Navagraha Powers
         </h3>
@@ -68,38 +65,60 @@ export default function MobileCardOverlay({
           border: `1px solid ${trayCard ? trayCard.color + "44" : "rgba(255,255,255,0.08)"}`,
           transition: "background-color 0.25s, border-color 0.25s",
           display: "flex",
-          alignItems: "center",
-          gap: "14px",
+          flexDirection: "column",
+          gap: "10px",
         }}>
           {trayCard && trayInfo ? (
             <>
-              {/* Card thumbnail */}
-              <div style={{ width: "56px", height: "56px", borderRadius: "10px", overflow: "hidden", flexShrink: 0, border: `2px solid ${trayCard.color}88` }}>
-                <img src={trayCard.image} alt={trayCard.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                <div style={{ width: "56px", height: "56px", borderRadius: "10px", overflow: "hidden", flexShrink: 0, border: `2px solid ${trayCard.color}88` }}>
+                  <img src={trayCard.image} alt={trayCard.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginBottom: "4px", flexWrap: "wrap" }}>
+                    <span style={{ fontWeight: "700", fontSize: "16px", color: trayCard.color }}>
+                      {trayInfo.emoji} {trayCard.name}
+                    </span>
+                    <span style={{ fontSize: "12px", color: "#ffd700", fontWeight: "bold" }}>
+                      {getCardCost(trayCard)}s
+                    </span>
+                    <span style={{ fontSize: "11px", color: "#64748b" }}>
+                      Tier {trayCard.tier}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: "12px", fontWeight: "700", color: "#e2e8f0", marginBottom: "3px" }}>
+                    {trayInfo.power}
+                  </div>
+                  <div style={{ fontSize: "12px", color: "#94a3b8", lineHeight: "1.5" }}>
+                    {trayInfo.detail}
+                  </div>
+                </div>
               </div>
-              {/* Text */}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginBottom: "4px" }}>
-                  <span style={{ fontFamily: "inherit", fontWeight: "700", fontSize: "16px", color: trayCard.color }}>
-                    {trayInfo.emoji} {trayCard.name}
-                  </span>
-                  <span style={{ fontSize: "12px", color: "#ffd700", fontWeight: "bold" }}>
-                    {getCardCost(trayCard)}s
-                  </span>
-                  <span style={{ fontSize: "11px", color: "#64748b", marginLeft: "auto" }}>
-                    Tier {trayCard.tier}
-                  </span>
-                </div>
-                <div style={{ fontSize: "12px", fontWeight: "700", color: "#e2e8f0", marginBottom: "3px" }}>
-                  {trayInfo.power}
-                </div>
-                <div style={{ fontSize: "12px", color: "#94a3b8", lineHeight: "1.5" }}>
-                  {trayInfo.detail}
-                </div>
-              </div>
+
+              {canUseTray && (
+                <button
+                  onClick={() => {
+                    onSelectCard(trayCard);
+                    setTimeout(() => { onClose(); setPreviewId(null); }, 200);
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    borderRadius: "10px",
+                    border: "none",
+                    background: trayCard.color,
+                    color: "#000",
+                    fontWeight: "bold",
+                    fontSize: "14px",
+                    cursor: "pointer",
+                  }}
+                >
+                  ⚡ Use Power
+                </button>
+              )}
             </>
           ) : (
-            <div style={{ width: "100%", textAlign: "center", color: "#334155", fontSize: "13px" }}>
+            <div style={{ textAlign: "center", color: "#334155", fontSize: "13px", padding: "16px 0" }}>
               Tap a card to see its power
             </div>
           )}
@@ -121,16 +140,14 @@ export default function MobileCardOverlay({
                     const cooldown = cardCooldowns[card.id];
                     const isSelected = selectedCard?.id === card.id;
                     const isPreviewed = previewId === card.id;
-                    const canUse = isUnlocked && !isUsed && currentTurn === "w";
 
                     return (
                       <div
                         key={card.id}
-                        onClick={() => handleCardTap(card, canUse, isSelected)}
+                        onClick={() => handleCardTap(card)}
                         style={{
                           borderRadius: "12px",
                           overflow: "hidden",
-                          // Selected = white border, previewed = colour border, else default
                           border: isSelected
                             ? "3px solid #fff"
                             : isPreviewed
@@ -153,25 +170,17 @@ export default function MobileCardOverlay({
                               alt={card.name}
                               style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", filter: isUsed ? "grayscale(80%)" : "none" }}
                             />
-
-                            {/* Cost badge */}
                             <div style={{ position: "absolute", top: "5px", right: "5px", backgroundColor: "rgba(0,0,0,0.82)", color: "#ffd700", fontSize: "11px", fontWeight: "bold", padding: "2px 5px", borderRadius: "6px" }}>
                               {getCardCost(card)}s
                             </div>
-
-                            {/* Name only at bottom — no description text */}
                             <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent, rgba(0,0,0,0.85))", padding: "18px 7px 7px" }}>
                               <div style={{ fontSize: "12px", fontWeight: "bold", color: "#fff", textAlign: "center" }}>
                                 {card.name}
                               </div>
                             </div>
-
-                            {/* Selected tick */}
                             {isSelected && (
                               <div style={{ position: "absolute", top: "5px", left: "5px", backgroundColor: "#fff", color: "#000", fontWeight: "bold", fontSize: "11px", borderRadius: "50%", width: "20px", height: "20px", display: "flex", alignItems: "center", justifyContent: "center" }}>✓</div>
                             )}
-
-                            {/* Cooldown overlay */}
                             {cooldown && (
                               <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", backgroundColor: "rgba(0,0,0,0.8)", color: "#fff", fontWeight: "bold", fontSize: "22px", borderRadius: "50%", width: "40px", height: "40px", display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid #a855f7" }}>
                                 {cooldown}
