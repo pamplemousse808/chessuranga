@@ -1,67 +1,197 @@
 // ─── MobileCardOverlay.js ────────────────────────────────────────────────────
+import { useState } from "react";
 import { SHARED_DECK } from "./gameConstants";
+
+// Short punchy descriptions for the tray (no room for full text on mobile)
+const TRAY_INFO = {
+  RAHU:    { emoji: "🔮", power: "Phase Walk",      detail: "Pass through blocking pieces for 2 moves. An unstoppable ghost on the board." },
+  KETU:    { emoji: "☄️", power: "Martyr's Curse",  detail: "If this piece is captured: you gain +12s, opponent loses 12s. A trap in disguise." },
+  SURYA:   { emoji: "☀️", power: "Invincibility",   detail: "This piece cannot be captured for 2 moves. Surya's radiance burns all who approach." },
+  CHANDRA: { emoji: "🌙", power: "Clones",          detail: "Place 1–2 mirror images on the same rank. Enemies won't know which is real." },
+  GURU:    { emoji: "🪐", power: "Resurrection",    detail: "Bring back a captured piece where it died. It can't move immediately — even Guru's grace needs a moment." },
+  SHUKRA:  { emoji: "💫", power: "Time Harvest",    detail: "Triple the time earned on your next 2 captures. Make every strike count." },
+  BUDHA:   { emoji: "⚡", power: "Double Move",     detail: "Take two consecutive moves. Ends early if the first move captures." },
+  MANGALA: { emoji: "🔥", power: "Smite",           detail: "Capture any adjacent enemy piece, ignoring normal movement rules. War cares nothing for geometry." },
+  SHANI:   { emoji: "❄️", power: "Freeze",          detail: "Immobilise an enemy piece for 2 turns. Even kings have cowered before Shani's gaze." },
+};
 
 export default function MobileCardOverlay({
   show, onClose, tier1Unlocked, tier2Unlocked, tier3Unlocked,
   selectedCard, onSelectCard, gameMode, getCardCost, currentTurn,
   usedCards, cardCooldowns
 }) {
+  // Track which card is previewed in the tray (defaults to selectedCard if set)
+  const [previewId, setPreviewId] = useState(null);
+
   if (!show) return null;
+
+  // The card shown in the tray: explicit preview > already-selected card > null
+  const trayCardId = previewId || selectedCard?.id || null;
+  const trayCard = trayCardId ? SHARED_DECK.find(c => c.id === trayCardId) : null;
+  const trayInfo = trayCardId ? TRAY_INFO[trayCardId] : null;
+
+  function handleCardTap(card, canUse, isSelected) {
+    // Always show in tray on tap
+    setPreviewId(card.id);
+    // If usable, also select/deselect it
+    if (canUse) {
+      onSelectCard(isSelected ? null : card);
+      if (!isSelected) {
+        // Short delay so user sees the tray update, then close overlay
+        setTimeout(() => onClose(), 320);
+      }
+    }
+  }
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 300, display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
-      <div onClick={onClose} style={{ position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)" }} />
-      <div style={{ position: "relative", backgroundColor: "#0f172a", borderRadius: "24px 24px 0 0", padding: "16px 16px 40px", maxHeight: "75vh", overflowY: "auto", boxShadow: "0 -8px 40px rgba(0,0,0,0.8)" }}>
-        <div style={{ width: "40px", height: "4px", backgroundColor: "#334155", borderRadius: "2px", margin: "0 auto 16px" }} />
-        <h3 style={{ color: "#e2e8f0", textAlign: "center", margin: "0 0 16px", fontSize: "16px" }}>🌟 Navagraha Powers</h3>
-        {[1, 2, 3].map(tier => {
-          const tierCards = SHARED_DECK.filter(c => c.tier === tier);
-          const isUnlocked = (tier === 1 && tier1Unlocked) || (tier === 2 && tier2Unlocked) || (tier === 3 && tier3Unlocked);
-          return (
-            <div key={tier} style={{ marginBottom: "16px" }}>
-              <div style={{ fontSize: "11px", color: "#64748b", marginBottom: "8px", textAlign: "center", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                Tier {tier} {!isUnlocked && "🔒"}
+      {/* Backdrop */}
+      <div onClick={() => { onClose(); setPreviewId(null); }} style={{ position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)" }} />
+
+      <div style={{ position: "relative", backgroundColor: "#0f172a", borderRadius: "24px 24px 0 0", maxHeight: "80vh", overflowY: "auto", boxShadow: "0 -8px 40px rgba(0,0,0,0.8)" }}>
+
+        {/* Drag handle */}
+        <div style={{ width: "40px", height: "4px", backgroundColor: "#334155", borderRadius: "2px", margin: "12px auto 0" }} />
+
+        {/* Header */}
+        <h3 style={{ color: "#e2e8f0", textAlign: "center", margin: "10px 0 12px", fontSize: "15px", fontFamily: "inherit" }}>
+          ✨ Navagraha Powers
+        </h3>
+
+        {/* ── Description Tray ── */}
+        <div style={{
+          margin: "0 14px 14px",
+          borderRadius: "14px",
+          minHeight: "88px",
+          padding: "14px 16px",
+          backgroundColor: trayCard ? `${trayCard.color}14` : "rgba(255,255,255,0.04)",
+          border: `1px solid ${trayCard ? trayCard.color + "44" : "rgba(255,255,255,0.08)"}`,
+          transition: "background-color 0.25s, border-color 0.25s",
+          display: "flex",
+          alignItems: "center",
+          gap: "14px",
+        }}>
+          {trayCard && trayInfo ? (
+            <>
+              {/* Card thumbnail */}
+              <div style={{ width: "56px", height: "56px", borderRadius: "10px", overflow: "hidden", flexShrink: 0, border: `2px solid ${trayCard.color}88` }}>
+                <img src={trayCard.image} alt={trayCard.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px" }}>
-                {tierCards.map(card => {
-                  const isUsed = (gameMode === "asura" || gameMode === "shukracharya") ? !!cardCooldowns[card.id] : usedCards.includes(card.id);
-                  const cooldown = cardCooldowns[card.id];
-                  const isSelected = selectedCard?.id === card.id;
-                  const cost = getCardCost(card);
-                  const canUse = isUnlocked && !isUsed && currentTurn === "w";
-                  return (
-                    <div
-                      key={card.id}
-                      onClick={() => {
-                        if (canUse) {
-                          onSelectCard(isSelected ? null : card);
-                          if (!isSelected) onClose();
-                        }
-                      }}
-                      style={{ borderRadius: "10px", overflow: "hidden", border: isSelected ? "3px solid #fff" : "2px solid #1e293b", opacity: isUsed ? 0.4 : 1, cursor: canUse ? "pointer" : "default", position: "relative", aspectRatio: "3/4" }}
-                    >
-                      {isUnlocked ? (
-                        <>
-                          <img src={card.image} alt={card.name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", filter: isUsed ? "grayscale(80%)" : "none" }} />
-                          <div style={{ position: "absolute", top: "4px", right: "4px", backgroundColor: "rgba(0,0,0,0.85)", color: "#ffd700", fontSize: "10px", fontWeight: "bold", padding: "2px 4px", borderRadius: "5px" }}>{cost}s</div>
-                          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, backgroundColor: "rgba(0,0,0,0.8)", padding: "4px 5px" }}>
-                            <div style={{ fontSize: "10px", fontWeight: "bold", color: "#fff" }}>{card.name}</div>
-                            <div style={{ fontSize: "8px", color: "#aaa", lineHeight: "1.2" }}>{card.description}</div>
-                          </div>
-                          {cooldown && (
-                            <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", backgroundColor: "rgba(0,0,0,0.8)", color: "#fff", fontWeight: "bold", fontSize: "20px", borderRadius: "50%", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid #a855f7" }}>{cooldown}</div>
-                          )}
-                        </>
-                      ) : (
-                        <div style={{ width: "100%", height: "100%", backgroundColor: "#1e293b", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "22px" }}>🔒</div>
-                      )}
-                    </div>
-                  );
-                })}
+              {/* Text */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginBottom: "4px" }}>
+                  <span style={{ fontFamily: "inherit", fontWeight: "700", fontSize: "16px", color: trayCard.color }}>
+                    {trayInfo.emoji} {trayCard.name}
+                  </span>
+                  <span style={{ fontSize: "12px", color: "#ffd700", fontWeight: "bold" }}>
+                    {getCardCost(trayCard)}s
+                  </span>
+                  <span style={{ fontSize: "11px", color: "#64748b", marginLeft: "auto" }}>
+                    Tier {trayCard.tier}
+                  </span>
+                </div>
+                <div style={{ fontSize: "12px", fontWeight: "700", color: "#e2e8f0", marginBottom: "3px" }}>
+                  {trayInfo.power}
+                </div>
+                <div style={{ fontSize: "12px", color: "#94a3b8", lineHeight: "1.5" }}>
+                  {trayInfo.detail}
+                </div>
               </div>
+            </>
+          ) : (
+            <div style={{ width: "100%", textAlign: "center", color: "#334155", fontSize: "13px" }}>
+              Tap a card to see its power
             </div>
-          );
-        })}
+          )}
+        </div>
+
+        {/* ── Card Grid ── */}
+        <div style={{ padding: "0 14px 36px" }}>
+          {[1, 2, 3].map(tier => {
+            const tierCards = SHARED_DECK.filter(c => c.tier === tier);
+            const isUnlocked = (tier === 1 && tier1Unlocked) || (tier === 2 && tier2Unlocked) || (tier === 3 && tier3Unlocked);
+            return (
+              <div key={tier} style={{ marginBottom: "18px" }}>
+                <div style={{ fontSize: "10px", color: "#475569", marginBottom: "8px", textAlign: "center", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                  Tier {tier} {!isUnlocked && "🔒"}
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px" }}>
+                  {tierCards.map(card => {
+                    const isUsed = (gameMode === "asura" || gameMode === "shukracharya") ? !!cardCooldowns[card.id] : usedCards.includes(card.id);
+                    const cooldown = cardCooldowns[card.id];
+                    const isSelected = selectedCard?.id === card.id;
+                    const isPreviewed = previewId === card.id;
+                    const canUse = isUnlocked && !isUsed && currentTurn === "w";
+
+                    return (
+                      <div
+                        key={card.id}
+                        onClick={() => handleCardTap(card, canUse, isSelected)}
+                        style={{
+                          borderRadius: "12px",
+                          overflow: "hidden",
+                          // Selected = white border, previewed = colour border, else default
+                          border: isSelected
+                            ? "3px solid #fff"
+                            : isPreviewed
+                              ? `2px solid ${card.color}`
+                              : isUnlocked && !isUsed
+                                ? `2px solid ${card.color}44`
+                                : "2px solid rgba(255,255,255,0.06)",
+                          opacity: isUsed ? 0.35 : isUnlocked ? 1 : 0.22,
+                          cursor: "pointer",
+                          position: "relative",
+                          aspectRatio: "3/4",
+                          boxShadow: isSelected ? `0 0 14px ${card.color}88` : isPreviewed ? `0 0 8px ${card.color}44` : "none",
+                          transition: "border-color 0.2s, box-shadow 0.2s, opacity 0.2s",
+                        }}
+                      >
+                        {isUnlocked ? (
+                          <>
+                            <img
+                              src={card.image}
+                              alt={card.name}
+                              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", filter: isUsed ? "grayscale(80%)" : "none" }}
+                            />
+
+                            {/* Cost badge */}
+                            <div style={{ position: "absolute", top: "5px", right: "5px", backgroundColor: "rgba(0,0,0,0.82)", color: "#ffd700", fontSize: "11px", fontWeight: "bold", padding: "2px 5px", borderRadius: "6px" }}>
+                              {getCardCost(card)}s
+                            </div>
+
+                            {/* Name only at bottom — no description text */}
+                            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent, rgba(0,0,0,0.85))", padding: "18px 7px 7px" }}>
+                              <div style={{ fontSize: "12px", fontWeight: "bold", color: "#fff", textAlign: "center" }}>
+                                {card.name}
+                              </div>
+                            </div>
+
+                            {/* Selected tick */}
+                            {isSelected && (
+                              <div style={{ position: "absolute", top: "5px", left: "5px", backgroundColor: "#fff", color: "#000", fontWeight: "bold", fontSize: "11px", borderRadius: "50%", width: "20px", height: "20px", display: "flex", alignItems: "center", justifyContent: "center" }}>✓</div>
+                            )}
+
+                            {/* Cooldown overlay */}
+                            {cooldown && (
+                              <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", backgroundColor: "rgba(0,0,0,0.8)", color: "#fff", fontWeight: "bold", fontSize: "22px", borderRadius: "50%", width: "40px", height: "40px", display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid #a855f7" }}>
+                                {cooldown}
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <div style={{ width: "100%", height: "100%", backgroundColor: "#0f172a", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "4px" }}>
+                            <span style={{ fontSize: "22px" }}>🔒</span>
+                            <span style={{ fontSize: "9px", color: "#334155", textAlign: "center", padding: "0 4px" }}>{card.name}</span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
