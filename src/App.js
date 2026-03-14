@@ -10,6 +10,7 @@ import HowToPlay from "./HowToPlay";
 import MobileCardOverlay from "./MobileCardOverlay";
 import PvpTabletLayout from "./PvpTabletLayout";
 import DailyPuzzle from "./DailyPuzzle";
+import NavagrahaPage from "./NavagrahaPage";
 
 // ── Mobile detection ──────────────────────────────────────────────────────────
 function useIsMobile() {
@@ -65,6 +66,7 @@ function App() {
   const [waitingForBot, setWaitingForBot] = useState(false);
   const [gameOverDismissed, setGameOverDismissed] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const [showNavagraha, setShowNavagraha] = useState(false);
   // Mobile UI state
   const [showCardOverlay, setShowCardOverlay] = useState(false);
   const { stockfish, stockfishRef, stockfishMoveRef } = useStockfish(gameMode, gameStarted, shukraDifficulty);
@@ -613,6 +615,7 @@ function App() {
             : null;
 
   if (showAbout) return <AboutPage onBack={() => setShowAbout(false)} />;
+  if (showNavagraha) return <NavagrahaPage onBack={() => setShowNavagraha(false)} />;
   if (gameMode === "daily") return <DailyPuzzle onBack={() => setGameMode(null)} />;
 
   // Route to daily puzzle
@@ -689,6 +692,12 @@ function App() {
                 <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>180-second bullet chess with celestial powers</p>
               </div>
 
+              {/* Navagraha Explained */}
+              <div style={{ textAlign: "center", maxWidth: "200px" }}>
+                <button onClick={() => setShowNavagraha(true)} style={{ padding: "16px 24px", fontSize: "16px", background: "linear-gradient(135deg, #9333ea, #6b21a8)", color: "#fff", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px", boxShadow: "0 0 20px rgba(147,51,234,0.3)" }}>🌟 Navagraha Explained</button>
+                <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>The nine celestial forces — their mythology and powers explained.</p>
+              </div>
+              
               {/* About */}
               <div style={{ textAlign: "center", maxWidth: "200px" }}>
                 <button onClick={() => setShowAbout(true)} style={{ padding: "16px 24px", fontSize: "16px", backgroundColor: "#1e293b", color: "#e2e8f0", border: "1px solid #334155", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px" }}>📖 About</button>
