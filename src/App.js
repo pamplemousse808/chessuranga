@@ -3,7 +3,7 @@ import { Chessboard } from "react-chessboard";
 import { Chess } from "chess.js";
 import AboutPage from "./AboutPage";
 import { Analytics } from '@vercel/analytics/react';
-import { SHARED_DECK, ASURA_DECK } from "./gameConstants";
+import { SHARED_DECK, ASURA_DECK, getTheme } from "./gameConstants";
 import { formatTime, getPieceValue, getPieceSymbol, getSquaresInRadius, getPieceId, getDailyPuzzleNumber } from "./gameUtils";
 import { useStockfish } from "./useStockfish";
 import HowToPlay from "./HowToPlay";
@@ -380,12 +380,12 @@ function App() {
         return gc;
       }
       // ── NEW: HIRANYA blocks capture (same as SURYA) ──
-      if (capturedPiece && poweredPieces[to]?.power === "HIRANYA" && poweredPieces[to].usesLeft > 0) {
+      if (cp && poweredPieces[to]?.power === "HIRANYA" && poweredPieces[to].usesLeft > 0) {
         return null;
       }
 
       // ── NEW: TARAKASURA — can only be captured by same piece type ──
-      if (capturedPiece && tarakaProtected[to]) {
+      if (cp && tarakaProtected[to]) {
         const attackerType = game.get(from)?.type;
         if (attackerType !== tarakaProtected[to].pieceType) {
           return null;
@@ -457,9 +457,9 @@ function App() {
         const tf = files.indexOf(to[0]), tr = parseInt(to[1]);
         const fileDiff = Math.abs(tf - ff), rankDiff = Math.abs(tr - fr);
         const isQueenMove = fileDiff === rankDiff || ff === tf || fr === tr;
-        if (isQueenMove && !(capturedPiece && capturedPiece.color === piece.color)) {
+        if (isQueenMove && !(cp && cp.color === piece.color)) {
           gc.remove(from);
-          if (capturedPiece) gc.remove(to);
+          if (cp) gc.remove(to);
           gc.put({ type: piece.type, color: piece.color }, to);
           const fp = gc.fen().split(" "); fp[1] = fp[1] === "w" ? "b" : "w"; gc.load(fp.join(" "));
           moveWasMade = true;
@@ -470,7 +470,7 @@ function App() {
       if (!moveWasMade && power?.power === "KALI_ASURA" && power.usesLeft > 0) {
         const ff = files.indexOf(from[0]), fr = parseInt(from[1]);
         const tf = files.indexOf(to[0]), tr = parseInt(to[1]);
-        if (Math.abs(tf - ff) <= 1 && Math.abs(tr - fr) <= 1 && capturedPiece && capturedPiece.color !== piece.color) {
+        if (Math.abs(tf - ff) <= 1 && Math.abs(tr - fr) <= 1 && cp && cp.color !== piece.color) {
           gc.remove(from); gc.remove(to); gc.put({ type: piece.type, color: piece.color }, to);
           const fp = gc.fen().split(" "); fp[1] = fp[1] === "w" ? "b" : "w"; gc.load(fp.join(" "));
           moveWasMade = true;
