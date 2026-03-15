@@ -64,3 +64,31 @@ export function getTheme(gameMode) {
       };
   }
 }
+
+// ── ASURA DECK (Black's cards in PvP mode) ────────────────────────────────────
+export const ASURA_DECK = [
+  // Tier 1
+  { id: "RAVANA",      name: "Ravana",      color: "#dc2626", radius: 3, tier: 1, cost: 8,  description: "Moves like a queen for 1 turn — ten heads see all directions", image: "/images/ravana.jpg"      },
+  { id: "HIRANYA",     name: "Hiranya",     color: "#b45309", radius: 2, tier: 1, cost: 8,  description: "Cannot be captured for 2 turns — Brahma's boon of invincibility", image: "/images/hiranya.jpg"  },
+  { id: "KALI_ASURA",  name: "Kali",        color: "#7c3aed", radius: 2, tier: 1, cost: 8,  description: "Capture any adjacent enemy piece, ignoring movement rules",      image: "/images/kali_asura.jpg" },
+  // Tier 2
+  { id: "MAHISHA",     name: "Mahishasura", color: "#065f46", radius: 2, tier: 2, cost: 10, description: "Shapeshift into any piece type you have captured",               image: "/images/mahisha.jpg"     },
+  { id: "VRITRA",      name: "Vritra",      color: "#1e40af", radius: 2, tier: 2, cost: 9,  description: "White pieces cannot enter or cross this piece's rank for 2 turns", image: "/images/vritra.jpg"    },
+  { id: "BALI",        name: "Bali",        color: "#a855f7", radius: 2, tier: 2, cost: 9,  description: "Resurrect a captured piece where it died",                        image: "/images/bali.jpg"        },
+  // Tier 3
+  { id: "TARAKA",      name: "Tarakasura",  color: "#be123c", radius: 1, tier: 3, cost: 11, description: "Can only be captured by a piece of the same type for 3 turns",   image: "/images/taraka.jpg"      },
+  { id: "SHUMBHA",     name: "Shumbha-Nishumbha", color: "#92400e", radius: 1, tier: 3, cost: 12, description: "Capture an enemy piece then snap back to your origin square", image: "/images/shumbha.jpg" },
+  { id: "SHUKRA_ASURA",name: "Shukracharya",color: "#ec4899", radius: 1, tier: 3, cost: 11, description: "Pawns promote to any captured piece type when reaching halfway",  image: "/images/shukra.jpg"      },
+];
+
+export const ASURA_CARD_EMOJI = {
+  RAVANA:       "👑",
+  HIRANYA:      "🛡️",
+  KALI_ASURA:   "⚔️",
+  MAHISHA:      "🐃",
+  VRITRA:       "🐍",
+  BALI:         "🙏",
+  TARAKA:       "💀",
+  SHUMBHA:      "👥",
+  SHUKRA_ASURA: "💫",
+};
