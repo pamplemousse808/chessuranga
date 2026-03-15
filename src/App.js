@@ -279,12 +279,6 @@ function App() {
         return;
       }
 
-      // ── NEW: SHUKRA_ASURA — mark this pawn for mid-board promotion ──
-      if (powerType === "SHUKRA_ASURA") {
-        setShukraAsuraPawns(prev => ({ ...prev, [square]: true }));
-        setActivationMode(false);
-        return;
-      }
       if (powerType === "SHANI") {
         const shaniRadius = SHARED_DECK.find(c => c.id === "SHANI").radius;
         const searchCenter = tileSquare || square;
@@ -763,7 +757,6 @@ function App() {
     setShumbhaMode(null);
     setVritraRanks([]);
     setTarakaProtected({});
-    setShukraAsuraPawns({});
   }
 
   const theme = getTheme(gameMode);
