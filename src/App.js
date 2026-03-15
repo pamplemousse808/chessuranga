@@ -62,7 +62,6 @@ function App() {
   const [shumbhaMode, setShumbhaMode] = useState(null);
   const [vritraRanks, setVritraRanks] = useState([]);
   const [tarakaProtected, setTarakaProtected] = useState({});
-  const [shukraAsuraPawns, setShukraAsuraPawns] = useState({});
   const [activationMode, setActivationMode] = useState(false);
   const [chaosModeShown, setChaosModeShown] = useState({ white: false, black: false });
   const [showChaosPopup, setShowChaosPopup] = useState(false);
@@ -203,6 +202,89 @@ function App() {
         if (avail.length === 0) { alert("No pieces to resurrect in range!"); setActivationMode(false); return; }
         setGuruMode({ tileSquare, playerColor: piece.color, availableResurrections: avail }); setActivationMode(false); return;
       }
+      // ── NEW: HIRANYA — same as SURYA, 2-turn immunity ──
+      if (powerType === "HIRANYA") {
+        const np = { ...poweredPieces };
+        np[square] = { power: "HIRANYA", usesLeft: 2, color: piece.color };
+        setPoweredPieces(np);
+        setActivationMode(false);
+        return;
+      }
+
+      // ── NEW: KALI_ASURA — same as MANGALA, capture any adjacent ──
+      if (powerType === "KALI_ASURA") {
+        const np = { ...poweredPieces };
+        np[square] = { power: "KALI_ASURA", usesLeft: 3, color: piece.color };
+        setPoweredPieces(np);
+        setActivationMode(false);
+        return;
+      }
+
+      // ── NEW: RAVANA — queen movement for 1 turn ──
+      if (powerType === "RAVANA") {
+        const np = { ...poweredPieces };
+        np[square] = { power: "RAVANA", usesLeft: 1, color: piece.color };
+        setPoweredPieces(np);
+        setActivationMode(false);
+        return;
+      }
+
+      // ── NEW: BALI — resurrection, same flow as GURU ──
+      if (powerType === "BALI") {
+        const baliRadius = ASURA_DECK.find(c => c.id === "BALI").radius;
+        const searchCenter = tileSquare || square;
+        const sir = getSquaresInRadius(searchCenter, baliRadius);
+        const avail = captureHistory.filter(cap => {
+          const occ = game.get(cap.square);
+          return cap.color === piece.color && sir.includes(cap.square) && (!occ || occ.color !== piece.color);
+        });
+        if (avail.length === 0) { alert("No pieces to resurrect in range!"); setActivationMode(false); return; }
+        setGuruMode({ tileSquare, playerColor: piece.color, availableResurrections: avail });
+        setActivationMode(false);
+        return;
+      }
+
+      // ── NEW: MAHISHA — shapeshift into a captured piece ──
+      if (powerType === "MAHISHA") {
+        const np = { ...poweredPieces };
+        np[square] = { power: "MAHISHA", usesLeft: 1, color: piece.color };
+        setPoweredPieces(np);
+        // Enter Mahishasura selection mode — show picker for captured piece types
+        const capturedTypes = [...new Set(whiteCaptured)]; // black captures white's pieces
+        if (capturedTypes.length === 0) { alert("No captured pieces to shapeshift into!"); setActivationMode(false); return; }
+        setMahishasuraMode({ targetSquare: square, awaitingChoice: true, capturedTypes });
+        setActivationMode(false);
+        return;
+      }
+
+      // ── NEW: VRITRA — block White from this rank for 2 turns ──
+      if (powerType === "VRITRA") {
+        const rank = parseInt(square[1]);
+        setVritraRanks(prev => [...prev.filter(v => v.rank !== rank), { rank, turnsLeft: 4 }]); // 4 half-turns = 2 full turns
+        setActivationMode(false);
+        return;
+      }
+
+      // ── NEW: TARAKA — protected for 3 turns ──
+      if (powerType === "TARAKA") {
+        setTarakaProtected(prev => ({ ...prev, [square]: { turnsLeft: 6, pieceType: piece.type } }));
+        setActivationMode(false);
+        return;
+      }
+
+      // ── NEW: SHUMBHA — enter hit-and-return mode ──
+      if (powerType === "SHUMBHA") {
+        setShumbhaMode({ pieceSquare: square, piece, awaitingTarget: true });
+        setActivationMode(false);
+        return;
+      }
+
+      // ── NEW: SHUKRA_ASURA — mark this pawn for mid-board promotion ──
+      if (powerType === "SHUKRA_ASURA") {
+        setShukraAsuraPawns(prev => ({ ...prev, [square]: true }));
+        setActivationMode(false);
+        return;
+      }
       if (powerType === "SHANI") {
         const shaniRadius = SHARED_DECK.find(c => c.id === "SHANI").radius;
         const searchCenter = tileSquare || square;
@@ -220,89 +302,8 @@ function App() {
         setShaniMode({ tileSquare: searchCenter, playerColor: piece.color, enemyPieces: enemies });
         setActivationMode(false);
         return;
-        // ── NEW: HIRANYA — same as SURYA, 2-turn immunity ──
-        if (powerType === "HIRANYA") {
-          const np = { ...poweredPieces };
-          np[square] = { power: "HIRANYA", usesLeft: 2, color: piece.color };
-          setPoweredPieces(np);
-          setActivationMode(false);
-          return;
-        }
 
-        // ── NEW: KALI_ASURA — same as MANGALA, capture any adjacent ──
-        if (powerType === "KALI_ASURA") {
-          const np = { ...poweredPieces };
-          np[square] = { power: "KALI_ASURA", usesLeft: 3, color: piece.color };
-          setPoweredPieces(np);
-          setActivationMode(false);
-          return;
-        }
 
-        // ── NEW: RAVANA — queen movement for 1 turn ──
-        if (powerType === "RAVANA") {
-          const np = { ...poweredPieces };
-          np[square] = { power: "RAVANA", usesLeft: 1, color: piece.color };
-          setPoweredPieces(np);
-          setActivationMode(false);
-          return;
-        }
-
-        // ── NEW: BALI — resurrection, same flow as GURU ──
-        if (powerType === "BALI") {
-          const baliRadius = ASURA_DECK.find(c => c.id === "BALI").radius;
-          const searchCenter = tileSquare || square;
-          const sir = getSquaresInRadius(searchCenter, baliRadius);
-          const avail = captureHistory.filter(cap => {
-            const occ = game.get(cap.square);
-            return cap.color === piece.color && sir.includes(cap.square) && (!occ || occ.color !== piece.color);
-          });
-          if (avail.length === 0) { alert("No pieces to resurrect in range!"); setActivationMode(false); return; }
-          setGuruMode({ tileSquare, playerColor: piece.color, availableResurrections: avail });
-          setActivationMode(false);
-          return;
-        }
-
-        // ── NEW: MAHISHA — shapeshift into a captured piece ──
-        if (powerType === "MAHISHA") {
-          const np = { ...poweredPieces };
-          np[square] = { power: "MAHISHA", usesLeft: 1, color: piece.color };
-          setPoweredPieces(np);
-          // Enter Mahishasura selection mode — show picker for captured piece types
-          const capturedTypes = [...new Set(whiteCaptured)]; // black captures white's pieces
-          if (capturedTypes.length === 0) { alert("No captured pieces to shapeshift into!"); setActivationMode(false); return; }
-          setMahishasuraMode({ targetSquare: square, awaitingChoice: true, capturedTypes });
-          setActivationMode(false);
-          return;
-        }
-
-        // ── NEW: VRITRA — block White from this rank for 2 turns ──
-        if (powerType === "VRITRA") {
-          const rank = parseInt(square[1]);
-          setVritraRanks(prev => [...prev.filter(v => v.rank !== rank), { rank, turnsLeft: 4 }]); // 4 half-turns = 2 full turns
-          setActivationMode(false);
-          return;
-        }
-
-        // ── NEW: TARAKA — protected for 3 turns ──
-        if (powerType === "TARAKA") {
-          setTarakaProtected(prev => ({ ...prev, [square]: { turnsLeft: 6, pieceType: piece.type } }));
-          setActivationMode(false);
-          return;
-        }
-
-        // ── NEW: SHUMBHA — enter hit-and-return mode ──
-        if (powerType === "SHUMBHA") {
-          setShumbhaMode({ pieceSquare: square, piece, awaitingTarget: true });
-          setActivationMode(false);
-          return;
-        }
-
-        // ── NEW: SHUKRA_ASURA — mark this pawn for mid-board promotion ──
-        if (powerType === "SHUKRA_ASURA") {
-          setShukraAsuraPawns(prev => ({ ...prev, [square]: true }));
-          setActivationMode(false);
-          return;
-        }
       }
       const np = { ...poweredPieces };
       let usesLeft = 1;
@@ -380,17 +381,7 @@ function App() {
         return gc;
       }
       // ── NEW: HIRANYA blocks capture (same as SURYA) ──
-      if (cp && poweredPieces[to]?.power === "HIRANYA" && poweredPieces[to].usesLeft > 0) {
-        return null;
-      }
 
-      // ── NEW: TARAKASURA — can only be captured by same piece type ──
-      if (cp && tarakaProtected[to]) {
-        const attackerType = game.get(from)?.type;
-        if (attackerType !== tarakaProtected[to].pieceType) {
-          return null;
-        }
-      }
       if (chandraMode && game.get(to)) {
         const isMirage = chandraMode.mirages.includes(to); const isReal = to === chandraMode.realSquare;
         if (isMirage) {
@@ -424,6 +415,17 @@ function App() {
 
       const piece = game.get(from); if (!piece) return null;
       const cp = game.get(to); const power = poweredPieces[from];
+      if (cp && poweredPieces[to]?.power === "HIRANYA" && poweredPieces[to].usesLeft > 0) {
+        return null;
+      }
+
+      // ── NEW: TARAKASURA — can only be captured by same piece type ──
+      if (cp && tarakaProtected[to]) {
+        const attackerType = game.get(from)?.type;
+        if (attackerType !== tarakaProtected[to].pieceType) {
+          return null;
+        }
+      }
       if (frozenPieces[from]) return null;
       // ── NEW: VRITRA — White cannot move to a blocked rank ──
       if (vritraRanks.length > 0 && piece && piece.color === "w") {
