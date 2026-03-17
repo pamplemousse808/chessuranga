@@ -45,7 +45,8 @@ function App() {
   const [blackCaptured, setBlackCaptured] = useState([]);
   const [captureHistory, setCaptureHistory] = useState([]);
   const [usedCards, setUsedCards] = useState([]);
-  const [tier1Unlocked, setTier1Unlocked] = useState(false);
+  const [lastWhiteCard, setLastWhiteCard] = useState(null);
+  const [lastBlackCard, setLastBlackCard] = useState(null);
   const [tier2Unlocked, setTier2Unlocked] = useState(false);
   const [tier3Unlocked, setTier3Unlocked] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
@@ -176,8 +177,12 @@ function App() {
     const newTile = { square, type: card.id, name: card.name, color: card.color + "66", radius: card.radius, turnsRemaining: 3, whiteActivated: false, blackActivated: false, whiteActivatedPiece: null, blackActivatedPiece: null };
     setActiveTiles([...activeTiles, newTile]);
     if (gameMode === "asura" || gameMode === "shukracharya") setCardCooldowns(prev => ({ ...prev, [card.id]: 6 }));
-    else setUsedCards([...usedCards, card.id]);
-    setSelectedCard(null);
+    else {
+      setUsedCards([...usedCards, card.id]);
+      if (game.turn() === "w") setLastWhiteCard(card.id);
+      else setLastBlackCard(card.id);
+    }
+    setSelectedCard(null); setSelectedCard(null);
   }
 
   function activateTileForPiece(square) {
@@ -268,7 +273,7 @@ function App() {
       // ── NEW: TARAKA — protected for 3 turns ──
       if (powerType === "TARAKA") {
         setTarakaProtected(prev => ({ ...prev, [square]: { turnsLeft: 6, pieceType: piece.type } }));
-        setActivationMode(false);
+        setActivationMode(false); pvp
         return;
       }
 
@@ -757,6 +762,8 @@ function App() {
     setShumbhaMode(null);
     setVritraRanks([]);
     setTarakaProtected({});
+    setLastWhiteCard(null);
+    setLastBlackCard(null);
   }
 
   const theme = getTheme(gameMode);
@@ -1152,6 +1159,8 @@ function App() {
             resetGame={resetGame}
             showChaosPopup={showChaosPopup}
             setShowChaosPopup={setShowChaosPopup}
+            lastWhiteCard={lastWhiteCard}
+            lastBlackCard={lastBlackCard}
           />
         )}
 
