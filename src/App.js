@@ -27,7 +27,6 @@ function useIsMobile() {
 // ── Main App ──────────────────────────────────────────────────────────────────
 function App() {
   const isMobile = useIsMobile();
-
   const [game, setGame] = useState(new Chess());
   const [moveFrom, setMoveFrom] = useState("");
   const [whiteTime, setWhiteTime] = useState(180);
@@ -47,6 +46,7 @@ function App() {
   const [usedCards, setUsedCards] = useState([]);
   const [lastWhiteCard, setLastWhiteCard] = useState(null);
   const [lastBlackCard, setLastBlackCard] = useState(null);
+  const [tier1Unlocked, setTier1Unlocked] = useState(false);
   const [tier2Unlocked, setTier2Unlocked] = useState(false);
   const [tier3Unlocked, setTier3Unlocked] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
@@ -273,7 +273,7 @@ function App() {
       // ── NEW: TARAKA — protected for 3 turns ──
       if (powerType === "TARAKA") {
         setTarakaProtected(prev => ({ ...prev, [square]: { turnsLeft: 6, pieceType: piece.type } }));
-        setActivationMode(false); pvp
+        setActivationMode(false); 
         return;
       }
 
