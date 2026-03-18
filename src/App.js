@@ -51,7 +51,6 @@ function App() {
   const [tier3Unlocked, setTier3Unlocked] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
   const [cardCooldowns, setCardCooldowns] = useState({});
-  const [activeTiles, setActiveTiles] = useState([]);
   const [poweredPieces, setPoweredPieces] = useState({});
   const [frozenPieces, setFrozenPieces] = useState({});
   const [chandraMode, setChandraMode] = useState(null);
@@ -63,7 +62,6 @@ function App() {
   const [shumbhaMode, setShumbhaMode] = useState(null);
   const [vritraRanks, setVritraRanks] = useState([]);
   const [tarakaProtected, setTarakaProtected] = useState({});
-  const [activationMode, setActivationMode] = useState(false);
   const [chaosModeShown, setChaosModeShown] = useState({ white: false, black: false });
   const [showChaosPopup, setShowChaosPopup] = useState(false);
   const [asuraLives, setAsuraLives] = useState({});
@@ -113,8 +111,6 @@ function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!gameStarted || moveCount === 0) return;
-    const updatedTiles = activeTiles.map(t => { const n = t.turnsRemaining - 0.5; return { ...t, turnsRemaining: n, expired: (t.whiteActivated && t.blackActivated) || n <= 0 }; }).filter(t => !t.expired);
-    setActiveTiles(updatedTiles);
     const updatedFrozen = {};
     Object.keys(frozenPieces).forEach(sq => { const tl = frozenPieces[sq].turnsLeft - 0.5; if (tl > 0) updatedFrozen[sq] = { turnsLeft: tl }; });
     setFrozenPieces(updatedFrozen);
@@ -155,177 +151,6 @@ function App() {
     if ((cp === "r" || cp === "q") && !tier3Unlocked) { setTier1Unlocked(true); setTier2Unlocked(true); setTier3Unlocked(true); }
   }
 
-  function getPiecesInZones() {
-    const result = []; const ct = game.turn();
-    activeTiles.forEach(tile => {
-      getSquaresInRadius(tile.square, tile.radius).forEach(sq => {
-        const piece = game.get(sq);
-        if (piece && piece.color === ct) {
-          const pc = piece.color === "w" ? "white" : "black";
-          const alreadyActivated = (pc === "white" && tile.whiteActivated) || (pc === "black" && tile.blackActivated);
-          if (!alreadyActivated && !poweredPieces[sq]) result.push({ square: sq, tileId: tile.square, tileType: tile.type, color: piece.color });
-        }
-      });
-    });
-    return result;
-  }
-
-  function placeTile(square) {
-    if (!selectedCard) return;
-    const card = selectedCard; const cost = getCardCost(card);
-    subtractTime(game.turn(), cost);
-    const newTile = { square, type: card.id, name: card.name, color: card.color + "66", radius: card.radius, turnsRemaining: 3, whiteActivated: false, blackActivated: false, whiteActivatedPiece: null, blackActivatedPiece: null };
-    setActiveTiles([...activeTiles, newTile]);
-    if (gameMode === "asura" || gameMode === "shukracharya") setCardCooldowns(prev => ({ ...prev, [card.id]: 6 }));
-    else {
-      setUsedCards([...usedCards, card.id]);
-      if (game.turn() === "w") setLastWhiteCard(card.id);
-      else setLastBlackCard(card.id);
-    }
-    setSelectedCard(null); setSelectedCard(null);
-  }
-
-  function activateTileForPiece(square) {
-    const piece = game.get(square); if (!piece) return;
-    const playerColor = piece.color === "w" ? "white" : "black";
-    let powerType = null; let tileSquare = null;
-    const updatedTiles = activeTiles.map(tile => {
-      const inRange = getSquaresInRadius(tile.square, tile.radius).includes(square);
-      if (inRange) {
-        if (playerColor === "white" && !tile.whiteActivated) { powerType = tile.type; tileSquare = tile.square; return { ...tile, whiteActivated: true, whiteActivatedPiece: square }; }
-        else if (playerColor === "black" && !tile.blackActivated) { powerType = tile.type; tileSquare = tile.square; return { ...tile, blackActivated: true, blackActivatedPiece: square }; }
-      }
-      return tile;
-    });
-    setActiveTiles(updatedTiles);
-    if (powerType) {
-      if (powerType === "CHANDRA") { setChandraPlacementMode({ square, piece, rank: parseInt(square[1]), mirages: [], teleportTo: null }); setActivationMode(false); return; }
-      if (powerType === "GURU") {
-        const tr = SHARED_DECK.find(c => c.id === "GURU").radius;
-        const sir = getSquaresInRadius(tileSquare, tr);
-        const avail = captureHistory.filter(cap => { const occ = game.get(cap.square); return cap.color === piece.color && sir.includes(cap.square) && (!occ || occ.color !== piece.color); });
-        if (avail.length === 0) { alert("No pieces to resurrect in range!"); setActivationMode(false); return; }
-        setGuruMode({ tileSquare, playerColor: piece.color, availableResurrections: avail }); setActivationMode(false); return;
-      }
-      // ── NEW: HIRANYA — same as SURYA, 2-turn immunity ──
-      if (powerType === "HIRANYA") {
-        const np = { ...poweredPieces };
-        np[square] = { power: "HIRANYA", usesLeft: 2, color: piece.color };
-        setPoweredPieces(np);
-        setActivationMode(false);
-        return;
-      }
-
-      // ── NEW: KALI_ASURA — same as MANGALA, capture any adjacent ──
-      if (powerType === "KALI_ASURA") {
-        const np = { ...poweredPieces };
-        np[square] = { power: "KALI_ASURA", usesLeft: 3, color: piece.color };
-        setPoweredPieces(np);
-        setActivationMode(false);
-        return;
-      }
-
-      // ── NEW: RAVANA — queen movement for 1 turn ──
-      if (powerType === "RAVANA") {
-        const np = { ...poweredPieces };
-        np[square] = { power: "RAVANA", usesLeft: 1, color: piece.color };
-        setPoweredPieces(np);
-        setActivationMode(false);
-        return;
-      }
-
-      // ── NEW: BALI — resurrection, same flow as GURU ──
-      if (powerType === "BALI") {
-        const baliRadius = ASURA_DECK.find(c => c.id === "BALI").radius;
-        const searchCenter = tileSquare || square;
-        const sir = getSquaresInRadius(searchCenter, baliRadius);
-        const avail = captureHistory.filter(cap => {
-          const occ = game.get(cap.square);
-          return cap.color === piece.color && sir.includes(cap.square) && (!occ || occ.color !== piece.color);
-        });
-        if (avail.length === 0) { alert("No pieces to resurrect in range!"); setActivationMode(false); return; }
-        setGuruMode({ tileSquare, playerColor: piece.color, availableResurrections: avail });
-        setActivationMode(false);
-        return;
-      }
-
-      // ── NEW: MAHISHA — shapeshift into a captured piece ──
-      if (powerType === "MAHISHA") {
-        const np = { ...poweredPieces };
-        np[square] = { power: "MAHISHA", usesLeft: 1, color: piece.color };
-        setPoweredPieces(np);
-        // Enter Mahishasura selection mode — show picker for captured piece types
-        const capturedTypes = [...new Set(whiteCaptured)]; // black captures white's pieces
-        if (capturedTypes.length === 0) { alert("No captured pieces to shapeshift into!"); setActivationMode(false); return; }
-        setMahishasuraMode({ targetSquare: square, awaitingChoice: true, capturedTypes });
-        setActivationMode(false);
-        return;
-      }
-
-      // ── NEW: VRITRA — block White from this rank for 2 turns ──
-      if (powerType === "VRITRA") {
-        const rank = parseInt(square[1]);
-        setVritraRanks(prev => [...prev.filter(v => v.rank !== rank), { rank, turnsLeft: 4 }]); // 4 half-turns = 2 full turns
-        setActivationMode(false);
-        return;
-      }
-
-      // ── NEW: TARAKA — protected for 3 turns ──
-      if (powerType === "TARAKA") {
-        setTarakaProtected(prev => ({ ...prev, [square]: { turnsLeft: 6, pieceType: piece.type } }));
-        setActivationMode(false); 
-        return;
-      }
-
-      // ── NEW: SHUMBHA — enter hit-and-return mode ──
-      if (powerType === "SHUMBHA") {
-        setShumbhaMode({ pieceSquare: square, piece, awaitingTarget: true });
-        setActivationMode(false);
-        return;
-      }
-
-      if (powerType === "SHANI") {
-        const shaniRadius = SHARED_DECK.find(c => c.id === "SHANI").radius;
-        const searchCenter = tileSquare || square;
-        const sir = getSquaresInRadius(searchCenter, shaniRadius);
-        const enemies = [];
-        const ec = piece.color === "w" ? "b" : "w";
-        sir.forEach(sq => {
-          const tp = game.get(sq);
-          if (tp && tp.color === ec && !frozenPieces[sq]) {
-            enemies.push({ square: sq, piece: tp });
-          }
-        });
-        console.log("SHANI activated from", square, "tileSquare:", tileSquare, "enemies found:", enemies.length);
-        if (enemies.length === 0) { alert("No enemy pieces to freeze in range!"); setActivationMode(false); return; }
-        setShaniMode({ tileSquare: searchCenter, playerColor: piece.color, enemyPieces: enemies });
-        setActivationMode(false);
-        return;
-
-
-      }
-      const np = { ...poweredPieces };
-      let usesLeft = 1;
-      if (powerType === "RAHU") usesLeft = 2;
-      if (powerType === "SURYA") usesLeft = 2;
-      if (powerType === "SHUKRA") usesLeft = 2;
-      if (powerType === "MANGALA") usesLeft = 3;
-      np[square] = { power: powerType, usesLeft, color: piece.color };
-      setPoweredPieces(np);
-    }
-    setActivationMode(false);
-  }
-
-  function updateTileActivations(newGame) {
-    const updated = activeTiles.map(tile => {
-      let t = { ...tile };
-      if (t.whiteActivatedPiece) { const p = newGame.get(t.whiteActivatedPiece); if (!p || p.color !== "w") t.whiteActivatedPiece = null; }
-      if (t.blackActivatedPiece) { const p = newGame.get(t.blackActivatedPiece); if (!p || p.color !== "b") t.blackActivatedPiece = null; }
-      return t;
-    });
-    setActiveTiles(updated);
-  }
-
   function tickAsuraCounters() {                                     // ── NEW
     setVritraRanks(prev => prev.map(v => ({ ...v, turnsLeft: v.turnsLeft - 1 })).filter(v => v.turnsLeft > 0));
     setTarakaProtected(prev => {
@@ -359,6 +184,235 @@ function App() {
       });
     }, 2000);
   }
+  // ── Helper: get adjacent enemy squares around a given square ─────────────────
+  function getAdjacentEnemySquares(square, enemyColor, gameState) {
+    const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
+    const f = files.indexOf(square[0]);
+    const r = parseInt(square[1]);
+    const result = [];
+    for (let df = -1; df <= 1; df++) {
+      for (let dr = -1; dr <= 1; dr++) {
+        if (df === 0 && dr === 0) continue;
+        const nf = f + df, nr = r + dr;
+        if (nf >= 0 && nf < 8 && nr >= 1 && nr <= 8) {
+          const sq = files[nf] + nr;
+          const piece = gameState.get(sq);
+          if (piece && piece.color === enemyColor) result.push(sq);
+        }
+      }
+    }
+    return result;
+  }
+
+  // ── Helper: mark card as used (handles pvp separate decks vs single usedCards) 
+  function markCardUsed(cardId, playerColor, gameMode, usedCards, setUsedCards) {
+    // In pvp mode, App.js tracks lastWhiteCard/lastBlackCard separately.
+    // For usedCards (single-player modes), just push the id.
+    if (gameMode !== "pvp") {
+      setUsedCards(prev => [...prev, cardId]);
+    }
+    // PvP: usedCards per player is handled via whiteUsedCards/blackUsedCards
+    // which App.js should maintain. For now we still push to the shared array
+    // as a fallback until those are fully wired up.
+    else {
+      setUsedCards(prev => [...prev, cardId]);
+    }
+  }
+  // ─────────────────────────────────────────────────────────────────────────────
+  // applyCardToPiece(square)
+  //
+  // Called when a player has a card selected and taps one of their own pieces.
+  // Validates the tap, fires the card effect, marks the card used.
+  // ─────────────────────────────────────────────────────────────────────────────
+  function applyCardToPiece(square) {
+    if (!selectedCard) return;
+
+    const piece = game.get(square);
+    const currentPlayer = game.turn();
+
+    // Must tap your own piece
+    if (!piece || piece.color !== currentPlayer) return;
+
+    // Frozen pieces can't receive cards
+    if (frozenPieces[square]) return;
+
+    const card = selectedCard;
+    const cardId = card.id;
+    const cost = getCardCost(card);
+    const enemyColor = currentPlayer === "w" ? "b" : "w";
+
+    // ── Shared: deduct time and mark card used ──────────────────────────────────
+    function commitCard() {
+      subtractTime(currentPlayer, cost);
+      markCardUsed(cardId, currentPlayer, gameMode, usedCards, setUsedCards);
+      if (gameMode === "pvp") {
+        if (currentPlayer === "w") setLastWhiteCard(cardId);
+        else setLastBlackCard(cardId);
+      }
+      setSelectedCard(null);
+    }
+
+    // ─── SWITCH on card id ──────────────────────────────────────────────────────
+
+    // ── Direct power cards (assign to poweredPieces immediately) ───────────────
+    // RAHU / RAVANA — phase walk (pass through pieces)
+    if (cardId === "RAHU" || cardId === "RAVANA") {
+      setPoweredPieces(prev => ({ ...prev, [square]: { power: "RAHU", usesLeft: 2 } }));
+      commitCard();
+      return;
+    }
+
+    // KETU — martyr's curse (time swap on capture)
+    if (cardId === "KETU") {
+      setPoweredPieces(prev => ({ ...prev, [square]: { power: "KETU", usesLeft: 4 } }));
+      commitCard();
+      return;
+    }
+
+    // SURYA / HIRANYA — invincibility (can't be captured)
+    if (cardId === "SURYA" || cardId === "HIRANYA") {
+      setPoweredPieces(prev => ({ ...prev, [square]: { power: "SURYA", usesLeft: 4 } }));
+      commitCard();
+      return;
+    }
+
+    // SHUKRA (Navagraha) — time harvest (triple time on next 2 captures)
+    if (cardId === "SHUKRA") {
+      setPoweredPieces(prev => ({ ...prev, [square]: { power: "SHUKRA", usesLeft: 2 } }));
+      commitCard();
+      return;
+    }
+
+    // BUDHA — double move
+    if (cardId === "BUDHA") {
+      setPoweredPieces(prev => ({ ...prev, [square]: { power: "BUDHA", usesLeft: 2 } }));
+      commitCard();
+      return;
+    }
+
+    // TARAKA — can only be captured by same piece type for 3 turns
+    if (cardId === "TARAKA") {
+      setTarakaProtected(prev => ({ ...prev, [square]: { turnsLeft: 6, pieceType: piece.type } }));
+      commitCard();
+      return;
+    }
+
+    // VRITRA — enemy pieces can't cross this piece's rank for 2 turns
+    if (cardId === "VRITRA") {
+      const rank = parseInt(square[1]);
+      setVritraRanks(prev => [...prev.filter(v => v.rank !== rank), { rank, turnsLeft: 4, color: currentPlayer }]);
+      commitCard();
+      return;
+    }
+
+    // SHUKRA_ASURA — pawns promote to any captured piece type at halfway
+    if (cardId === "SHUKRA_ASURA") {
+      setPoweredPieces(prev => ({ ...prev, [square]: { power: "SHUKRA_ASURA", usesLeft: 6 } }));
+      commitCard();
+      return;
+    }
+
+    // ── CHANDRA — clone flow (existing chandraPlacementMode unchanged) ──────────
+    if (cardId === "CHANDRA") {
+      commitCard();
+      setChandraPlacementMode({
+        square,
+        piece,
+        rank: parseInt(square[1]),
+        mirages: [],
+        teleportTo: null,
+      });
+      return;
+    }
+
+    // ── GURU / BALI — resurrection flow (existing guruMode unchanged) ───────────
+    if (cardId === "GURU" || cardId === "BALI") {
+      const avail = captureHistory.filter(cap => {
+        const occ = game.get(cap.square);
+        return (
+          cap.color === currentPlayer &&
+          (!occ || occ.color !== currentPlayer)
+        );
+      });
+      if (avail.length === 0) {
+        alert("No captured pieces to resurrect!");
+        return;
+      }
+      commitCard();
+      setGuruMode({
+        tileSquare: square,
+        playerColor: currentPlayer,
+        availableResurrections: avail,
+      });
+      return;
+    }
+
+    // ── MAHISHA — shapeshift into any captured piece type ──────────────────────
+    if (cardId === "MAHISHA") {
+      // Build list of unique captured enemy piece types the player can shapeshift into
+      const capturedTypes = [...new Set(
+        captureHistory
+          .filter(c => c.color === enemyColor)
+          .map(c => c.piece)
+          .filter(t => t !== "k")
+      )];
+      if (capturedTypes.length === 0) {
+        alert("No captured pieces to shapeshift into!");
+        return;
+      }
+      commitCard();
+      setMahishasuraMode({ square, piece, availableTypes: capturedTypes });
+      return;
+    }
+
+    // ── SHUMBHA — capture then snap back ───────────────────────────────────────
+    if (cardId === "SHUMBHA") {
+      setPoweredPieces(prev => ({ ...prev, [square]: { power: "SHUMBHA", usesLeft: 1, originSquare: square } }));
+      commitCard();
+      return;
+    }
+
+    // ── SHANI / KALI_ASURA — freeze/smite: highlight enemy targets ─────────────
+    // Player taps their own piece first, then we show enemy targets to tap next.
+    if (cardId === "SHANI" || cardId === "KALI_ASURA") {
+      // Find all enemy pieces on the board as valid targets
+      const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
+      const enemies = [];
+      files.forEach(f => {
+        for (let r = 1; r <= 8; r++) {
+          const sq = f + r;
+          const p = game.get(sq);
+          if (p && p.color === enemyColor && !frozenPieces[sq]) {
+            enemies.push({ square: sq, piece: p });
+          }
+        }
+      });
+      if (enemies.length === 0) {
+        alert("No enemy pieces to target!");
+        return;
+      }
+      commitCard();
+      setShaniMode({ enemyPieces: enemies, cardId });
+      return;
+    }
+
+    // ── MANGALA — smite adjacent: highlight adjacent enemies ───────────────────
+    if (cardId === "MANGALA") {
+      const adjacentEnemies = getAdjacentEnemySquares(square, enemyColor, game);
+      if (adjacentEnemies.length === 0) {
+        alert("No adjacent enemy pieces to capture!");
+        return;
+      }
+      commitCard();
+      // Re-use shaniMode shape — onSquareClick handles both by checking cardId
+      setShaniMode({
+        enemyPieces: adjacentEnemies.map(sq => ({ square: sq, piece: game.get(sq) })),
+        cardId: "MANGALA",
+        fromSquare: square, // remember which piece is doing the capturing
+      });
+      return;
+    }
+  }
 
   function handleMove(from, to, promotion = "q") {
     try {
@@ -387,7 +441,7 @@ function App() {
           const gc = new Chess(game.fen());
           chandraMode.mirages.forEach(sq => { if (gc.get(sq)) gc.remove(sq); });
           const move = gc.move({ from, to, promotion }); if (!move) return null;
-          setChandraMode(null); setGame(gc); updateTileActivations(gc); tickAsuraCounters(); setMoveCount(p => p + 1);
+          setChandraMode(null); setGame(gc); tickAsuraCounters(); setMoveCount(p => p + 1);
           if (gc.isCheckmate()) { setGameOver(true); setWinner(gc.turn() === "w" ? "black" : "white"); }
           return gc;
         } else if (isReal) {
@@ -614,85 +668,177 @@ function App() {
   function onSquareClick(square) {
     if (gameOver || !gameStarted) return;
     if ((gameMode === "asura" || gameMode === "shukracharya") && game.turn() === "b") return;
-    if (selectedCard) { placeTile(square); return; }
+
+    // ── Card application: player has selected a card and taps a piece ───────────
+    if (selectedCard) {
+      applyCardToPiece(square);
+      return;
+    }
+
+    // ── GURU resurrection target selection ─────────────────────────────────────
     if (guruMode) {
       const res = guruMode.availableResurrections.filter(r => r.square === square);
       if (res.length === 1) performResurrection(res[0], square);
       else if (res.length > 1) setGuruPickerMode({ square, options: res });
       return;
     }
-    if (shaniMode) { const tp = shaniMode.enemyPieces.find(p => p.square === square); if (tp) { setFrozenPieces({ ...frozenPieces, [square]: { turnsLeft: 4 } }); setShaniMode(null); } return; }
-    // ── NEW: Mahishasura — click to choose captured piece type ──
-    if (mahishasuraMode?.awaitingChoice) {
-      // The click is on a piece type button in the UI, not on the board
-      // (handled by the UI overlay — see App.js JSX below)
-      return;
-    }
-
-    // ── NEW: Shumbha-Nishumbha — click target to capture then snap back ──
-    if (shumbhaMode?.awaitingTarget) {
-      const attacker = game.get(shumbhaMode.pieceSquare);
-      const target = game.get(square);
-      if (!attacker || !target || target.color === attacker.color) return;
-
-      // Must be adjacent
+    if (selectedCard) {
+      const currentPlayer = game.turn();
       const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
-      const fileDiff = Math.abs(files.indexOf(square[0]) - files.indexOf(shumbhaMode.pieceSquare[0]));
-      const rankDiff = Math.abs(parseInt(square[1]) - parseInt(shumbhaMode.pieceSquare[1]));
-      if (fileDiff > 1 || rankDiff > 1) {
-        alert("Shumbha-Nishumbha can only strike adjacent squares!");
+      files.forEach(f => {
+        for (let r = 1; r <= 8; r++) {
+          const sq = f + r;
+          const p = game.get(sq);
+          if (p && p.color === currentPlayer && !frozenPieces[sq]) {
+            customStyles[sq] = {
+              ...(customStyles[sq] || {}),
+              border: "3px solid #ffd700",
+              boxShadow: "0 0 15px #ffd700, inset 0 0 10px rgba(255,215,0,0.3)",
+            };
+          }
+        }
+      });
+    }
+    // ── SHANI freeze / MANGALA smite / KALI_ASURA target selection ─────────────
+    // shaniMode is now reused for all "tap enemy to apply effect" flows.
+    if (shaniMode) {
+      const target = shaniMode.enemyPieces.find(p => p.square === square);
+      if (!target) return;
+
+      if (shaniMode.cardId === "MANGALA") {
+        // MANGALA: move the piece to the target square, capturing it
+        const fromSq = shaniMode.fromSquare;
+        const movingPiece = game.get(fromSq);
+        if (!movingPiece) { setShaniMode(null); return; }
+        const ng = new Chess(game.fen());
+        ng.remove(fromSq);
+        ng.remove(square);
+        ng.put({ type: movingPiece.type, color: movingPiece.color }, square);
+        // Flip turn
+        const fp = ng.fen().split(" ");
+        fp[1] = fp[1] === "w" ? "b" : "w";
+        ng.load(fp.join(" "));
+        // Record capture
+        setCaptureHistory(prev => [...prev, { piece: target.piece.type, square, color: target.piece.color }]);
+        if (game.turn() === "w") setBlackCaptured(prev => [...prev, target.piece.type]);
+        else setWhiteCaptured(prev => [...prev, target.piece.type]);
+        checkTierUnlocks(target.piece.type);
+        // Move powered piece data if the moving piece had a power
+        if (poweredPieces[fromSq]) {
+          setPoweredPieces(prev => {
+            const updated = { ...prev };
+            updated[square] = updated[fromSq];
+            delete updated[fromSq];
+            return updated;
+          });
+        }
+        setGame(ng);
+        setMoveCount(prev => prev + 1);
+        if (ng.isCheckmate()) { setGameOver(true); setWinner(ng.turn() === "w" ? "black" : "white"); }
+        setShaniMode(null);
         return;
       }
 
-      // Execute: remove target, keep attacker at origin
-      const newGame = new Chess(game.fen());
-      newGame.remove(square); // captured piece gone
-      // attacker stays at pieceSquare — no move needed, just record capture
-      const timeBonus = getPieceValue(target.type);
-      addTime("b", timeBonus);
-      setCaptureHistory(prev => [...prev, { piece: target.type, square, color: target.color }]);
-      setWhiteCaptured(prev => [...prev, target.type]);
-      checkTierUnlocks(target.type);
+      if (shaniMode.cardId === "KALI_ASURA") {
+        // KALI: capture any adjacent enemy (same as MANGALA — reuse logic above)
+        // For now treat identically to MANGALA but without requiring adjacency
+        // (KALI_ASURA description says "capture any adjacent enemy piece")
+        const fromSq = shaniMode.fromSquare;
+        if (fromSq) {
+          const movingPiece = game.get(fromSq);
+          if (movingPiece) {
+            const ng = new Chess(game.fen());
+            ng.remove(fromSq);
+            ng.remove(square);
+            ng.put({ type: movingPiece.type, color: movingPiece.color }, square);
+            const fp = ng.fen().split(" ");
+            fp[1] = fp[1] === "w" ? "b" : "w";
+            ng.load(fp.join(" "));
+            setCaptureHistory(prev => [...prev, { piece: target.piece.type, square, color: target.piece.color }]);
+            if (game.turn() === "w") setBlackCaptured(prev => [...prev, target.piece.type]);
+            else setWhiteCaptured(prev => [...prev, target.piece.type]);
+            checkTierUnlocks(target.piece.type);
+            setGame(ng);
+            setMoveCount(prev => prev + 1);
+            if (ng.isCheckmate()) { setGameOver(true); setWinner(ng.turn() === "w" ? "black" : "white"); }
+          }
+        } else {
+          // SHANI-style: just freeze the target
+          setFrozenPieces(prev => ({ ...prev, [square]: { turnsLeft: 4 } }));
+        }
+        setShaniMode(null);
+        return;
+      }
 
-      // Flip turn manually
-      const fen = newGame.fen().split(" ");
-      fen[1] = "w";
-      newGame.load(fen.join(" "));
-      setGame(newGame);
-      setMoveCount(prev => prev + 1);
-      setShumbhaMode(null);
-
-      if (newGame.isCheckmate()) { setGameOver(true); setWinner("white"); }
+      // Default: SHANI freeze
+      setFrozenPieces(prev => ({ ...prev, [square]: { turnsLeft: 4 } }));
+      setShaniMode(null);
       return;
     }
+
+    // ── MAHISHA shapeshift target selection ────────────────────────────────────
+    if (mahishasuraMode) {
+      // mahishasuraMode is set in applyCardToPiece — the UI should show
+      // a picker overlay (like guruPickerMode) for the player to choose
+      // a piece type. This click handler just dismisses if they tap elsewhere.
+      return;
+    }
+
+    // ── CHANDRA clone placement ─────────────────────────────────────────────────
     if (chandraPlacementMode) {
-      const cr = parseInt(square[1]);
-      if (cr === chandraPlacementMode.rank) {
+      const clickedRank = parseInt(square[1]);
+      if (clickedRank === chandraPlacementMode.rank) {
         const piece = game.get(square);
         if (chandraPlacementMode.piece.type === "b") {
           const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
-          const of2 = files.indexOf(chandraPlacementMode.square[0]), or = parseInt(chandraPlacementMode.square[1]);
-          const oIL = (of2 + or) % 2 === 0, cf = files.indexOf(square[0]);
-          if (oIL !== ((cf + cr) % 2 === 0)) return;
+          const of2 = files.indexOf(chandraPlacementMode.square[0]);
+          const or2 = parseInt(chandraPlacementMode.square[1]);
+          const oIsLight = (of2 + or2) % 2 === 0;
+          const cf = files.indexOf(square[0]);
+          if (oIsLight !== ((cf + clickedRank) % 2 === 0)) return;
         }
         if (!piece || square === chandraPlacementMode.square) {
           if (square === chandraPlacementMode.square) return;
-          if (chandraPlacementMode.mirages.includes(square)) setChandraPlacementMode({ ...chandraPlacementMode, mirages: chandraPlacementMode.mirages.filter(s => s !== square) });
-          else if (chandraPlacementMode.mirages.length < 2) setChandraPlacementMode({ ...chandraPlacementMode, mirages: [...chandraPlacementMode.mirages, square] });
+          if (chandraPlacementMode.mirages.includes(square)) {
+            setChandraPlacementMode({ ...chandraPlacementMode, mirages: chandraPlacementMode.mirages.filter(s => s !== square) });
+          } else if (chandraPlacementMode.mirages.length < 2) {
+            setChandraPlacementMode({ ...chandraPlacementMode, mirages: [...chandraPlacementMode.mirages, square] });
+          }
         }
       }
       return;
     }
-    if (activationMode) { const piz = getPiecesInZones(); const pInZ = piz.find(p => p.square === square); if (pInZ) { const piece = game.get(square); if (piece && piece.color === game.turn()) { activateTileForPiece(square); return; } } return; }
-    if (!moveFrom) { const piece = game.get(square); if (piece && piece.color === game.turn()) { if (frozenPieces[square]) return; setMoveFrom(square); } return; }
-    const tp2 = game.get(square); if (tp2 && tp2.color === game.turn()) { if (frozenPieces[square]) return; setMoveFrom(square); return; }
-    const mp = game.get(moveFrom); if (!mp || mp.color !== game.turn()) { setMoveFrom(""); return; }
-    handleMove(moveFrom, square);
+
+    // ── Normal piece movement ───────────────────────────────────────────────────
+    if (!moveFrom) {
+      const piece = game.get(square);
+      if (piece && piece.color === game.turn()) {
+        if (frozenPieces[square]) return;
+        setMoveFrom(square);
+      }
+      return;
+    }
+
+    // Switch selection to another own piece
+    const tappedPiece = game.get(square);
+    if (tappedPiece && tappedPiece.color === game.turn()) {
+      if (frozenPieces[square]) return;
+      setMoveFrom(square);
+      return;
+    }
+
+    const movingPiece = game.get(moveFrom);
+    if (!movingPiece || movingPiece.color !== game.turn()) {
+      setMoveFrom("");
+      return;
+    }
+
+    const result = handleMove(moveFrom, square);
     setMoveFrom("");
   }
 
   function onPieceDrop(sourceSquare, targetSquare) {
-    if (gameOver || !gameStarted || selectedCard || activationMode || chandraPlacementMode || guruMode || shaniMode) return false;
+    if (gameOver || !gameStarted || selectedCard || chandraPlacementMode || guruMode || shaniMode) return false;
     if ((gameMode === "asura" || gameMode === "shukracharya") && game.turn() === "b") return false;
     if (chandraMode) {
       if (chandraMode.mirages.includes(sourceSquare)) return false;
@@ -750,11 +896,10 @@ function App() {
   function resetGame() {
     setGame(new Chess()); setWhiteTime(startingTime); setBlackTime(startingTime);
     setGameOver(false); setWinner(null); setGameStarted(false); setGameMode(null); setMoveFrom("");
-    setActiveTiles([]); setMoveCount(0); setWhiteCaptured([]); setBlackCaptured([]); setCaptureHistory([]);
+    setMoveCount(0); setWhiteCaptured([]); setBlackCaptured([]); setCaptureHistory([]);
     setTier1Unlocked(false); setTier2Unlocked(false); setTier3Unlocked(false);
     setUsedCards([]); setSelectedCard(null); setChaosModeShown({ white: false, black: false });
-    setPoweredPieces({}); setFrozenPieces({}); setActivationMode(false);
-    setChandraMode(null); setChandraPlacementMode(null); setGuruMode(null); setResurrectedPieces({});
+    setPoweredPieces({}); setFrozenPieces({}); setChandraMode(null); setChandraPlacementMode(null); setGuruMode(null); setResurrectedPieces({});
     setShaniMode(null); setAsuraLives({}); setWaitingForBot(false);
     setShukraDifficulty(null); setShowShukraSelect(false); setGuruPickerMode(null); setCardCooldowns({});
     setShowCardOverlay(false); setGameOverDismissed(false);
@@ -769,19 +914,26 @@ function App() {
   const theme = getTheme(gameMode);
 
   const customStyles = {};
-  const piecesInZones = getPiecesInZones();
 
-  activeTiles.forEach(tile => {
-    getSquaresInRadius(tile.square, tile.radius).forEach(sq => { customStyles[sq] = { backgroundColor: tile.color, boxShadow: sq === tile.square ? `inset 0 0 20px ${tile.color}` : "" }; });
-    if (tile.whiteActivatedPiece) customStyles[tile.whiteActivatedPiece] = { ...(customStyles[tile.whiteActivatedPiece] || {}), border: "3px solid #4ecca3", boxShadow: "inset 0 0 10px rgba(78,204,163,0.8)" };
-    if (tile.blackActivatedPiece) customStyles[tile.blackActivatedPiece] = { ...(customStyles[tile.blackActivatedPiece] || {}), border: "3px solid #4ecca3", boxShadow: "inset 0 0 10px rgba(78,204,163,0.8)" };
-  });
   Object.keys(poweredPieces).forEach(sq => { const p = poweredPieces[sq]; if (!p?.power) return; const card = SHARED_DECK.find(c => c.id === p.power); if (card) customStyles[sq] = { ...(customStyles[sq] || {}), border: `4px solid ${card.color}`, boxShadow: `0 0 20px ${card.color}, inset 0 0 15px ${card.color}88` }; });
   Object.keys(frozenPieces).forEach(sq => { customStyles[sq] = { ...(customStyles[sq] || {}), border: "4px solid #1f2937", backgroundColor: "rgba(31,41,55,0.7)", boxShadow: "inset 0 0 20px rgba(31,41,55,0.9)" }; });
   Object.keys(resurrectedPieces).forEach(sq => { customStyles[sq] = { ...(customStyles[sq] || {}), border: "4px solid #a855f7", boxShadow: "0 0 25px #a855f7, inset 0 0 20px rgba(168,85,247,0.6)", animation: "resurrectPulse 2s infinite" }; });
   if (guruMode) guruMode.availableResurrections.forEach(r => { customStyles[r.square] = { ...(customStyles[r.square] || {}), backgroundColor: "rgba(168,85,247,0.4)", border: "3px dashed #a855f7", boxShadow: "0 0 20px rgba(168,85,247,0.6)", cursor: "pointer" }; });
-  if (shaniMode) shaniMode.enemyPieces.forEach(ep => { customStyles[ep.square] = { ...(customStyles[ep.square] || {}), backgroundColor: "rgba(31,41,55,0.5)", border: "3px dashed #1f2937", boxShadow: "0 0 20px rgba(31,41,55,0.8)", cursor: "pointer" }; });
-  if (chandraPlacementMode) {
+  if (shaniMode) {
+    const borderColor = shaniMode.cardId === "MANGALA" ? "#ef4444" : "#1f2937";
+    const bgColor = shaniMode.cardId === "MANGALA"
+      ? "rgba(239,68,68,0.3)"
+      : "rgba(31,41,55,0.5)";
+    shaniMode.enemyPieces.forEach(ep => {
+      customStyles[ep.square] = {
+        ...(customStyles[ep.square] || {}),
+        backgroundColor: bgColor,
+        border: `3px dashed ${borderColor}`,
+        boxShadow: `0 0 20px ${borderColor}88`,
+        cursor: "pointer",
+      };
+    });
+  } if (chandraPlacementMode) {
     const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
     files.forEach(f => { const sq = f + chandraPlacementMode.rank; if (!game.get(sq) && sq !== chandraPlacementMode.square) customStyles[sq] = { ...(customStyles[sq] || {}), backgroundColor: "rgba(229,231,235,0.3)", border: "2px dashed #e5e7eb" }; });
     chandraPlacementMode.mirages.forEach(ms => { customStyles[ms] = { ...(customStyles[ms] || {}), backgroundColor: "rgba(229,231,235,0.6)", border: "3px solid #e5e7eb", boxShadow: "0 0 15px #e5e7eb" }; });
@@ -789,7 +941,6 @@ function App() {
     if (chandraPlacementMode.teleportTo) customStyles[chandraPlacementMode.teleportTo] = { ...(customStyles[chandraPlacementMode.teleportTo] || {}), backgroundColor: "rgba(255,215,0,0.4)", border: "3px solid #ffd700", boxShadow: "0 0 20px #ffd700" };
   }
   if (chandraMode) chandraMode.mirages.forEach(ms => { customStyles[ms] = { ...(customStyles[ms] || {}), boxShadow: "0 0 10px rgba(229,231,235,0.6)" }; });
-  if (activationMode) piecesInZones.forEach(pi => { customStyles[pi.square] = { ...(customStyles[pi.square] || {}), border: "3px solid #ffd700", boxShadow: "0 0 15px #ffd700, inset 0 0 10px rgba(255,215,0,0.3)", animation: "pulse 1.5s infinite" }; });
   if (moveFrom && !selectedCard) customStyles[moveFrom] = { ...(customStyles[moveFrom] || {}), backgroundColor: "rgba(255,255,0,0.5)" };
 
   const trulyDeadCount = gameMode === "asura" ? Object.values(asuraLives).filter(l => l === 0).length : 0;
@@ -798,12 +949,11 @@ function App() {
   const boardSize = isMobile ? Math.min(window.innerWidth - 16, 480) : 600;
 
   // ── Active special mode label for mobile banner ───────────────────────────
-  const specialModeLabel = activationMode ? "⚡ Tap a glowing piece to activate"
-    : chandraPlacementMode ? "🌙 Tap empty squares on this rank to place clones"
-      : guruMode ? "🪐 Tap a death square to resurrect"
-        : shaniMode ? "🪐 Tap an enemy piece to freeze"
-          : selectedCard ? `✨ ${selectedCard.name} selected — tap the board to place`
-            : null;
+  chandraPlacementMode ? "🌙 Tap empty squares on this rank to place clones"
+    : guruMode ? "🪐 Tap a death square to resurrect"
+      : shaniMode ? "🪐 Tap an enemy piece to freeze"
+        : selectedCard ? `✨ ${selectedCard.name} selected — tap the board to place`
+          : null;
 
   if (showAbout) return <AboutPage onBack={() => setShowAbout(false)} />;
   if (showNavagraha) return <NavagrahaPage onBack={() => setShowNavagraha(false)} />;
@@ -929,19 +1079,6 @@ function App() {
                   </div>
                 )}
               </div>
-
-              {!selectedCard && !chandraPlacementMode && !guruMode && !shaniMode && piecesInZones.length > 0 && (
-                <div>
-                  {activationMode ? (
-                    <>
-                      <div style={{ fontSize: "12px", color: "#ffd700", marginBottom: "10px", padding: "10px", backgroundColor: "#16213e", borderRadius: "8px" }}>💡 Click glowing piece to activate!</div>
-                      <button onClick={() => setActivationMode(false)} style={{ width: "100%", padding: "10px", fontSize: "12px", backgroundColor: "#e94560", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer", fontWeight: "bold" }}>Skip Activation</button>
-                    </>
-                  ) : (
-                    <button onClick={() => setActivationMode(true)} style={{ width: "100%", padding: "12px", fontSize: "13px", backgroundColor: "#ffd700", color: "#000", border: "none", borderRadius: "5px", cursor: "pointer", fontWeight: "bold" }}>Activate Power ({piecesInZones.length})</button>
-                  )}
-                </div>
-              )}
 
               {guruMode && (
                 <div style={{ padding: "10px", backgroundColor: "#16213e", borderRadius: "8px" }}>
@@ -1093,7 +1230,7 @@ function App() {
                 <Chessboard position={game.fen()} onPieceDrop={onPieceDrop} onSquareClick={onSquareClick} animationDuration={300} customSquareStyles={customStyles} customDarkSquareStyle={{ backgroundColor: theme.darkSquare }} customLightSquareStyle={{ backgroundColor: theme.lightSquare }} boardWidth={600} />
               </div>
               <div style={{ fontSize: "32px", fontWeight: "bold", marginTop: "10px", color: whiteTime < 30 ? "#ff6b6b" : theme.text }}>🌟 You: {formatTime(whiteTime)}</div>
-              {!gameOver && <p style={{ marginTop: "15px", fontSize: "16px" }}>Turn: {game.turn() === "w" ? (gameMode === "asura" ? "You" : "White") : (gameMode === "asura" ? "Asura" : "Black")}{activationMode && <span style={{ color: "#ffd700", marginLeft: "10px" }}>⚡ ACTIVATION</span>}{chandraPlacementMode && <span style={{ color: "#e5e7eb", marginLeft: "10px" }}>🌙 CLONES</span>}{guruMode && <span style={{ color: "#a855f7", marginLeft: "10px" }}>🪐 RESURRECT</span>}{shaniMode && <span style={{ color: "#94a3b8", marginLeft: "10px" }}>🪐 FREEZE</span>}{waitingForBot && <span style={{ color: "#ff6b6b", marginLeft: "10px" }}>👹 Thinking...</span>}</p>}
+              {!gameOver && <p style={{ marginTop: "15px", fontSize: "16px" }}>Turn: {game.turn() === "w" ? (gameMode === "asura" ? "You" : "White") : (gameMode === "asura" ? "Asura" : "Black")}{chandraPlacementMode && <span style={{ color: "#e5e7eb", marginLeft: "10px" }}>🌙 CLONES</span>}{guruMode && <span style={{ color: "#a855f7", marginLeft: "10px" }}>🪐 RESURRECT</span>}{shaniMode && <span style={{ color: "#94a3b8", marginLeft: "10px" }}>🪐 FREEZE</span>}{waitingForBot && <span style={{ color: "#ff6b6b", marginLeft: "10px" }}>👹 Thinking...</span>}</p>}
               {!gameOver && <button onClick={resetGame} style={{ marginTop: "15px", padding: "10px 20px", fontSize: "14px", backgroundColor: "#e94560", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer", fontWeight: "bold" }}>Main Menu</button>}
             </div>
 
@@ -1150,11 +1287,9 @@ function App() {
             setChandraPlacementMode={setChandraPlacementMode}
             setGuruMode={setGuruMode}
             setShaniMode={setShaniMode}
-            setActivationMode={setActivationMode}
             chandraPlacementMode={chandraPlacementMode}
             guruMode={guruMode}
             shaniMode={shaniMode}
-            activationMode={activationMode}
             piecesInZones={piecesInZones}
             resetGame={resetGame}
             showChaosPopup={showChaosPopup}
@@ -1197,8 +1332,8 @@ function App() {
             {specialModeLabel && (
               <div style={{ width: "100%", backgroundColor: selectedCard ? "#1e293b" : "#1a1a00", border: `1px solid ${selectedCard ? "#ffd700" : "#ffd700"}`, borderRadius: "8px", padding: "8px 12px", marginBottom: "6px", fontSize: "13px", color: "#ffd700", textAlign: "center", animation: "bannerPulse 1.5s infinite" }}>
                 {specialModeLabel}
-                {(chandraPlacementMode || guruMode || shaniMode || activationMode || selectedCard) && (
-                  <button onClick={() => { setSelectedCard(null); setChandraPlacementMode(null); setGuruMode(null); setShaniMode(null); setActivationMode(false); }} style={{ marginLeft: "10px", fontSize: "11px", background: "none", border: "1px solid #ffd700", borderRadius: "4px", color: "#ffd700", cursor: "pointer", padding: "2px 6px" }}>✕ cancel</button>
+                {(chandraPlacementMode || guruMode || shaniMode || selectedCard) && (
+                  <button onClick={() => { setSelectedCard(null); setChandraPlacementMode(null); setGuruMode(null); setShaniMode(null); }} style={{ marginLeft: "10px", fontSize: "11px", background: "none", border: "1px solid #ffd700", borderRadius: "4px", color: "#ffd700", cursor: "pointer", padding: "2px 6px" }}>✕ cancel</button>
                 )}
               </div>
             )}
@@ -1322,17 +1457,6 @@ function App() {
                 Celestial powers unlock as you capture pieces
               </div>
             </div>
-
-
-            {/* Activate power button */}
-            {!selectedCard && !chandraPlacementMode && !guruMode && !shaniMode && piecesInZones.length > 0 && game.turn() === "w" && (
-              <button
-                onClick={() => setActivationMode(a => !a)}
-                style={{ width: "100%", marginTop: "8px", padding: "12px", fontSize: "14px", backgroundColor: activationMode ? "#e94560" : "#ffd700", color: "#000", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold" }}
-              >
-                {activationMode ? "✕ Cancel Activation" : `⚡ Activate Power (${piecesInZones.length} available)`}
-              </button>
-            )}
 
             {/* Guru picker modal */}
             {guruPickerMode && (

@@ -310,8 +310,8 @@ function PvpCardTray({
                   border: isSelected
                     ? "2px solid #fff"
                     : isUnlocked && !isUsed
-                    ? `2px solid ${card.color}66`
-                    : "2px solid rgba(255,255,255,0.06)",
+                      ? `2px solid ${card.color}66`
+                      : "2px solid rgba(255,255,255,0.06)",
                   opacity: isUsed ? 0.3 : isUnlocked ? 1 : 0.25,
                   cursor: canUse ? "pointer" : "default",
                   boxShadow: isSelected ? `0 0 12px ${card.color}` : "none",
@@ -481,12 +481,9 @@ export default function PvpTabletLayout({
   setChandraPlacementMode,
   setGuruMode,
   setShaniMode,
-  setActivationMode,
   chandraPlacementMode,
   guruMode,
   shaniMode,
-  activationMode,
-  piecesInZones,
   resetGame,
   showChaosPopup,
   setShowChaosPopup,
@@ -671,36 +668,7 @@ export default function PvpTabletLayout({
             width: "100%",
           }}
         >
-          {!selectedCard && !chandraPlacementMode && !guruMode && !shaniMode && piecesInZones.length > 0 && (
-            <div
-              style={{
-                transform: currentTurn === "b" ? "rotate(180deg)" : "none",
-                width: tabletBoard,
-                marginBottom: "6px",
-              }}
-            >
-              <button
-                onClick={() => setActivationMode(a => !a)}
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  fontSize: "14px",
-                  backgroundColor: activationMode ? "#e94560" : "#ffd700",
-                  color: "#000",
-                  border: "none",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontWeight: "bold",
-                }}
-              >
-                {activationMode
-                  ? "✕ Cancel Activation"
-                  : `⚡ Activate Power (${piecesInZones.length} available)`}
-              </button>
-            </div>
-          )}
-
-          <div
+         <div
             style={{
               transform: currentTurn === "b" ? "rotate(180deg)" : "none",
               width: tabletBoard,
@@ -731,7 +699,6 @@ export default function PvpTabletLayout({
                     setChandraPlacementMode(null);
                     setGuruMode(null);
                     setShaniMode(null);
-                    setActivationMode(false);
                   }}
                   style={{
                     fontSize: "11px",
