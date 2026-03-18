@@ -204,21 +204,7 @@ function App() {
     return result;
   }
 
-  // ── Helper: mark card as used (handles pvp separate decks vs single usedCards) 
-  function markCardUsed(cardId, playerColor, gameMode, usedCards, setUsedCards) {
-    // In pvp mode, App.js tracks lastWhiteCard/lastBlackCard separately.
-    // For usedCards (single-player modes), just push the id.
-    if (gameMode !== "pvp") {
-      setUsedCards(prev => [...prev, cardId]);
-    }
-    // PvP: usedCards per player is handled via whiteUsedCards/blackUsedCards
-    // which App.js should maintain. For now we still push to the shared array
-    // as a fallback until those are fully wired up.
-    else {
-      setUsedCards(prev => [...prev, cardId]);
-    }
-  }
-  // ─────────────────────────────────────────────────────────────────────────────
+   // ─────────────────────────────────────────────────────────────────────────────
   // applyCardToPiece(square)
   //
   // Called when a player has a card selected and taps one of their own pieces.
@@ -244,7 +230,7 @@ function App() {
     // ── Shared: deduct time and mark card used ──────────────────────────────────
     function commitCard() {
       subtractTime(currentPlayer, cost);
-      markCardUsed(cardId, currentPlayer, gameMode, usedCards, setUsedCards);
+      setUsedCards(prev => [...prev, cardId])
       if (gameMode === "pvp") {
         if (currentPlayer === "w") setLastWhiteCard(cardId);
         else setLastBlackCard(cardId);
