@@ -327,15 +327,22 @@ function App() {
 
     // ── GURU / BALI — resurrection flow (existing guruMode unchanged) ───────────
     if (cardId === "GURU" || cardId === "BALI") {
+      const guruRadius = cardId === "GURU"
+        ? (SHARED_DECK.find(c => c.id === "GURU")?.radius ?? 2)
+        : (ASURA_DECK.find(c => c.id === "BALI")?.radius ?? 2);
       const avail = captureHistory.filter(cap => {
         const occ = game.get(cap.square);
+        const fileDiff = Math.abs(cap.square.charCodeAt(0) - square.charCodeAt(0));
+        const rankDiff = Math.abs(parseInt(cap.square[1]) - parseInt(square[1]));
+        const inRadius = fileDiff <= guruRadius && rankDiff <= guruRadius;
         return (
           cap.color === currentPlayer &&
+          inRadius &&
           (!occ || occ.color !== currentPlayer)
         );
       });
       if (avail.length === 0) {
-        alert("No captured pieces to resurrect!");
+        alert("No captured pieces to resurrect in range!");
         return;
       }
       commitCard();
@@ -541,7 +548,7 @@ function App() {
       }
 
       if (!moveWasMade) { const m = gc.move({ from, to, promotion }); if (!m) return null; }
-      if (power?.power === "BUDHA" && !cp && power.usesLeft === 1) { const fp = gc.fen().split(" "); fp[1] = fp[1] === "w" ? "b" : "w"; gc.load(fp.join(" ")); }
+      if (power?.power === "BUDHA" && !cp && power.usesLeft === 2) { const fp = gc.fen().split(" "); fp[1] = fp[1] === "w" ? "b" : "w"; gc.load(fp.join(" ")); }
 
       if (cp) {
         let tb = getPieceValue(cp.type); const cpHadKetu = poweredPieces[to]?.power === "KETU";
