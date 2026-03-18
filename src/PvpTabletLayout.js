@@ -9,9 +9,7 @@ const DECK_FOR = { w: SHARED_DECK, b: ASURA_DECK };
 const EMOJI_FOR = { w: CARD_EMOJI, b: ASURA_CARD_EMOJI };
 
 // ── CardTooltip ───────────────────────────────────────────────────────────────
-// Fullscreen overlay tooltip, always right-way-up for the tapping player.
-// `flipped` = true for Black's tray (rotated 180° at top of screen).
-function CardTooltip({ card, emoji, cost, onCancel, flipped }) {
+function CardTooltip({ card, emoji, cost, onClose, onCancel, flipped }) {
   if (!card) return null;
   return (
     <div
@@ -25,9 +23,8 @@ function CardTooltip({ card, emoji, cost, onCancel, flipped }) {
         backgroundColor: "rgba(0,0,0,0.75)",
         backdropFilter: "blur(6px)",
       }}
-      onClick={onCancel}
+      onClick={onClose}
     >
-      {/* Rotate the card panel so it reads right-way-up for the tapping player */}
       <div
         onClick={e => e.stopPropagation()}
         style={{
@@ -101,8 +98,9 @@ function CardTooltip({ card, emoji, cost, onCancel, flipped }) {
           {card.description}
         </p>
 
-        {/* Cost + Cancel */}
-        <div style={{ display: "flex", gap: "12px", width: "100%", marginTop: "4px" }}>
+        {/* Cost + Tap instruction + Cancel */}
+        <div style={{ display: "flex", gap: "8px", width: "100%", marginTop: "4px" }}>
+          {/* Cost */}
           <div
             style={{
               flex: 1,
@@ -116,6 +114,26 @@ function CardTooltip({ card, emoji, cost, onCancel, flipped }) {
             <div style={{ fontSize: "24px", fontWeight: "900", color: "#ffd700" }}>{cost}s</div>
             <div style={{ fontSize: "11px", color: "#94a3b8", marginTop: "2px" }}>time cost</div>
           </div>
+
+          {/* Tap a piece instruction */}
+          <div
+            style={{
+              flex: 1,
+              textAlign: "center",
+              backgroundColor: "rgba(78,204,163,0.1)",
+              border: "1px solid rgba(78,204,163,0.3)",
+              borderRadius: "10px",
+              padding: "10px 6px",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+            }}
+          >
+            <div style={{ fontSize: "13px", fontWeight: "700", color: "#4ecca3" }}>👆 Tap a piece</div>
+            <div style={{ fontSize: "11px", color: "#94a3b8", marginTop: "2px" }}>to place card</div>
+          </div>
+
+          {/* Cancel */}
           <button
             onClick={onCancel}
             style={{
@@ -139,8 +157,6 @@ function CardTooltip({ card, emoji, cost, onCancel, flipped }) {
 }
 
 // ── LastCardBanner ────────────────────────────────────────────────────────────
-// Shows what the OPPONENT played last turn, displayed above the current player's tray.
-// `flipped` is false for White (bottom), true for Black (top, rotated).
 function LastCardBanner({ lastCard, lastCardEmoji, opponentColor, flipped }) {
   if (!lastCard) return null;
   const label = opponentColor === "w" ? "⬜ White played" : "⬛ Black played";
@@ -201,8 +217,8 @@ function PvpCardTray({
   onSelectCard,
   usedCards,
   getCardCost,
-  lastOpponentCard,      // { card, emoji } | null — what opponent played last turn
-  flipped,               // true for Black's tray (sits at top, rotated 180°)
+  lastOpponentCard,
+  flipped,
 }) {
   const [tooltipCard, setTooltipCard] = useState(null);
 
@@ -212,7 +228,6 @@ function PvpCardTray({
   const emojiMap = EMOJI_FOR[myColor];
   const opponentColor = myColor === "w" ? "b" : "w";
 
-  // Find the full card object + emoji for the last opponent card id
   const lastCardObj = lastOpponentCard
     ? DECK_FOR[opponentColor].find(c => c.id === lastOpponentCard.id) ?? null
     : null;
@@ -226,23 +241,23 @@ function PvpCardTray({
       (tierNum === 2 && tier2Unlocked) ||
       (tierNum === 3 && tier3Unlocked);
     if (!isUnlocked) return;
-    const isUsed = usedCards.includes(card.id);
-    if (isUsed) return;
-
-    if (selectedCard?.id === card.id) {
-      // Tapping the already-selected card opens the tooltip
-      setTooltipCard(card);
-    } else {
-      onSelectCard(card);
-      setTooltipCard(card);
-    }
+    if (usedCards.includes(card.id)) return;
+    onSelectCard(card);
+    setTooltipCard(card);
   }
 
+  // Closes overlay but KEEPS card selected — next tap goes to the board
+  function handleTooltipClose() {
+    setTooltipCard(null);
+  }
+
+  // Cancel button — fully deselects the card
   function handleTooltipCancel() {
     setTooltipCard(null);
     onSelectCard(null);
   }
 
+  // Card strip (shared between flipped and non-flipped renders)
   const trayContent = (
     <div
       style={{
@@ -255,7 +270,6 @@ function PvpCardTray({
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        {/* Turn label */}
         <div
           style={{
             fontSize: "11px",
@@ -270,7 +284,6 @@ function PvpCardTray({
           {isMyTurn ? "▶ YOUR\nTURN" : myColor === "w" ? "⬜ White" : "⬛ Black"}
         </div>
 
-        {/* Cards */}
         <div style={{ display: "flex", gap: "5px", flex: 1, justifyContent: "center" }}>
           {deck.map(card => {
             const tierNum = card.tier;
@@ -318,7 +331,6 @@ function PvpCardTray({
                         filter: isUsed ? "grayscale(100%)" : "none",
                       }}
                     />
-                    {/* Cost badge */}
                     {!isUsed && (
                       <div
                         style={{
@@ -336,7 +348,6 @@ function PvpCardTray({
                         {cost}s
                       </div>
                     )}
-                    {/* Emoji badge top-left */}
                     {!isUsed && (
                       <div
                         style={{
@@ -387,41 +398,40 @@ function PvpCardTray({
           })}
         </div>
       </div>
-
-      {/* Tooltip overlay — rendered outside tray rotation so it's always readable */}
-      {tooltipCard && (
-        <CardTooltip
-          card={tooltipCard}
-          emoji={emojiMap[tooltipCard.id] ?? "✨"}
-          cost={getCardCost(tooltipCard)}
-          onCancel={handleTooltipCancel}
-          flipped={flipped}
-        />
-      )}
     </div>
   );
 
-  // For Black's tray we wrap in a rotate(180deg) container
+  // ── Black's tray (flipped=true) ──
+  // Tooltip rendered OUTSIDE the rotate wrapper so it doesn't get double-rotated
   if (flipped) {
     return (
       <>
         <div style={{ transform: "rotate(180deg)", width: "100%" }}>
           {trayContent}
         </div>
-        {/* Banner is OUTSIDE the flip so it reads correctly for Black (who is viewing from the top) */}
         <LastCardBanner
           lastCard={lastCardObj}
           lastCardEmoji={lastCardEmoji}
           opponentColor={opponentColor}
           flipped={true}
         />
+        {tooltipCard && (
+          <CardTooltip
+            card={tooltipCard}
+            emoji={emojiMap[tooltipCard.id] ?? "✨"}
+            cost={getCardCost(tooltipCard)}
+            onClose={handleTooltipClose}
+            onCancel={handleTooltipCancel}
+            flipped={true}
+          />
+        )}
       </>
     );
   }
 
+  // ── White's tray (flipped=false) ──
   return (
     <>
-      {/* White's banner sits ABOVE the tray */}
       <LastCardBanner
         lastCard={lastCardObj}
         lastCardEmoji={lastCardEmoji}
@@ -429,6 +439,16 @@ function PvpCardTray({
         flipped={false}
       />
       {trayContent}
+      {tooltipCard && (
+        <CardTooltip
+          card={tooltipCard}
+          emoji={emojiMap[tooltipCard.id] ?? "✨"}
+          cost={getCardCost(tooltipCard)}
+          onClose={handleTooltipClose}
+          onCancel={handleTooltipCancel}
+          flipped={false}
+        />
+      )}
     </>
   );
 }
@@ -451,12 +471,9 @@ export default function PvpTabletLayout({
   tier3Unlocked,
   selectedCard,
   setSelectedCard,
-  // Separate used-card arrays for each player.
-  // Pass whiteUsedCards / blackUsedCards from App.js.
-  // Falls back to a shared `usedCards` prop so existing code doesn't break.
   whiteUsedCards,
   blackUsedCards,
-  usedCards,        // legacy fallback — remove once App.js is updated
+  usedCards,
   getCardCost,
   whiteCaptured,
   blackCaptured,
@@ -476,15 +493,12 @@ export default function PvpTabletLayout({
   guruPickerMode,
   setGuruPickerMode,
   performResurrection,
-  // New: last card played by each player (full card id string or null).
-  // App.js should track these and pass them in.
-  lastWhiteCard,   // id of the last card White played, or null
-  lastBlackCard,   // id of the last card Black played, or null
+  lastWhiteCard,
+  lastBlackCard,
 }) {
   const currentTurn = game.turn();
   const tabletBoard = Math.min(window.innerWidth - 24, 560);
 
-  // Resolve used-card arrays — supports both old (shared) and new (separate) props
   const wUsed = whiteUsedCards ?? usedCards ?? [];
   const bUsed = blackUsedCards ?? usedCards ?? [];
 
@@ -597,8 +611,6 @@ export default function PvpTabletLayout({
         {/* ════════════════════════════════════════
             BLACK'S ZONE — rotated 180° at top
         ════════════════════════════════════════ */}
-
-        {/* Black timer + captures (rotated for Black's reading angle) */}
         <div
           style={{
             transform: "rotate(180deg)",
@@ -631,7 +643,6 @@ export default function PvpTabletLayout({
           </div>
         </div>
 
-        {/* Black's card tray (flipped=true → renders rotated + banner below) */}
         <PvpCardTray
           currentTurn={currentTurn}
           myColor="b"
@@ -660,7 +671,6 @@ export default function PvpTabletLayout({
             width: "100%",
           }}
         >
-          {/* Activation button — rotated for whichever player's turn */}
           {!selectedCard && !chandraPlacementMode && !guruMode && !shaniMode && piecesInZones.length > 0 && (
             <div
               style={{
@@ -690,7 +700,6 @@ export default function PvpTabletLayout({
             </div>
           )}
 
-          {/* Special mode banner (Chandra/Guru/Shani/etc.) */}
           <div
             style={{
               transform: currentTurn === "b" ? "rotate(180deg)" : "none",
@@ -739,7 +748,6 @@ export default function PvpTabletLayout({
               </div>
             )}
 
-            {/* Turn indicator */}
             <div
               style={{
                 width: "100%",
@@ -753,7 +761,6 @@ export default function PvpTabletLayout({
             </div>
           </div>
 
-          {/* Board */}
           <div id="pvp-board" style={{ width: tabletBoard, height: tabletBoard, flexShrink: 0 }}>
             <Chessboard
               position={game.fen()}
@@ -788,8 +795,6 @@ export default function PvpTabletLayout({
         {/* ════════════════════════════════════════
             WHITE'S ZONE — normal orientation at bottom
         ════════════════════════════════════════ */}
-
-        {/* White's card tray (flipped=false → banner above, tray below) */}
         <PvpCardTray
           currentTurn={currentTurn}
           myColor="w"
@@ -804,7 +809,6 @@ export default function PvpTabletLayout({
           flipped={false}
         />
 
-        {/* White timer + captures */}
         <div
           style={{
             width: "100%",
