@@ -59,8 +59,7 @@ function App() {
   const [resurrectedPieces, setResurrectedPieces] = useState({});
   const [shaniMode, setShaniMode] = useState(null);
   const [mahishasuraMode, setMahishasuraMode] = useState(null);
-  const [shumbhaMode, setShumbhaMode] = useState(null);
-  const [vritraRanks, setVritraRanks] = useState([]);
+  const [shumbhaMode, setShumbhaMode] = useState(null); // eslint-disable-line no-unused-vars  const [vritraRanks, setVritraRanks] = useState([]);
   const [tarakaProtected, setTarakaProtected] = useState({});
   const [chaosModeShown, setChaosModeShown] = useState({ white: false, black: false });
   const [showChaosPopup, setShowChaosPopup] = useState(false);
