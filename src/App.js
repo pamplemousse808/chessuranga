@@ -568,7 +568,7 @@ function App() {
         if (nu > 0) np3[to] = { ...power, usesLeft: nu };
       }
       const cleanPP = {}; Object.keys(np3).forEach(sq => { if (np3[sq]?.power) cleanPP[sq] = np3[sq]; }); setPoweredPieces(cleanPP);
-      setGame(gc); updateTileActivations(gc); tickAsuraCounters(); setMoveCount(p => p + 1);
+      setGame(gc); tickAsuraCounters(); setMoveCount(p => p + 1);
       if (gc.isCheckmate()) { setGameOver(true); setWinner(gc.turn() === "w" ? "black" : "white"); }
       return gc;
     } catch (e) { console.error("Move error:", e); return null; }
@@ -948,8 +948,7 @@ function App() {
   // ── Board size ────────────────────────────────────────────────────────────
   const boardSize = isMobile ? Math.min(window.innerWidth - 16, 480) : 600;
 
-  // ── Active special mode label for mobile banner ───────────────────────────
-  chandraPlacementMode ? "🌙 Tap empty squares on this rank to place clones"
+  const specialModeLabel = chandraPlacementMode ? "🌙 Tap empty squares on this rank to place clones"
     : guruMode ? "🪐 Tap a death square to resurrect"
       : shaniMode ? "🪐 Tap an enemy piece to freeze"
         : selectedCard ? `✨ ${selectedCard.name} selected — tap the board to place`
@@ -1290,7 +1289,6 @@ function App() {
             chandraPlacementMode={chandraPlacementMode}
             guruMode={guruMode}
             shaniMode={shaniMode}
-            piecesInZones={piecesInZones}
             resetGame={resetGame}
             showChaosPopup={showChaosPopup}
             setShowChaosPopup={setShowChaosPopup}
