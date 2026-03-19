@@ -204,7 +204,7 @@ function App() {
     return result;
   }
 
-   // ─────────────────────────────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────────────────────
   // applyCardToPiece(square)
   //
   // Called when a player has a card selected and taps one of their own pieces.
@@ -230,7 +230,11 @@ function App() {
     // ── Shared: deduct time and mark card used ──────────────────────────────────
     function commitCard() {
       subtractTime(currentPlayer, cost);
-      setUsedCards(prev => [...prev, cardId])
+      if (gameMode === "asura" || gameMode === "shukracharya") {
+        setCardCooldowns(prev => ({ ...prev, [cardId]: 6 }));
+      } else {
+        setUsedCards(prev => [...prev, cardId]);
+      }
       if (gameMode === "pvp") {
         if (currentPlayer === "w") setLastWhiteCard(cardId);
         else setLastBlackCard(cardId);
