@@ -616,7 +616,7 @@ function App() {
       }
       // ── MAHISHA — shapeshift after moving ──
       if (power?.power === "MAHISHA" && power.usesLeft > 0) {
-        setMahishaShiftMode({ square: to, pieceType: piece.type, color: piece.color, gc });
+        setMahishasuraMode({ square: to, pieceType: piece.type, color: piece.color, gc });
         // Don't commit game yet — wait for player to pick a shape
         return gc;
       }
@@ -890,7 +890,7 @@ function App() {
   }
 
   function onPieceDrop(sourceSquare, targetSquare) {
-    if (gameOver || !gameStarted || selectedCard || chandraPlacementMode || guruMode || shaniMode || mahishaShiftMode || shumbhaSnapBack || shukraAsuraPromo) return false;
+    if (gameOver || !gameStarted || selectedCard || chandraPlacementMode || guruMode || shaniMode || mahishasuraMode || shukraAsuraPromo) return false;
     if ((gameMode === "asura" || gameMode === "shukracharya") && game.turn() === "b") return false;
     if (chandraMode) {
       if (chandraMode.mirages.includes(sourceSquare)) return false;
@@ -983,7 +983,6 @@ function App() {
     setShukraDifficulty(null); setShowShukraSelect(false); setGuruPickerMode(null); setCardCooldowns({});
     setShowCardOverlay(false); setGameOverDismissed(false);
     setMahishasuraMode(null);
-    setShumbhaMode(null);
     setVritraRanks([]);
     setTarakaProtected({});
     setLastWhiteCard(null);
