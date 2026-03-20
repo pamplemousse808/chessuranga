@@ -70,6 +70,7 @@ function App() {
   const [gameOverDismissed, setGameOverDismissed] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [showNavagraha, setShowNavagraha] = useState(false);
+  const [cardPlayedThisTurn, setCardPlayedThisTurn] = useState(false);
   // Mobile UI state
   const [showCardOverlay, setShowCardOverlay] = useState(false);
   const { stockfish, stockfishRef, stockfishMoveRef } = useStockfish(gameMode, gameStarted, shukraDifficulty);
@@ -212,7 +213,7 @@ function App() {
   // ─────────────────────────────────────────────────────────────────────────────
   function applyCardToPiece(square) {
     if (!selectedCard) return;
-
+    if (gameMode === "pvp" && cardPlayedThisTurn) return;
     const piece = game.get(square);
     const currentPlayer = game.turn();
 
@@ -230,6 +231,7 @@ function App() {
     // ── Shared: deduct time and mark card used ──────────────────────────────────
     function commitCard() {
       subtractTime(currentPlayer, cost);
+      setCardPlayedThisTurn(true);
       if (gameMode === "asura" || gameMode === "shukracharya") {
         setCardCooldowns(prev => ({ ...prev, [cardId]: 6 }));
       } else {
@@ -426,7 +428,7 @@ function App() {
         if (p2?.type === "p") { const tr = parseInt(to[1]); if ((p2.color === "w" && tr === 8) || (p2.color === "b" && tr === 1)) mo.promotion = "q"; }
         const move = gc.move(mo); if (!move) return null;
         if (cp) { addTime(gc.turn() === "w" ? "b" : "w", getPieceValue(cp.type)); if (gc.turn() === "w") setBlackCaptured(p => [...p, cp.type]); else setWhiteCaptured(p => [...p, cp.type]); checkTierUnlocks(cp.type); }
-        setGame(gc); setMoveCount(p => p + 1);
+        setGame(gc); setMoveCount(p => p + 1); setCardPlayedThisTurn(false);
         if (gc.isCheckmate()) { setGameOver(true); setWinner(gc.turn() === "w" ? "black" : "white"); }
         return gc;
       }
@@ -438,7 +440,7 @@ function App() {
           const gc = new Chess(game.fen());
           chandraMode.mirages.forEach(sq => { if (gc.get(sq)) gc.remove(sq); });
           const move = gc.move({ from, to, promotion }); if (!move) return null;
-          setChandraMode(null); setGame(gc); tickAsuraCounters(); setMoveCount(p => p + 1);
+          setChandraMode(null); setGame(gc); tickAsuraCounters(); setMoveCount(p => p + 1); setCardPlayedThisTurn(false);
           if (gc.isCheckmate()) { setGameOver(true); setWinner(gc.turn() === "w" ? "black" : "white"); }
           return gc;
         } else if (isReal) {
@@ -457,7 +459,7 @@ function App() {
             if (gc.turn() === "w") setBlackCaptured(p => [...p, cp.type]); else setWhiteCaptured(p => [...p, cp.type]);
             checkTierUnlocks(cp.type);
           }
-          setGame(gc); setMoveCount(p => p + 1);
+          setGame(gc); setMoveCount(p => p + 1); setCardPlayedThisTurn(false);
           if (gc.isCheckmate()) { setGameOver(true); setWinner(gc.turn() === "w" ? "black" : "white"); }
           return gc;
         }
@@ -565,7 +567,7 @@ function App() {
         if (nu > 0) np3[to] = { ...power, usesLeft: nu };
       }
       const cleanPP = {}; Object.keys(np3).forEach(sq => { if (np3[sq]?.power) cleanPP[sq] = np3[sq]; }); setPoweredPieces(cleanPP);
-      setGame(gc); tickAsuraCounters(); setMoveCount(p => p + 1);
+      setGame(gc); tickAsuraCounters(); setMoveCount(p => p + 1); setCardPlayedThisTurn(false);
       if (gc.isCheckmate()) { setGameOver(true); setWinner(gc.turn() === "w" ? "black" : "white"); }
       return gc;
     } catch (e) { console.error("Move error:", e); return null; }
@@ -905,6 +907,7 @@ function App() {
     setTarakaProtected({});
     setLastWhiteCard(null);
     setLastBlackCard(null);
+    setCardPlayedThisTurn(false);
   }
 
   const theme = getTheme(gameMode);
