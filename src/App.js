@@ -213,7 +213,7 @@ function App() {
   // ─────────────────────────────────────────────────────────────────────────────
   function applyCardToPiece(square) {
     if (!selectedCard) return;
-    if (gameMode === "pvp" && cardPlayedThisTurn) return;
+    if (cardPlayedThisTurn) return;
     const piece = game.get(square);
     const currentPlayer = game.turn();
 
@@ -1060,21 +1060,35 @@ function App() {
 
             {/* LEFT: cards */}
             <div style={{ width: "280px", display: "flex", flexDirection: "column", gap: "15px" }}>
-              <div style={{ padding: "10px", backgroundColor: "#16213e", borderRadius: "8px", fontSize: "14px", minHeight: "110px" }}>
+              <div style={{
+                padding: selectedCard ? "14px" : "10px",
+                backgroundColor: selectedCard ? `${selectedCard.color}18` : "#16213e",
+                border: selectedCard ? `2px solid ${selectedCard.color}66` : "2px solid transparent",
+                borderRadius: "12px",
+                fontSize: "14px",
+                minHeight: "110px",
+                transition: "all 0.25s ease",
+              }}>
                 {selectedCard ? (
                   <>
-                    <strong style={{ fontSize: "16px" }}>{selectedCard.name}</strong>
-                    <div style={{ fontSize: "22px", color: "#ffd700", marginTop: "5px", fontWeight: "bold" }}>{getCardCost(selectedCard)}s</div>
-                    <div style={{ fontSize: "15px", color: "#aaa", marginTop: "5px" }}>{selectedCard.description}</div>
-                    <div style={{ fontSize: "13px", color: "#aaa", marginTop: "5px" }}>Click board to place</div>
+                    <div style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
+                      <div style={{ width: "64px", height: "64px", borderRadius: "10px", overflow: "hidden", border: `2px solid ${selectedCard.color}`, flexShrink: 0 }}>
+                        <img src={selectedCard.image} alt={selectedCard.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: "17px", fontWeight: "800", color: "#f1f5f9" }}>{selectedCard.name}</div>
+                        <div style={{ display: "inline-block", marginTop: "4px", backgroundColor: `${selectedCard.color}22`, border: `1px solid ${selectedCard.color}66`, borderRadius: "20px", padding: "2px 10px", fontSize: "11px", fontWeight: "700", color: selectedCard.color, textTransform: "uppercase", letterSpacing: "0.08em" }}>Tier {selectedCard.tier}</div>
+                        <div style={{ fontSize: "22px", fontWeight: "900", color: "#ffd700", marginTop: "4px" }}>{getCardCost(selectedCard)}s</div>
+                      </div>
+                    </div>
+                    <div style={{ fontSize: "13px", color: "#cbd5e1", marginTop: "10px", lineHeight: "1.5" }}>{selectedCard.description}</div>
+                    <div style={{ display: "flex", gap: "8px", marginTop: "10px" }}>
+                      <div style={{ flex: 1, textAlign: "center", backgroundColor: "rgba(78,204,163,0.1)", border: "1px solid rgba(78,204,163,0.3)", borderRadius: "8px", padding: "7px 4px", fontSize: "12px", fontWeight: "700", color: "#4ecca3" }}>👆 Click a piece to apply</div>
+                      <button onClick={() => setSelectedCard(null)} style={{ flex: 1, backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "8px", color: "#94a3b8", fontSize: "12px", fontWeight: "600", cursor: "pointer", padding: "7px 4px" }}>✕ Deselect</button>
+                    </div>
                   </>
                 ) : (
                   <div style={{ color: "#555", fontSize: "13px", marginTop: "10px", textAlign: "center" }}>Select a card to see its power</div>
-                )}
-                {gameOver && gameOverDismissed && (
-                  <div onClick={() => setGameOverDismissed(false)} style={{ position: "fixed", top: "12px", left: "50%", transform: "translateX(-50%)", backgroundColor: theme.accent, color: "#000", padding: "8px 20px", borderRadius: "20px", fontSize: "13px", fontWeight: "bold", cursor: "pointer", zIndex: 300, boxShadow: "0 4px 15px rgba(0,0,0,0.4)" }}>
-                    {winner === "white" ? "🌟 You won!" : "👹 You lost!"} · tap to see result
-                  </div>
                 )}
               </div>
 
