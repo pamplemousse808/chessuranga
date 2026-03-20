@@ -71,6 +71,7 @@ function App() {
   const [showAbout, setShowAbout] = useState(false);
   const [showNavagraha, setShowNavagraha] = useState(false);
   const [cardPlayedThisTurn, setCardPlayedThisTurn] = useState(false);
+  const [shukraAsuraPromo, setShukraAsuraPromo] = useState(null); // { square, gc }
   // Mobile UI state
   const [showCardOverlay, setShowCardOverlay] = useState(false);
   const { stockfish, stockfishRef, stockfishMoveRef } = useStockfish(gameMode, gameStarted, shukraDifficulty);
@@ -127,6 +128,18 @@ function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moveCount]);
+
+  // TARAKA decay
+  const updatedTaraka = {};
+  Object.keys(tarakaProtected).forEach(sq => {
+    const tl = tarakaProtected[sq].turnsLeft - 0.5;
+    if (tl > 0) updatedTaraka[sq] = { ...tarakaProtected[sq], turnsLeft: tl };
+  });
+  setTarakaProtected(updatedTaraka);
+
+  // VRITRA decay
+  const updatedVritra = vritraRanks.filter(v => v.turnsLeft - 0.5 > 0).map(v => ({ ...v, turnsLeft: v.turnsLeft - 0.5 }));
+  setVritraRanks(updatedVritra);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -519,7 +532,31 @@ function App() {
           moveWasMade = true;
         }
       }
-
+      // ── SHUMBHA — viper strike: capture then snap back to origin ──
+      if (!moveWasMade && power?.power === "SHUMBHA" && power.usesLeft > 0) {
+        const originSquare = power.originSquare;
+        const ff = files.indexOf(from[0]), fr = parseInt(from[1]);
+        const tf = files.indexOf(to[0]), tr = parseInt(to[1]);
+        const fileDiff = Math.abs(tf - ff), rankDiff = Math.abs(tr - fr);
+        // Must be a capture, must be within normal move range for that piece type
+        let validStrike = false;
+        if (cp && cp.color !== piece.color) {
+          if (piece.type === "p") validStrike = fileDiff === 1 && tr === fr + (piece.color === "w" ? 1 : -1);
+          else if (piece.type === "n") validStrike = (fileDiff === 2 && rankDiff === 1) || (fileDiff === 1 && rankDiff === 2);
+          else if (piece.type === "b") validStrike = fileDiff === rankDiff;
+          else if (piece.type === "r") validStrike = ff === tf || fr === tr;
+          else if (piece.type === "q") validStrike = fileDiff === rankDiff || ff === tf || fr === tr;
+          else if (piece.type === "k") validStrike = fileDiff <= 1 && rankDiff <= 1;
+        }
+        if (validStrike && originSquare) {
+          // Remove the captured piece, return striker to origin
+          gc.remove(from);
+          gc.remove(to);
+          gc.put({ type: piece.type, color: piece.color }, originSquare);
+          const fp = gc.fen().split(" "); fp[1] = fp[1] === "w" ? "b" : "w"; gc.load(fp.join(" "));
+          moveWasMade = true;
+        }
+      }
       // ── NEW: KALI_ASURA — capture any adjacent (same as MANGALA) ──
       if (!moveWasMade && power?.power === "KALI_ASURA" && power.usesLeft > 0) {
         const ff = files.indexOf(from[0]), fr = parseInt(from[1]);
@@ -541,6 +578,18 @@ function App() {
 
       if (!moveWasMade) { const m = gc.move({ from, to, promotion }); if (!m) return null; }
       if (power?.power === "BUDHA" && !cp && power.usesLeft === 2) { const fp = gc.fen().split(" "); fp[1] = fp[1] === "w" ? "b" : "w"; gc.load(fp.join(" ")); }
+      // ── SHUKRA_ASURA — black pawn promotes at rank 4 ──
+      if (piece.color === "b" && piece.type === "p" && parseInt(to[1]) === 4) {
+        const movedPiece = gc.get(to);
+        if (movedPiece && poweredPieces[from]?.power === "SHUKRA_ASURA") {
+          setShukraAsuraPromo({ square: to, gc });
+          setGame(gc);
+          tickAsuraCounters();
+          setMoveCount(p => p + 1);
+          setCardPlayedThisTurn(false);
+          return gc;
+        }
+      }
 
       if (cp) {
         let tb = getPieceValue(cp.type); const cpHadKetu = poweredPieces[to]?.power === "KETU";
@@ -565,6 +614,12 @@ function App() {
         delete np3[from]; let nu = power.usesLeft - 1;
         if (power.power === "BUDHA" && cp) nu = 0;
         if (nu > 0) np3[to] = { ...power, usesLeft: nu };
+      }
+      // ── MAHISHA — shapeshift after moving ──
+      if (power?.power === "MAHISHA" && power.usesLeft > 0) {
+        setMahishaShiftMode({ square: to, pieceType: piece.type, color: piece.color, gc });
+        // Don't commit game yet — wait for player to pick a shape
+        return gc;
       }
       const cleanPP = {}; Object.keys(np3).forEach(sq => { if (np3[sq]?.power) cleanPP[sq] = np3[sq]; }); setPoweredPieces(cleanPP);
       setGame(gc); tickAsuraCounters(); setMoveCount(p => p + 1); setCardPlayedThisTurn(false);
@@ -836,7 +891,7 @@ function App() {
   }
 
   function onPieceDrop(sourceSquare, targetSquare) {
-    if (gameOver || !gameStarted || selectedCard || chandraPlacementMode || guruMode || shaniMode) return false;
+    if (gameOver || !gameStarted || selectedCard || chandraPlacementMode || guruMode || shaniMode || mahishaShiftMode || shumbhaSnapBack || shukraAsuraPromo) return false;
     if ((gameMode === "asura" || gameMode === "shukracharya") && game.turn() === "b") return false;
     if (chandraMode) {
       if (chandraMode.mirages.includes(sourceSquare)) return false;
@@ -882,6 +937,33 @@ function App() {
     setGame(ng);
     setChandraMode({ realSquare, piece, mirages, turnsLeft: 4, color: piece.color });
     setChandraPlacementMode(null);
+  }
+
+  function confirmMahishaShift(newType) {
+    if (!mahishasuraMode) return;
+    const { square, piece } = mahishasuraMode;
+    const ng = new Chess(game.fen());
+    ng.remove(square);
+    ng.put({ type: newType, color: piece.color }, square);
+    // Remove the power — one use
+    const np = { ...poweredPieces };
+    delete np[square];
+    setPoweredPieces(np);
+    setMahishasuraMode(null);
+    setGame(ng);
+  }
+
+  function confirmShukraAsuraPromo(newType) {
+    if (!shukraAsuraPromo) return;
+    const { square, gc } = shukraAsuraPromo;
+    gc.remove(square);
+    gc.put({ type: newType, color: "b" }, square);
+    // Consume the power
+    const np = { ...poweredPieces };
+    delete np[square];
+    setPoweredPieces(np);
+    setShukraAsuraPromo(null);
+    setGame(gc);
   }
 
   function startGame(mode, difficulty = null) {
@@ -1110,6 +1192,50 @@ function App() {
                 </div>
               )}
 
+              {mahishasuraMode && (
+                <div style={{ padding: "12px", backgroundColor: "#1a0a2e", border: "2px solid #ff6600", borderRadius: "10px", marginBottom: "10px" }}>
+                  <div style={{ fontWeight: "bold", color: "#ff6600", marginBottom: "8px", fontSize: "13px" }}>🦬 MAHISHA — Choose a form</div>
+                  <div style={{ fontSize: "11px", color: "#aaa", marginBottom: "8px" }}>
+                    Shapeshift into a captured piece type:
+                  </div>
+                  <div style={{ display: "flex", gap: "6px", justifyContent: "center", flexWrap: "wrap" }}>
+                    {mahishasuraMode.availableTypes.map(type => (
+                      <button
+                        key={type}
+                        onClick={() => confirmMahishaShift(type)}
+                        style={{ padding: "8px 14px", fontSize: "16px", backgroundColor: "#ff6600", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}
+                      >
+                        {({ p: "♟", n: "♞", b: "♝", r: "♜", q: "♛" })[type]}
+                      </button>
+                    ))}
+                  </div>
+                  <button onClick={() => setMahishasuraMode(null)} style={{ marginTop: "8px", width: "100%", padding: "6px", fontSize: "11px", backgroundColor: "#e94560", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer" }}>Cancel</button>
+                </div>
+              )}
+
+              {shukraAsuraPromo && (
+                <div style={{ padding: "12px", backgroundColor: "#1a1a0e", border: "2px solid #ffd700", borderRadius: "10px", marginBottom: "10px" }}>
+                  <div style={{ fontWeight: "bold", color: "#ffd700", marginBottom: "8px", fontSize: "13px" }}>💀 SHUKRA — Promote your pawn</div>
+                  <div style={{ display: "flex", gap: "6px", justifyContent: "center" }}>
+                    {[
+                      { type: "q", label: "♛" },
+                      { type: "r", label: "♜" },
+                      { type: "b", label: "♝" },
+                      { type: "n", label: "♞" },
+                    ].map(({ type, label }) => (
+                      <button
+                        key={type}
+                        onClick={() => confirmShukraAsuraPromo(type)}
+                        style={{ padding: "8px 14px", fontSize: "16px", backgroundColor: "#b8860b", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                  <button onClick={() => setShukraAsuraPromo(null)} style={{ marginTop: "8px", width: "100%", padding: "6px", fontSize: "11px", backgroundColor: "#e94560", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer" }}>Cancel</button>
+                </div>
+              )}
+              
               {chandraPlacementMode && (
                 <div style={{ padding: "10px", backgroundColor: "#16213e", borderRadius: "8px" }}>
                   <div style={{ fontSize: "14px", fontWeight: "bold", marginBottom: "10px", color: "#e5e7eb" }}>🌙 CHANDRA</div>
