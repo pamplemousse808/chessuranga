@@ -59,7 +59,6 @@ function App() {
   const [resurrectedPieces, setResurrectedPieces] = useState({});
   const [shaniMode, setShaniMode] = useState(null);
   const [mahishasuraMode, setMahishasuraMode] = useState(null);
-  const [shumbhaMode, setShumbhaMode] = useState(null); // eslint-disable-line no-unused-vars  
   const [vritraRanks, setVritraRanks] = useState([]);
   const [tarakaProtected, setTarakaProtected] = useState({});
   const [chaosModeShown, setChaosModeShown] = useState({ white: false, black: false });
@@ -1235,7 +1234,7 @@ function App() {
                   <button onClick={() => setShukraAsuraPromo(null)} style={{ marginTop: "8px", width: "100%", padding: "6px", fontSize: "11px", backgroundColor: "#e94560", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer" }}>Cancel</button>
                 </div>
               )}
-              
+
               {chandraPlacementMode && (
                 <div style={{ padding: "10px", backgroundColor: "#16213e", borderRadius: "8px" }}>
                   <div style={{ fontSize: "14px", fontWeight: "bold", marginBottom: "10px", color: "#e5e7eb" }}>🌙 CHANDRA</div>
