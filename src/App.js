@@ -79,7 +79,7 @@ function App() {
   const [showCardOverlay, setShowCardOverlay] = useState(false);
   const { stockfish, stockfishRef, stockfishMoveRef } = useStockfish(gameMode, gameStarted, shukraDifficulty);
 
-  
+
   useEffect(() => {
     if (gameMode === "asura" && gameStarted && Object.keys(asuraLives).length === 0) {
       const lives = {};
@@ -144,7 +144,30 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moveCount]); ks
 
-
+  useEffect(() => {
+    if (!guruDuplicateMode?.side) return;
+    const { square, piece, side } = guruDuplicateMode;
+    const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
+    const fileIdx = files.indexOf(square[0]);
+    const rank = square[1];
+    const targetFileIdx = side === "left" ? fileIdx - 1 : fileIdx + 1;
+    if (targetFileIdx < 0 || targetFileIdx > 7) {
+      alert("No space to spawn duplicate on that side!");
+      setGuruDuplicateMode(null);
+      return;
+    }
+    const targetSq = files[targetFileIdx] + rank;
+    if (game.get(targetSq)) {
+      alert("That square is occupied!");
+      setGuruDuplicateMode(null);
+      return;
+    }
+    const ng = new Chess(game.fen());
+    ng.put({ type: piece.type, color: piece.color }, targetSq);
+    setGame(ng);
+    setDuplicatePieces(prev => ({ ...prev, [targetSq]: { turnsLeft: 4, originalSquare: square } }));
+    setGuruDuplicateMode(null);
+  }, [guruDuplicateMode?.side]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -170,12 +193,28 @@ function App() {
     if ((cp === "r" || cp === "q") && !tier3Unlocked) { setTier1Unlocked(true); setTier2Unlocked(true); setTier3Unlocked(true); }
   }
 
-  function tickAsuraCounters() {                                     // ── NEW
+  function tickAsuraCounters() {
     setVritraRanks(prev => prev.map(v => ({ ...v, turnsLeft: v.turnsLeft - 1 })).filter(v => v.turnsLeft > 0));
     setTarakaProtected(prev => {
       const next = {};
       Object.entries(prev).forEach(([sq, val]) => {
         if (val.turnsLeft > 1) next[sq] = { ...val, turnsLeft: val.turnsLeft - 1 };
+      });
+      return next;
+    });
+    // ── NEW: tick Guru duplicates ──
+    setDuplicatePieces(prev => {
+      const next = {};
+      Object.entries(prev).forEach(([sq, val]) => {
+        if (val.turnsLeft > 1) next[sq] = { ...val, turnsLeft: val.turnsLeft - 1 };
+        else {
+          // dissolve — remove from board
+          setGame(g => {
+            const ng = new Chess(g.fen());
+            ng.remove(sq);
+            return ng;
+          });
+        }
       });
       return next;
     });
@@ -274,7 +313,7 @@ function App() {
 
     // KETU — martyr's curse (time swap on capture)
     if (cardId === "KETU") {
-      setPoweredPieces(prev => ({ ...prev, [square]: { power: "KETU", usesLeft: 4 } }));
+      setPoweredPieces(prev => ({ ...prev, [square]: { power: "KETU", usesLeft: 4, startSquare: square } }));
       commitCard();
       return;
     }
@@ -335,10 +374,17 @@ function App() {
       return;
     }
 
-    // ── GURU / BALI — resurrection flow (existing guruMode unchanged) ───────────
-    if (cardId === "GURU" || cardId === "BALI") {
-      const guruRadius = cardId === "GURU"
-        ? (SHARED_DECK.find(c => c.id === "GURU")?.radius ?? 2)
+    // - new GURU
+    if (cardId === "GURU") {
+      commitCard();
+      setGuruDuplicateMode({ square, piece, side: null });
+      return;
+    }
+
+    // ── SHUKRA / BALI — resurrection flow (existing guruMode unchanged) ───────────
+    if (cardId === "SHUKRA" || cardId === "BALI") {
+      const guruRadius = cardId === "SHUKRA"
+        ? (SHARED_DECK.find(c => c.id === "SHUKRA")?.radius ?? 2)
         : (ASURA_DECK.find(c => c.id === "BALI")?.radius ?? 2);
       const avail = captureHistory.filter(cap => {
         const occ = game.get(cap.square);
@@ -600,7 +646,21 @@ function App() {
         let tb = getPieceValue(cp.type); const cpHadKetu = poweredPieces[to]?.power === "KETU";
         if (power?.power === "SHUKRA" && power.usesLeft > 0) tb *= 3;
         const np2 = {}; Object.keys(poweredPieces).forEach(sq => { if (poweredPieces[sq]?.power && sq !== to) np2[sq] = poweredPieces[sq]; }); setPoweredPieces(np2);
-        if (cpHadKetu) { addTime(game.turn() === "w" ? "b" : "w", 12); subtractTime(game.turn(), 12); } else addTime(game.turn(), tb);
+        if (cpHadKetu) {
+          // ── NEW: Ketu teleport — return to start square if empty ──
+          const startSq = poweredPieces[to]?.startSquare;
+          if (startSq && !gc.get(startSq) && startSq !== to) {
+            gc.put({ type: cp.type, color: cp.color }, startSq);
+            // remove from capture lists — piece didn't actually die
+          } else {
+            // start square occupied — piece dies normally, record capture
+            setCaptureHistory(p => [...p, { piece: cp.type, square: to, color: cp.color }]);
+            if (cp.color === "b") setWhiteCaptured(p => [...p, cp.type]);
+            else setBlackCaptured(p => [...p, cp.type]);
+            checkTierUnlocks(cp.type);
+          }
+        }
+
         if (gameMode === "asura" && cp.color === "b") {
           const pid = getPieceId(to, cp); const lr = asuraLives[pid] || 0;
           if (lr > 0) { setAsuraLives({ ...asuraLives, [pid]: lr - 1 }); respawnAsuraPiece(pid, cp.type); }
@@ -994,6 +1054,8 @@ function App() {
     setLastWhiteCard(null);
     setLastBlackCard(null);
     setCardPlayedThisTurn(false);
+    setGuruDuplicateMode(null);
+    setDuplicatePieces({});
   }
 
   const { background, darkSquare, lightSquare, accent, text } = getTheme(gameMode);
