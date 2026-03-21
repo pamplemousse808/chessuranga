@@ -990,7 +990,7 @@ function App() {
     setCardPlayedThisTurn(false);
   }
 
-  const theme = getTheme(gameMode);
+  const theme = getTheme(gameMode ?? null);
 
   const customStyles = {};
 
