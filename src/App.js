@@ -125,20 +125,21 @@ function App() {
     if (gameMode === "asura" || gameMode === "shukracharya") {
       setCardCooldowns(prev => { const u = { ...prev }; Object.keys(u).forEach(id => { u[id] -= 1; if (u[id] <= 0) delete u[id]; }); return u; });
     }
+    // TARAKA decay
+    const updatedTaraka = {};
+    Object.keys(tarakaProtected).forEach(sq => {
+      const tl = tarakaProtected[sq].turnsLeft - 0.5;
+      if (tl > 0) updatedTaraka[sq] = { ...tarakaProtected[sq], turnsLeft: tl };
+    });
+    setTarakaProtected(updatedTaraka);
+
+    // VRITRA decay
+    const updatedVritra = vritraRanks.filter(v => v.turnsLeft - 0.5 > 0).map(v => ({ ...v, turnsLeft: v.turnsLeft - 0.5 }));
+    setVritraRanks(updatedVritra);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moveCount]);
 
-  // TARAKA decay
-  const updatedTaraka = {};
-  Object.keys(tarakaProtected).forEach(sq => {
-    const tl = tarakaProtected[sq].turnsLeft - 0.5;
-    if (tl > 0) updatedTaraka[sq] = { ...tarakaProtected[sq], turnsLeft: tl };
-  });
-  setTarakaProtected(updatedTaraka);
 
-  // VRITRA decay
-  const updatedVritra = vritraRanks.filter(v => v.turnsLeft - 0.5 > 0).map(v => ({ ...v, turnsLeft: v.turnsLeft - 0.5 }));
-  setVritraRanks(updatedVritra);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
