@@ -142,7 +142,7 @@ function App() {
     const updatedVritra = vritraRanks.filter(v => v.turnsLeft - 0.5 > 0).map(v => ({ ...v, turnsLeft: v.turnsLeft - 0.5 }));
     setVritraRanks(updatedVritra);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [moveCount]); ks
+  }, [moveCount]);
 
   useEffect(() => {
     if (!guruDuplicateMode?.side) return;
