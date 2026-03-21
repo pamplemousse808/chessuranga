@@ -3,7 +3,7 @@ import { Chessboard } from "react-chessboard";
 import { Chess } from "chess.js";
 import AboutPage from "./AboutPage";
 import { Analytics } from '@vercel/analytics/react';
-import gameConstants, { SHARED_DECK, ASURA_DECK, getTheme } from "./gameConstants";
+import { SHARED_DECK, ASURA_DECK, getTheme } from "./gameConstants";
 import { formatTime, getPieceValue, getPieceSymbol, getPieceId, getDailyPuzzleNumber } from "./gameUtils";
 import { useStockfish } from "./useStockfish";
 import HowToPlay from "./HowToPlay";
@@ -990,8 +990,8 @@ function App() {
     setCardPlayedThisTurn(false);
   }
 
-  const theme = gameConstants.getTheme(gameMode);
-
+  const { background, darkSquare, lightSquare, accent, text } = getTheme(gameMode);
+  const theme = { background, darkSquare, lightSquare, accent, text };
   const customStyles = {};
 
   Object.keys(poweredPieces).forEach(sq => { const p = poweredPieces[sq]; if (!p?.power) return; const card = SHARED_DECK.find(c => c.id === p.power); if (card) customStyles[sq] = { ...(customStyles[sq] || {}), border: `4px solid ${card.color}`, boxShadow: `0 0 20px ${card.color}, inset 0 0 15px ${card.color}88` }; });
