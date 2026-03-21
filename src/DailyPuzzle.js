@@ -93,7 +93,7 @@ export default function DailyPuzzle({ onBack }) {
             color: selectedCard.color + "66", radius: selectedCard.radius,
             turnsRemaining: 4, whiteActivated: false, blackActivated: false,
             whiteActivatedPiece: null, blackActivatedPiece: null
-        }]);
+        }]);    
         setCardsUsed(prev => [...prev, selectedCard.id]);
         setAvailableCards(prev => prev.filter(c => c.id !== selectedCard.id));
         setMoveHistory(prev => [...prev, { isBot: false, cardUsed: selectedCard.id }]);

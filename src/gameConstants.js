@@ -1,3 +1,4 @@
+console.log("gameConstants loaded");
 export const SHARED_DECK = [
   // Tier 1
   { id: "RAHU",    name: "Rahu",    color: "#9333ea", radius: 3, tier: 1, cost: 7,  description: "Pass through pieces for 2 moves",                         image: "/images/rahu.jpg"    },
@@ -92,3 +93,4 @@ export const ASURA_CARD_EMOJI = {
   SHUMBHA:      "👥",
   SHUKRA_ASURA: "💫",
 };
+export default { SHARED_DECK, ASURA_DECK, CARD_EMOJI, ASURA_CARD_EMOJI, PIECE_VALUES, getTheme };

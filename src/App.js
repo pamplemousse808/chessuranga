@@ -3,7 +3,7 @@ import { Chessboard } from "react-chessboard";
 import { Chess } from "chess.js";
 import AboutPage from "./AboutPage";
 import { Analytics } from '@vercel/analytics/react';
-import { SHARED_DECK, ASURA_DECK, getTheme } from "./gameConstants";
+import gameConstants, { SHARED_DECK, ASURA_DECK, getTheme } from "./gameConstants";
 import { formatTime, getPieceValue, getPieceSymbol, getPieceId, getDailyPuzzleNumber } from "./gameUtils";
 import { useStockfish } from "./useStockfish";
 import HowToPlay from "./HowToPlay";
@@ -990,7 +990,7 @@ function App() {
     setCardPlayedThisTurn(false);
   }
 
-  const theme = getTheme(gameMode ?? null);
+  const theme = gameConstants.getTheme(gameMode);
 
   const customStyles = {};
 
