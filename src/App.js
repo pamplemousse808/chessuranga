@@ -58,6 +58,10 @@ function App() {
   const [guruMode, setGuruMode] = useState(null);
   const [resurrectedPieces, setResurrectedPieces] = useState({});
   const [shaniMode, setShaniMode] = useState(null);
+  const [guruDuplicateMode, setGuruDuplicateMode] = useState(null);
+  // null | { square: sq, piece: {type,color}, side: null | 'left' | 'right' }
+  const [duplicatePieces, setDuplicatePieces] = useState({});
+  // { 'e4': { turnsLeft: 2, originalSquare: 'e2' } }
   const [mahishasuraMode, setMahishasuraMode] = useState(null);
   const [vritraRanks, setVritraRanks] = useState([]);
   const [tarakaProtected, setTarakaProtected] = useState({});
@@ -75,6 +79,7 @@ function App() {
   const [showCardOverlay, setShowCardOverlay] = useState(false);
   const { stockfish, stockfishRef, stockfishMoveRef } = useStockfish(gameMode, gameStarted, shukraDifficulty);
 
+  
   useEffect(() => {
     if (gameMode === "asura" && gameStarted && Object.keys(asuraLives).length === 0) {
       const lives = {};
@@ -137,7 +142,7 @@ function App() {
     const updatedVritra = vritraRanks.filter(v => v.turnsLeft - 0.5 > 0).map(v => ({ ...v, turnsLeft: v.turnsLeft - 0.5 }));
     setVritraRanks(updatedVritra);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [moveCount]);
+  }, [moveCount]); ks
 
 
 

@@ -117,6 +117,7 @@ function CardTooltip({ card, emoji, cost, onClose, onCancel, flipped }) {
 
           {/* Tap a piece instruction */}
           <div
+            onClick={onClose}
             style={{
               flex: 1,
               textAlign: "center",
@@ -127,6 +128,7 @@ function CardTooltip({ card, emoji, cost, onClose, onCancel, flipped }) {
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
+              cursor: "pointer",
             }}
           >
             <div style={{ fontSize: "13px", fontWeight: "700", color: "#4ecca3" }}>👆 Tap a piece</div>
@@ -668,7 +670,7 @@ export default function PvpTabletLayout({
             width: "100%",
           }}
         >
-         <div
+          <div
             style={{
               transform: currentTurn === "b" ? "rotate(180deg)" : "none",
               width: tabletBoard,
