@@ -1417,6 +1417,26 @@ function App() {
                 </div>
               )}
 
+              {guruDuplicateMode && !guruDuplicateMode.side && (
+                <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", backgroundColor: "#0f172a", border: "2px solid #a855f7", borderRadius: "16px", padding: "20px 24px", zIndex: 1000, textAlign: "center", boxShadow: "0 0 40px rgba(168,85,247,0.5)", width: "88vw", maxWidth: "340px" }}>
+                  <div style={{ fontSize: "16px", fontWeight: "bold", color: "#a855f7", marginBottom: "8px" }}>🪐 Guru — Duplicate</div>
+                  <div style={{ fontSize: "13px", color: "#aaa", marginBottom: "20px" }}>Spawn duplicate to the left or right?</div>
+                  <div style={{ display: "flex", gap: "16px", justifyContent: "center" }}>
+                    <button
+                      onClick={() => setGuruDuplicateMode(prev => ({ ...prev, side: "left" }))}
+                      style={{ padding: "14px 28px", fontSize: "15px", backgroundColor: "#1e1040", border: "2px solid #a855f7", borderRadius: "10px", cursor: "pointer", color: "#fff", fontWeight: "bold" }}>
+                      ← Left
+                    </button>
+                    <button
+                      onClick={() => setGuruDuplicateMode(prev => ({ ...prev, side: "right" }))}
+                      style={{ padding: "14px 28px", fontSize: "15px", backgroundColor: "#1e1040", border: "2px solid #a855f7", borderRadius: "10px", cursor: "pointer", color: "#fff", fontWeight: "bold" }}>
+                      Right →
+                    </button>
+                  </div>
+                  <button onClick={() => setGuruDuplicateMode(null)} style={{ marginTop: "16px", fontSize: "12px", background: "none", border: "none", color: "#aaa", cursor: "pointer", textDecoration: "underline" }}>cancel</button>
+                </div>
+              )}
+
               <div style={{ width: "600px", height: "600px", flexShrink: 0 }}>
                 <Chessboard position={game.fen()} onPieceDrop={onPieceDrop} onSquareClick={onSquareClick} animationDuration={300} customSquareStyles={customStyles} customDarkSquareStyle={{ backgroundColor: theme.darkSquare }} customLightSquareStyle={{ backgroundColor: theme.lightSquare }} boardWidth={600} />
               </div>
@@ -1667,6 +1687,25 @@ function App() {
               </div>
             )}
 
+            {/* Guru duplicate picker */}
+            {guruDuplicateMode && !guruDuplicateMode.side && (
+              <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", backgroundColor: "#0f172a", border: "2px solid #a855f7", borderRadius: "16px", padding: "20px 24px", zIndex: 700, textAlign: "center", boxShadow: "0 0 40px rgba(168,85,247,0.5)", width: "88vw", maxWidth: "340px" }}>
+                <div style={{ fontSize: "16px", fontWeight: "bold", color: "#a855f7", marginBottom: "8px" }}>🪐 Guru — Duplicate</div>
+                <div style={{ fontSize: "13px", color: "#aaa", marginBottom: "20px" }}>Spawn duplicate to the left or right?</div>
+                <div style={{ display: "flex", gap: "16px", justifyContent: "center" }}>
+                  <button onClick={() => setGuruDuplicateMode(prev => ({ ...prev, side: "left" }))}
+                    style={{ padding: "14px 28px", fontSize: "15px", backgroundColor: "#1e1040", border: "2px solid #a855f7", borderRadius: "10px", cursor: "pointer", color: "#fff", fontWeight: "bold" }}>
+                    ← Left
+                  </button>
+                  <button onClick={() => setGuruDuplicateMode(prev => ({ ...prev, side: "right" }))}
+                    style={{ padding: "14px 28px", fontSize: "15px", backgroundColor: "#1e1040", border: "2px solid #a855f7", borderRadius: "10px", cursor: "pointer", color: "#fff", fontWeight: "bold" }}>
+                    Right →
+                  </button>
+                </div>
+                <button onClick={() => setGuruDuplicateMode(null)} style={{ marginTop: "16px", fontSize: "12px", background: "none", border: "none", color: "#aaa", cursor: "pointer", textDecoration: "underline" }}>cancel</button>
+              </div>
+            )}
+            
             {/* ── NEW: Mahishasura picker ── */}
             {mahishasuraMode?.awaitingChoice && (
               <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", backgroundColor: "#0f172a", border: "2px solid #065f46", borderRadius: "16px", padding: "20px 24px", zIndex: 700, textAlign: "center", width: "88vw", maxWidth: "340px" }}>
