@@ -513,7 +513,7 @@ function App() {
           chandraMode.mirages.forEach(sq => { if (cleanGame.get(sq)) cleanGame.remove(sq); });
           setGame(cleanGame); setChandraMode(null);
           const gc = new Chess(cleanGame.fen()); const piece = gc.get(from); if (!piece) return null;
-          const cp = gc.get(to); const power = poweredPieces[from];
+          const cp = gc.get(to);
           const move = gc.move({ from, to, promotion }); if (!move) return null;
           if (cp) {
             let tb = getPieceValue(cp.type); const cpHadKetu = poweredPieces[to]?.power === "KETU";
@@ -644,7 +644,6 @@ function App() {
 
       if (cp) {
         let tb = getPieceValue(cp.type); const cpHadKetu = poweredPieces[to]?.power === "KETU";
-        if (power?.power === "SHUKRA" && power.usesLeft > 0) tb *= 3;
         const np2 = {}; Object.keys(poweredPieces).forEach(sq => { if (poweredPieces[sq]?.power && sq !== to) np2[sq] = poweredPieces[sq]; }); setPoweredPieces(np2);
         if (cpHadKetu) {
           // ── NEW: Ketu teleport — return to start square if empty ──
