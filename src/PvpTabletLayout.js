@@ -483,17 +483,13 @@ export default function PvpTabletLayout({
   setChandraPlacementMode,
   setGuruMode,
   setShaniMode,
-  chandraPlacementMode,
-  guruMode,
-  shaniMode,
   resetGame,
   showChaosPopup,
   setShowChaosPopup,
-  guruPickerMode,
-  setGuruPickerMode,
-  performResurrection,
   lastWhiteCard,
   lastBlackCard,
+  guruDuplicateMode,
+  setGuruDuplicateMode,
 }) {
   const currentTurn = game.turn();
   const tabletBoard = Math.min(window.innerWidth - 24, 560);
@@ -626,7 +622,7 @@ export default function PvpTabletLayout({
             </div>
           </div>
         )}
-        
+
         {/* ════════════════════════════════════════
             BLACK'S ZONE — rotated 180° at top
         ════════════════════════════════════════ */}
