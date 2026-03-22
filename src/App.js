@@ -459,24 +459,31 @@ function App() {
     // ── SHANI / KALI_ASURA — freeze/smite: highlight enemy targets ─────────────
     // Player taps their own piece first, then we show enemy targets to tap next.
     if (cardId === "SHANI" || cardId === "KALI_ASURA") {
-      // Find all enemy pieces on the board as valid targets
+      const cardDef = cardId === "SHANI"
+        ? SHARED_DECK.find(c => c.id === "SHANI")
+        : ASURA_DECK.find(c => c.id === "KALI_ASURA");
+      const radius = cardDef?.radius ?? 1;
       const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
+      const fromFile = files.indexOf(square[0]);
+      const fromRank = parseInt(square[1]);
       const enemies = [];
-      files.forEach(f => {
+      files.forEach((f, fi) => {
         for (let r = 1; r <= 8; r++) {
-          const sq = f + r;
-          const p = game.get(sq);
-          if (p && p.color === enemyColor && !frozenPieces[sq]) {
-            enemies.push({ square: sq, piece: p });
+          if (Math.abs(fi - fromFile) <= radius && Math.abs(r - fromRank) <= radius) {
+            const sq = f + r;
+            const p = game.get(sq);
+            if (p && p.color === enemyColor && !frozenPieces[sq]) {
+              enemies.push({ square: sq, piece: p });
+            }
           }
         }
       });
       if (enemies.length === 0) {
-        alert("No enemy pieces to target!");
+        alert("No enemy pieces in range!");
         return;
       }
       commitCard();
-      setShaniMode({ enemyPieces: enemies, cardId });
+      setShaniMode({ enemyPieces: enemies, cardId, fromSquare: square });
       return;
     }
 
@@ -828,7 +835,7 @@ function App() {
       const target = shaniMode.enemyPieces.find(p => p.square === square);
       if (!target) return;
 
-      if (shaniMode.cardId === "MANGALA") {
+      if (shaniMode.cardId === "MANGALA" || shaniMode.cardId === "KALI_ASURA") {
         // MANGALA: move the piece to the target square, capturing it
         const fromSq = shaniMode.fromSquare;
         const movingPiece = game.get(fromSq);
@@ -862,39 +869,15 @@ function App() {
         return;
       }
 
-      if (shaniMode.cardId === "KALI_ASURA") {
-        // KALI: capture any adjacent enemy (same as MANGALA — reuse logic above)
-        // For now treat identically to MANGALA but without requiring adjacency
-        // (KALI_ASURA description says "capture any adjacent enemy piece")
-        const fromSq = shaniMode.fromSquare;
-        if (fromSq) {
-          const movingPiece = game.get(fromSq);
-          if (movingPiece) {
-            const ng = new Chess(game.fen());
-            ng.remove(fromSq);
-            ng.remove(square);
-            ng.put({ type: movingPiece.type, color: movingPiece.color }, square);
-            const fp = ng.fen().split(" ");
-            fp[1] = fp[1] === "w" ? "b" : "w";
-            ng.load(fp.join(" "));
-            setCaptureHistory(prev => [...prev, { piece: target.piece.type, square, color: target.piece.color }]);
-            if (game.turn() === "w") setBlackCaptured(prev => [...prev, target.piece.type]);
-            else setWhiteCaptured(prev => [...prev, target.piece.type]);
-            checkTierUnlocks(target.piece.type);
-            setGame(ng);
-            setMoveCount(prev => prev + 1);
-            if (ng.isCheckmate()) { setGameOver(true); setWinner(ng.turn() === "w" ? "black" : "white"); }
-          }
-        } else {
-          // SHANI-style: just freeze the target
-          setFrozenPieces(prev => ({ ...prev, [square]: { turnsLeft: 4 } }));
-        }
-        setShaniMode(null);
-        return;
-      }
-
       // Default: SHANI freeze
       setFrozenPieces(prev => ({ ...prev, [square]: { turnsLeft: 4 } }));
+      const ng = new Chess(game.fen());
+      const fp = ng.fen().split(" ");
+      fp[1] = fp[1] === "w" ? "b" : "w";
+      ng.load(fp.join(" "));
+      setGame(ng);
+      setMoveCount(prev => prev + 1);
+      setCardPlayedThisTurn(false);
       setShaniMode(null);
       return;
     }
