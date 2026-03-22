@@ -60,7 +60,7 @@ function App() {
   const [shaniMode, setShaniMode] = useState(null);
   const [guruDuplicateMode, setGuruDuplicateMode] = useState(null);
   // null | { square: sq, piece: {type,color}, side: null | 'left' | 'right' }
-  const [duplicatePieces, setDuplicatePieces] = useState({});
+  const [, setDuplicatePieces] = useState({});
   // { 'e4': { turnsLeft: 2, originalSquare: 'e2' } }
   const [mahishasuraMode, setMahishasuraMode] = useState(null);
   const [vritraRanks, setVritraRanks] = useState([]);
@@ -167,6 +167,7 @@ function App() {
     setGame(ng);
     setDuplicatePieces(prev => ({ ...prev, [targetSq]: { turnsLeft: 4, originalSquare: square } }));
     setGuruDuplicateMode(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [guruDuplicateMode?.side]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -516,7 +517,6 @@ function App() {
           const move = gc.move({ from, to, promotion }); if (!move) return null;
           if (cp) {
             let tb = getPieceValue(cp.type); const cpHadKetu = poweredPieces[to]?.power === "KETU";
-            if (power?.power === "SHUKRA" && power.usesLeft > 0) tb *= 3;
             const np = {}; Object.keys(poweredPieces).forEach(sq => { if (poweredPieces[sq]?.power && sq !== to) np[sq] = poweredPieces[sq]; }); setPoweredPieces(np);
             if (cpHadKetu) { addTime(gc.turn() === "w" ? "b" : "w", 12); subtractTime(gc.turn() === "w" ? "w" : "b", 12); } else addTime(gc.turn() === "w" ? "b" : "w", tb);
             setCaptureHistory(p => [...p, { piece: cp.type, square: to, color: cp.color }]);
