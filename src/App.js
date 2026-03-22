@@ -326,10 +326,30 @@ function App() {
       return;
     }
 
-    // SHUKRA (Navagraha) — time harvest (triple time on next 2 captures)
+    // SHUKRA (Navagraha) — resurrection
     if (cardId === "SHUKRA") {
-      setPoweredPieces(prev => ({ ...prev, [square]: { power: "SHUKRA", usesLeft: 2 } }));
+      const shukraRadius = SHARED_DECK.find(c => c.id === "SHUKRA")?.radius ?? 2;
+      const avail = captureHistory.filter(cap => {
+        const occ = game.get(cap.square);
+        const fileDiff = Math.abs(cap.square.charCodeAt(0) - square.charCodeAt(0));
+        const rankDiff = Math.abs(parseInt(cap.square[1]) - parseInt(square[1]));
+        const inRadius = fileDiff <= shukraRadius && rankDiff <= shukraRadius;
+        return (
+          cap.color === currentPlayer &&
+          inRadius &&
+          (!occ || occ.color !== currentPlayer)
+        );
+      });
+      if (avail.length === 0) {
+        alert("No captured pieces to resurrect in range!");
+        return;
+      }
       commitCard();
+      setGuruMode({
+        tileSquare: square,
+        playerColor: currentPlayer,
+        availableResurrections: avail,
+      });
       return;
     }
 
@@ -801,23 +821,7 @@ function App() {
       else if (res.length > 1) setGuruPickerMode({ square, options: res });
       return;
     }
-    if (selectedCard) {
-      const currentPlayer = game.turn();
-      const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
-      files.forEach(f => {
-        for (let r = 1; r <= 8; r++) {
-          const sq = f + r;
-          const p = game.get(sq);
-          if (p && p.color === currentPlayer && !frozenPieces[sq]) {
-            customStyles[sq] = {
-              ...(customStyles[sq] || {}),
-              border: "3px solid #ffd700",
-              boxShadow: "0 0 15px #ffd700, inset 0 0 10px rgba(255,215,0,0.3)",
-            };
-          }
-        }
-      });
-    }
+
     // ── SHANI freeze / MANGALA smite / KALI_ASURA target selection ─────────────
     // shaniMode is now reused for all "tap enemy to apply effect" flows.
     if (shaniMode) {
