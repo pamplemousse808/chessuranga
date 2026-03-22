@@ -643,7 +643,7 @@ function App() {
       }
 
       if (cp) {
-        let tb = getPieceValue(cp.type); const cpHadKetu = poweredPieces[to]?.power === "KETU";
+        const cpHadKetu = poweredPieces[to]?.power === "KETU";
         const np2 = {}; Object.keys(poweredPieces).forEach(sq => { if (poweredPieces[sq]?.power && sq !== to) np2[sq] = poweredPieces[sq]; }); setPoweredPieces(np2);
         if (cpHadKetu) {
           // ── NEW: Ketu teleport — return to start square if empty ──
@@ -653,6 +653,7 @@ function App() {
             // remove from capture lists — piece didn't actually die
           } else {
             // start square occupied — piece dies normally, record capture
+            addTime(game.turn(), getPieceValue(cp.type)); // ── time bonus
             setCaptureHistory(p => [...p, { piece: cp.type, square: to, color: cp.color }]);
             if (cp.color === "b") setWhiteCaptured(p => [...p, cp.type]);
             else setBlackCaptured(p => [...p, cp.type]);
