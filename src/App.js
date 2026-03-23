@@ -314,7 +314,7 @@ function App() {
 
     // KETU — martyr's curse (time swap on capture)
     if (cardId === "KETU") {
-      setPoweredPieces(prev => ({ ...prev, [square]: { power: "KETU", usesLeft: 4, startSquare: square } }));
+      setPoweredPieces(prev => ({ ...prev, [square]: { power: "KETU", usesLeft: 6, startSquare: square } }));
       commitCard();
       return;
     }
@@ -544,8 +544,18 @@ function App() {
           const move = gc.move({ from, to, promotion }); if (!move) return null;
           if (cp) {
             let tb = getPieceValue(cp.type); const cpHadKetu = poweredPieces[to]?.power === "KETU";
+            const ketuStart = poweredPieces[to]?.startSquare; // read BEFORE cleanup
             const np = {}; Object.keys(poweredPieces).forEach(sq => { if (poweredPieces[sq]?.power && sq !== to) np[sq] = poweredPieces[sq]; }); setPoweredPieces(np);
-            if (cpHadKetu) { addTime(gc.turn() === "w" ? "b" : "w", 12); subtractTime(gc.turn() === "w" ? "w" : "b", 12); } else addTime(gc.turn() === "w" ? "b" : "w", tb);
+            if (cpHadKetu) {
+              if (ketuStart && !gc.get(ketuStart) && ketuStart !== to) {
+                gc.put({ type: cp.type, color: cp.color }, ketuStart);
+              } else {
+                addTime(gc.turn() === "w" ? "b" : "w", 12); subtractTime(gc.turn() === "w" ? "w" : "b", 12);
+                setCaptureHistory(p => [...p, { piece: cp.type, square: to, color: cp.color }]);
+                if (gc.turn() === "w") setBlackCaptured(p => [...p, cp.type]); else setWhiteCaptured(p => [...p, cp.type]);
+                checkTierUnlocks(cp.type);
+              }
+            } else addTime(gc.turn() === "w" ? "b" : "w", tb);
             setCaptureHistory(p => [...p, { piece: cp.type, square: to, color: cp.color }]);
             if (gc.turn() === "w") setBlackCaptured(p => [...p, cp.type]); else setWhiteCaptured(p => [...p, cp.type]);
             checkTierUnlocks(cp.type);
@@ -671,10 +681,10 @@ function App() {
 
       if (cp) {
         const cpHadKetu = poweredPieces[to]?.power === "KETU";
+        const ketuStartSq = poweredPieces[to]?.startSquare; // read BEFORE cleanup
         const np2 = {}; Object.keys(poweredPieces).forEach(sq => { if (poweredPieces[sq]?.power && sq !== to) np2[sq] = poweredPieces[sq]; }); setPoweredPieces(np2);
         if (cpHadKetu) {
-          // ── NEW: Ketu teleport — return to start square if empty ──
-          const startSq = poweredPieces[to]?.startSquare;
+          const startSq = ketuStartSq;
           if (startSq && !gc.get(startSq) && startSq !== to) {
             gc.put({ type: cp.type, color: cp.color }, startSq);
             // remove from capture lists — piece didn't actually die
@@ -1067,7 +1077,21 @@ function App() {
         cursor: "pointer",
       };
     });
-  } if (chandraPlacementMode) {
+  }
+  
+  vritraRanks.forEach(v => {
+    const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
+    files.forEach(f => {
+      const sq = `${f}${v.rank}`;
+      customStyles[sq] = {
+        ...(customStyles[sq] || {}),
+        backgroundColor: "rgba(10, 42, 74, 0.55)",
+        boxShadow: "inset 0 0 8px #0A2A4A",
+      };
+    });
+  });
+
+  if (chandraPlacementMode) {
     const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
     files.forEach(f => { const sq = f + chandraPlacementMode.rank; if (!game.get(sq) && sq !== chandraPlacementMode.square) customStyles[sq] = { ...(customStyles[sq] || {}), backgroundColor: "rgba(229,231,235,0.3)", border: "2px dashed #e5e7eb" }; });
     chandraPlacementMode.mirages.forEach(ms => { customStyles[ms] = { ...(customStyles[ms] || {}), backgroundColor: "rgba(229,231,235,0.6)", border: "3px solid #e5e7eb", boxShadow: "0 0 15px #e5e7eb" }; });
@@ -1705,7 +1729,7 @@ function App() {
                 <button onClick={() => setGuruDuplicateMode(null)} style={{ marginTop: "16px", fontSize: "12px", background: "none", border: "none", color: "#aaa", cursor: "pointer", textDecoration: "underline" }}>cancel</button>
               </div>
             )}
-            
+
             {/* ── NEW: Mahishasura picker ── */}
             {mahishasuraMode?.awaitingChoice && (
               <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", backgroundColor: "#0f172a", border: "2px solid #065f46", borderRadius: "16px", padding: "20px 24px", zIndex: 700, textAlign: "center", width: "88vw", maxWidth: "340px" }}>

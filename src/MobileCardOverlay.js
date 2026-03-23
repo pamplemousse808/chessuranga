@@ -3,15 +3,15 @@ import { useState } from "react";
 import { SHARED_DECK } from "./gameConstants";
 
 const TRAY_INFO = {
-  RAHU:    { emoji: "🔮", power: "Phase Walk",      detail: "Pass through blocking pieces for 2 moves. An unstoppable ghost on the board." },
-  KETU:    { emoji: "☄️", power: "Martyr's Curse",  detail: "If this piece is captured: you gain +12s, opponent loses 12s. A trap in disguise." },
-  SURYA:   { emoji: "☀️", power: "Invincibility",   detail: "This piece cannot be captured for 2 moves. Surya's radiance burns all who approach." },
-  CHANDRA: { emoji: "🌙", power: "Clones",          detail: "Place 1–2 mirror images on the same rank. Enemies won't know which is real." },
-  GURU:    { emoji: "🪐", power: "Resurrection",    detail: "Bring back a captured piece where it died. It can't move immediately — even Guru's grace needs a moment." },
-  SHUKRA:  { emoji: "💫", power: "Time Harvest",    detail: "Triple the time earned on your next 2 captures. Make every strike count." },
-  BUDHA:   { emoji: "⚡", power: "Double Move",     detail: "Take two consecutive moves. Ends early if the first move captures." },
-  MANGALA: { emoji: "🔥", power: "Smite",           detail: "Capture any adjacent enemy piece, ignoring normal movement rules. War cares nothing for geometry." },
-  SHANI:   { emoji: "❄️", power: "Freeze",          detail: "Immobilise an enemy piece for 2 turns. Even kings have cowered before Shani's gaze." },
+  RAHU: { emoji: "🔮", power: "Phase Walk", detail: "Pass through blocking pieces for 2 moves. An unstoppable ghost on the board." },
+  KETU: { emoji: "☄️", power: "Ketu's Curse", detail: "If captured, this piece teleports back to where it was activated instead of dying. Lasts 3 turns." },
+  SURYA: { emoji: "☀️", power: "Invincibility", detail: "This piece cannot be captured for 2 moves. Surya's radiance burns all who approach." },
+  CHANDRA: { emoji: "🌙", power: "Clones", detail: "Place 1–2 mirror images on the same rank. Enemies won't know which is real." },
+  GURU: { emoji: "🪐", power: "Duplicate", detail: "Spawn a real copy of this piece left or right — it moves and captures for 2 turns, then dissolves." },
+  SHUKRA: { emoji: "💫", power: "Resurrection", detail: "Bring back a captured piece to where it died. It can't move immediately — even Shukra's grace needs a moment." },
+  BUDHA: { emoji: "⚡", power: "Double Move", detail: "Take two consecutive moves. Ends early if the first move captures." },
+  MANGALA: { emoji: "🔥", power: "Smite", detail: "Capture any adjacent enemy piece, ignoring normal movement rules. War cares nothing for geometry." },
+  SHANI: { emoji: "❄️", power: "Freeze", detail: "Immobilise an enemy piece for 2 turns. Even kings have cowered before Shani's gaze." },
 };
 
 export default function MobileCardOverlay({
@@ -29,14 +29,14 @@ export default function MobileCardOverlay({
 
   const canUseTray = trayCard
     ? (() => {
-        const isUsed = (gameMode === "asura" || gameMode === "shukracharya")
-          ? !!cardCooldowns[trayCard.id]
-          : usedCards.includes(trayCard.id);
-        const isUnlocked = trayCard.tier === 1 ? tier1Unlocked
-          : trayCard.tier === 2 ? tier2Unlocked
+      const isUsed = (gameMode === "asura" || gameMode === "shukracharya")
+        ? !!cardCooldowns[trayCard.id]
+        : usedCards.includes(trayCard.id);
+      const isUnlocked = trayCard.tier === 1 ? tier1Unlocked
+        : trayCard.tier === 2 ? tier2Unlocked
           : tier3Unlocked;
-        return isUnlocked && !isUsed && currentTurn === "w";
-      })()
+      return isUnlocked && !isUsed && currentTurn === "w";
+    })()
     : false;
 
   function handleCardTap(card) {
