@@ -843,7 +843,10 @@ function App() {
 
     // ── GURU resurrection target selection ─────────────────────────────────────
     if (guruMode) {
+      console.log("guruMode squares:", guruMode.availableResurrections.map(r => r.square));
+      console.log("clicked square:", square);
       const res = guruMode.availableResurrections.filter(r => r.square === square);
+      console.log("matched:", res);
       if (res.length === 1) performResurrection(res[0], square);
       else if (res.length > 1) setGuruPickerMode({ square, options: res });
       return;
@@ -1263,8 +1266,8 @@ function App() {
 
               {guruMode && (
                 <div style={{ padding: "10px", backgroundColor: "#16213e", borderRadius: "8px" }}>
-                  <div style={{ fontSize: "14px", fontWeight: "bold", marginBottom: "10px", color: "#a855f7" }}>🪐 GURU</div>
-                  <div style={{ fontSize: "12px", color: "#aaa", marginBottom: "10px" }}>Click a death square to resurrect:</div>
+                  <div style={{ color: "#ec4899" }}>💫 {guruMode.cardId === "BALI" ? "BALI" : "SHUKRA"}</div>
+                  <div style={{ color: "#aaa" }}>Click a square to resurrect a fallen piece:</div>
                   <div style={{ fontSize: "11px", color: "#888", marginBottom: "10px" }}>{guruMode.availableResurrections.map((r, i) => <div key={i}>{getPieceSymbol(r.piece)} at {r.square}</div>)}</div>
                   <button onClick={() => setGuruMode(null)} style={{ width: "100%", padding: "8px", fontSize: "12px", backgroundColor: "#e94560", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer" }}>Cancel</button>
                 </div>
