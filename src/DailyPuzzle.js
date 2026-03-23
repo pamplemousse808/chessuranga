@@ -306,7 +306,7 @@ export default function DailyPuzzle({ onBack }) {
                             const g = new Chess(); g.load(dailyData.fen); setGame(g);
                             setMoveFrom(""); setMoveCount(0); setCardsUsed([]);
                             setAvailableCards(dailyData.dailyCards); setSelectedCard(null);
-                            setPoweredPieces({}); setActiveTiles([]); 
+                            setPoweredPieces({});  
                             setMoveHistory([]); setAttempts(a => a + 1);
                         }} style={{ marginTop: "8px", padding: "6px 14px", backgroundColor: "transparent", border: "1px solid #2a1a30", borderRadius: "8px", color: "#e5dfeb", cursor: "pointer", fontSize: "11px" }}>
                             ↩ Restart puzzle
@@ -355,7 +355,7 @@ export default function DailyPuzzle({ onBack }) {
                                     const g = new Chess(); g.load(dailyData.fen); setGame(g);
                                     setMoveFrom(""); setMoveCount(0); setCardsUsed([]);
                                     setAvailableCards(dailyData.dailyCards); setSelectedCard(null);
-                                    setPoweredPieces({}); setActiveTiles([]);
+                                    setPoweredPieces({}); 
                                     setPuzzleOver(null); setMoveHistory([]); setAttempts(a => a + 1);
                                 }} style={{ padding: "11px 20px", backgroundColor: "transparent", border: "2px solid #4a3060", borderRadius: "10px", color: "#a88a5a", cursor: "pointer", fontSize: "13px" }}>Try Again 🔄</button>
                             </div>
@@ -373,7 +373,7 @@ export default function DailyPuzzle({ onBack }) {
                                     const g = new Chess(); g.load(dailyData.fen); setGame(g);
                                     setMoveFrom(""); setMoveCount(0); setCardsUsed([]);
                                     setAvailableCards(dailyData.dailyCards); setSelectedCard(null);
-                                    setPoweredPieces({}); setActiveTiles([]);
+                                    setPoweredPieces({}); 
                                     setPuzzleOver(null); setMoveHistory([]); setAttempts(a => a + 1);
                                 }} style={{ padding: "12px 22px", backgroundColor: "#e94560", border: "none", borderRadius: "10px", color: "#fff", cursor: "pointer", fontSize: "14px", fontWeight: "bold" }}>
                                     Try Again 🔄
