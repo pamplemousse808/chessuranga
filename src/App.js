@@ -56,6 +56,7 @@ function App() {
   const [chandraMode, setChandraMode] = useState(null);
   const [chandraPlacementMode, setChandraPlacementMode] = useState(null);
   const [guruMode, setGuruMode] = useState(null);
+  const [budhaSquare, setBudhaSquare] = useState(null);
   const [resurrectedPieces, setResurrectedPieces] = useState({});
   const [shaniMode, setShaniMode] = useState(null);
   const [guruDuplicateMode, setGuruDuplicateMode] = useState(null);
@@ -555,10 +556,12 @@ function App() {
                 if (gc.turn() === "w") setBlackCaptured(p => [...p, cp.type]); else setWhiteCaptured(p => [...p, cp.type]);
                 checkTierUnlocks(cp.type);
               }
-            } else addTime(gc.turn() === "w" ? "b" : "w", tb);
-            setCaptureHistory(p => [...p, { piece: cp.type, square: to, color: cp.color }]);
-            if (gc.turn() === "w") setBlackCaptured(p => [...p, cp.type]); else setWhiteCaptured(p => [...p, cp.type]);
-            checkTierUnlocks(cp.type);
+            } else {
+              addTime(gc.turn() === "w" ? "b" : "w", tb);
+              setCaptureHistory(p => [...p, { piece: cp.type, square: to, color: cp.color }]);
+              if (gc.turn() === "w") setBlackCaptured(p => [...p, cp.type]); else setWhiteCaptured(p => [...p, cp.type]);
+              checkTierUnlocks(cp.type);
+            }
           }
           setGame(gc); setMoveCount(p => p + 1); setCardPlayedThisTurn(false);
           if (gc.isCheckmate()) { setGameOver(true); setWinner(gc.turn() === "w" ? "black" : "white"); }
@@ -665,7 +668,12 @@ function App() {
       }
 
       if (!moveWasMade) { const m = gc.move({ from, to, promotion }); if (!m) return null; }
-      if (power?.power === "BUDHA" && !cp && power.usesLeft === 2) { const fp = gc.fen().split(" "); fp[1] = fp[1] === "w" ? "b" : "w"; gc.load(fp.join(" ")); }
+      if (power?.power === "BUDHA" && !cp && power.usesLeft === 2) {
+        const fp = gc.fen().split(" "); fp[1] = fp[1] === "w" ? "b" : "w"; gc.load(fp.join(" "));
+        setBudhaSquare(to); // lock second move to this square
+      }
+      if (power.power === "BUDHA" && cp) nu = 0;
+      if (nu === 0 && power.power === "BUDHA") setBudhaSquare(null);
       // ── SHUKRA_ASURA — black pawn promotes at rank 4 ──
       if (piece.color === "b" && piece.type === "p" && parseInt(to[1]) === 4) {
         const movedPiece = gc.get(to);
@@ -830,6 +838,9 @@ function App() {
       applyCardToPiece(square);
       return;
     }
+
+    // ── BUDHA: lock second move to the powered piece ────────────────────────────
+    if (budhaSquare && square !== budhaSquare) return;
 
     // ── GURU resurrection target selection ─────────────────────────────────────
     if (guruMode) {
@@ -1078,7 +1089,7 @@ function App() {
       };
     });
   }
-  
+
   vritraRanks.forEach(v => {
     const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
     files.forEach(f => {
