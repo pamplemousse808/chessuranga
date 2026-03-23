@@ -672,8 +672,6 @@ function App() {
         const fp = gc.fen().split(" "); fp[1] = fp[1] === "w" ? "b" : "w"; gc.load(fp.join(" "));
         setBudhaSquare(to); // lock second move to this square
       }
-      if (power.power === "BUDHA" && cp) nu = 0;
-      if (nu === 0 && power.power === "BUDHA") setBudhaSquare(null);
       // ── SHUKRA_ASURA — black pawn promotes at rank 4 ──
       if (piece.color === "b" && piece.type === "p" && parseInt(to[1]) === 4) {
         const movedPiece = gc.get(to);
@@ -723,6 +721,7 @@ function App() {
       if (power) {
         delete np3[from]; let nu = power.usesLeft - 1;
         if (power.power === "BUDHA" && cp) nu = 0;
+        if (nu === 0 && power.power === "BUDHA") setBudhaSquare(null);
         if (nu > 0) np3[to] = { ...power, usesLeft: nu };
       }
       // ── MAHISHA — shapeshift after moving ──
