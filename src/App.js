@@ -167,6 +167,7 @@ function App() {
     ng.put({ type: piece.type, color: piece.color }, targetSq);
     setGame(ng);
     setDuplicatePieces(prev => ({ ...prev, [targetSq]: { turnsLeft: 4, originalSquare: square } }));
+    console.log("set duplicate at:", targetSq);
     setGuruDuplicateMode(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [guruDuplicateMode?.side]);
@@ -196,6 +197,7 @@ function App() {
   }
 
   function tickAsuraCounters() {
+    console.log("duplicatePieces at tick:", duplicatePieces);
     setVritraRanks(prev => prev.map(v => ({ ...v, turnsLeft: v.turnsLeft - 1 })).filter(v => v.turnsLeft > 0));
     setTarakaProtected(prev => {
       const next = {};
