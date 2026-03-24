@@ -61,7 +61,7 @@ function App() {
   const [shaniMode, setShaniMode] = useState(null);
   const [guruDuplicateMode, setGuruDuplicateMode] = useState(null);
   // null | { square: sq, piece: {type,color}, side: null | 'left' | 'right' }
-  const [, setDuplicatePieces] = useState({});
+  const [duplicatePieces, setDuplicatePieces] = useState({});
   // { 'e4': { turnsLeft: 2, originalSquare: 'e2' } }
   const [mahishasuraMode, setMahishasuraMode] = useState(null);
   const [vritraRanks, setVritraRanks] = useState([]);
