@@ -315,7 +315,7 @@ function App() {
       return;
     }
 
-    // KETU — martyr's curse (time swap on capture)
+    // KETU — martyr's curse 
     if (cardId === "KETU") {
       setPoweredPieces(prev => ({ ...prev, [square]: { power: "KETU", usesLeft: 6, startSquare: square } }));
       commitCard();
@@ -553,7 +553,7 @@ function App() {
               if (ketuStart && !gc.get(ketuStart) && ketuStart !== to) {
                 gc.put({ type: cp.type, color: cp.color }, ketuStart);
               } else {
-                addTime(gc.turn() === "w" ? "b" : "w", 12); subtractTime(gc.turn() === "w" ? "w" : "b", 12);
+                addTime(gc.turn() === "w" ? "b" : "w", getPieceValue(cp.type));
                 setCaptureHistory(p => [...p, { piece: cp.type, square: to, color: cp.color }]);
                 if (gc.turn() === "w") setBlackCaptured(p => [...p, cp.type]); else setWhiteCaptured(p => [...p, cp.type]);
                 checkTierUnlocks(cp.type);
@@ -698,7 +698,7 @@ function App() {
             // remove from capture lists — piece didn't actually die
           } else {
             // start square occupied — piece dies normally, record capture
-            addTime(game.turn(), getPieceValue(cp.type)); // ── time bonus
+            addTime(game.turn(), getPieceValue(cp.type));
             setCaptureHistory(p => [...p, { piece: cp.type, square: to, color: cp.color }]);
             if (cp.color === "b") setWhiteCaptured(p => [...p, cp.type]);
             else setBlackCaptured(p => [...p, cp.type]);
@@ -808,14 +808,21 @@ function App() {
         const res = ng.move(fm);
         if (res) {
           if (scp) {
-            setCaptureHistory(p => [...p, { piece: scp.type, square: fm.to, color: scp.color }]);
-            if (scp.color === "w") setBlackCaptured(p => [...p, scp.type]);
-            else setWhiteCaptured(p => [...p, scp.type]);
-            checkTierUnlocks(scp.type);
-            // ✅ Apply KETU: white gains 12s, bot loses 12s
             if (scpHadKetu) {
-              addTime("w", 12);
-              subtractTime("b", 12);
+              const ketuStart = poweredPiecesRef.current[fm.to]?.startSquare;
+              if (ketuStart && !ng.get(ketuStart) && ketuStart !== fm.to) {
+                ng.put({ type: scp.type, color: scp.color }, ketuStart);
+              } else {
+                setCaptureHistory(p => [...p, { piece: scp.type, square: fm.to, color: scp.color }]);
+                if (scp.color === "w") setBlackCaptured(p => [...p, scp.type]);
+                else setWhiteCaptured(p => [...p, scp.type]);
+                checkTierUnlocks(scp.type);
+              }
+            } else {
+              setCaptureHistory(p => [...p, { piece: scp.type, square: fm.to, color: scp.color }]);
+              if (scp.color === "w") setBlackCaptured(p => [...p, scp.type]);
+              else setWhiteCaptured(p => [...p, scp.type]);
+              checkTierUnlocks(scp.type);
             }
           }
           setTimeout(() => {
