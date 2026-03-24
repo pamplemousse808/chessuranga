@@ -1164,7 +1164,7 @@ function App() {
         {/* ── Mode selection ── */}
         {!gameStarted && (
           <div style={{ textAlign: "center", maxWidth: isMobile ? "100%" : "900px", margin: "0 auto", padding: isMobile ? "0 8px" : "0" }}>
-            <img src="/images/chessuranga.jpg" alt="Chessuranga" style={{ width: "100%", borderRadius: "16px", display: "block", marginBottom: "24px", boxShadow: "0 0 60px rgba(100,60,255,0.4)" }} />
+            <img src="/images/chessuranga.jpg?v=2" alt="Chessuranga" style={{ width: "100%", borderRadius: "16px", display: "block", marginBottom: "24px", boxShadow: "0 0 60px rgba(100,60,255,0.4)" }} />
             {/* Row 1: Shukracharya, Daily Puzzle, Asura */}
             <div style={{ display: "flex", gap: isMobile ? "12px" : "20px", justifyContent: "center", flexWrap: "wrap", marginBottom: "16px", alignItems: "flex-start" }}>
 
