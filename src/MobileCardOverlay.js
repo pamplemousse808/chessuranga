@@ -1,30 +1,41 @@
 // ─── MobileCardOverlay.js ────────────────────────────────────────────────────
 import { useState } from "react";
-import { SHARED_DECK } from "./gameConstants";
+import { SHARED_DECK, ASURA_DECK } from "./gameConstants";
 
 const TRAY_INFO = {
-  RAHU: { emoji: "🔮", power: "Phase Walk", detail: "Pass through blocking pieces for 2 moves. An unstoppable ghost on the board." },
-  KETU: { emoji: "☄️", power: "Ketu's Curse", detail: "If captured, this piece teleports back to where it was activated instead of dying. Lasts 3 turns." },
-  SURYA: { emoji: "☀️", power: "Invincibility", detail: "This piece cannot be captured for 2 moves. Surya's radiance burns all who approach." },
-  CHANDRA: { emoji: "🌙", power: "Clones", detail: "Place 1–2 mirror images on the same rank. Enemies won't know which is real." },
-  GURU: { emoji: "🪐", power: "Duplicate", detail: "Spawn a real copy of this piece left or right — it moves and captures for 2 turns, then dissolves." },
-  SHUKRA: { emoji: "💫", power: "Resurrection", detail: "Bring back a captured piece to where it died. It can't move immediately — even Shukra's grace needs a moment." },
-  BUDHA: { emoji: "⚡", power: "Double Move", detail: "Take two consecutive moves. Ends early if the first move captures." },
-  MANGALA: { emoji: "🔥", power: "Smite", detail: "Capture any adjacent enemy piece, ignoring normal movement rules. War cares nothing for geometry." },
-  SHANI: { emoji: "❄️", power: "Freeze", detail: "Immobilise an enemy piece for 2 turns. Even kings have cowered before Shani's gaze." },
+  RAHU: { emoji: "🔮", power: "Shadow Passage", detail: "Pass through blocking pieces for 2 moves. An unstoppable ghost on the board." },
+  KETU: { emoji: "☄️", power: "Martyr's Comet", detail: "If captured, this piece teleports back to where it was activated instead of dying. Lasts 3 turns." },
+  SURYA: { emoji: "☀️", power: "Solar Aegis", detail: "This piece cannot be captured for 2 moves. Surya's radiance burns all who approach." },
+  CHANDRA: { emoji: "🌙", power: "Lunar Illusion", detail: "Place 1–2 mirror images on the same rank. Enemies won't know which is real." },
+  GURU: { emoji: "🪐", power: "Brihaspati's Echo", detail: "Spawn a real copy of this piece left or right — it moves and captures for 2 turns, then dissolves." },
+  SHUKRA: { emoji: "💫", power: "Venus Rises", detail: "Bring back a captured piece  where it died, but only if the square is empty. It won't be able to move immediately — even Shukra's grace needs a moment." },
+  BUDHA: { emoji: "⚡", power: "Mercury's Gambit", detail: "Take two consecutive moves. Ends early if the first move captures." },
+  MANGALA: { emoji: "🔥", power: "Mangala's Wrath", detail: "Capture any adjacent enemy piece, ignoring normal movement rules. War cares nothing for geometry." },
+  SHANI: { emoji: "❄️", power: "Saturn's Judgment", detail: "Immobilise an enemy piece for 2 turns. Even kings have cowered before Shani's gaze." },
+
+  RAVANA: { emoji: "👑", power: "Ten-Headed Queen", detail: "This piece moves like a queen for 1 turn. Ten heads see all directions — no square is safe." },
+  HIRANYA: { emoji: "🛡️", power: "Brahma's Boon", detail: "This piece cannot be captured for 2 turns. Hiranyakashipu was granted invincibility — now so are you." },
+  SHUKRA_ASURA: { emoji: "💫", power: "Dark Resurrection", detail: "Your pawns promote to any piece type you've already captured when they reach the halfway rank." },
+  MAHISHA: { emoji: "🐃", power: "Shapeshift", detail: "Transform this piece into any type you have already captured. Mahishasura wore many forms." },
+  BALI: { emoji: "🙏", power: "Demon's Grace", detail: "Resurrect a captured piece on the square where it died, but only if the square is empty. Even in defeat, Bali returns. The piece won't be able to move immediately." },
+  SHUMBHA: { emoji: "👥", power: "Twin Strike", detail: "Capture an enemy piece then snap back to your origin square. Strike and vanish like the twin demons." },
+  TARAKA: { emoji: "💀", power: "Type Lock", detail: "This piece can only be captured by a piece of the same type for 3 turns. Tarakasura's curse binds your enemy." },
+  KALI_ASURA: { emoji: "⚔️", power: "Wrathful Smite", detail: "Capture any adjacent enemy piece, ignoring all movement rules. Kali's wrath knows no geometry." },
+  VRITRA: { emoji: "🐍", power: "Rank Blockade", detail: "Enemy pieces cannot enter or cross this piece's rank for 2 turns. Vritra seals the river." },
 };
 
 export default function MobileCardOverlay({
   show, onClose, tier1Unlocked, tier2Unlocked, tier3Unlocked,
   selectedCard, onSelectCard, gameMode, getCardCost, currentTurn,
-  usedCards, cardCooldowns
+  usedCards, cardCooldowns, playerDeck
 }) {
   const [previewId, setPreviewId] = useState(null);
 
   if (!show) return null;
 
   const trayCardId = previewId || selectedCard?.id || null;
-  const trayCard = trayCardId ? SHARED_DECK.find(c => c.id === trayCardId) : null;
+  const activeDeck = (gameMode === "shukracharya" && playerDeck === "asura") ? ASURA_DECK : SHARED_DECK;
+  const trayCard = trayCardId ? activeDeck.find(c => c.id === trayCardId) : null;
   const trayInfo = trayCardId ? TRAY_INFO[trayCardId] : null;
 
   const canUseTray = trayCard
@@ -127,7 +138,7 @@ export default function MobileCardOverlay({
         {/* ── Card Grid ── */}
         <div style={{ padding: "0 14px 36px" }}>
           {[1, 2, 3].map(tier => {
-            const tierCards = SHARED_DECK.filter(c => c.tier === tier);
+            const tierCards = (gameMode === "shukracharya" && playerDeck === "asura" ? ASURA_DECK : SHARED_DECK).filter(c => c.tier === tier);
             const isUnlocked = (tier === 1 && tier1Unlocked) || (tier === 2 && tier2Unlocked) || (tier === 3 && tier3Unlocked);
             return (
               <div key={tier} style={{ marginBottom: "18px" }}>

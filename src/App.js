@@ -76,6 +76,7 @@ function App() {
   const [showNavagraha, setShowNavagraha] = useState(false);
   const [cardPlayedThisTurn, setCardPlayedThisTurn] = useState(false);
   const [shukraAsuraPromo, setShukraAsuraPromo] = useState(null); // { square, gc }
+  const [shukraDeck, setShukraDeck] = useState("navagraha"); // "navagraha" | "asura"
   // Mobile UI state
   const [showCardOverlay, setShowCardOverlay] = useState(false);
   const { stockfish, stockfishRef, stockfishMoveRef } = useStockfish(gameMode, gameStarted, shukraDifficulty);
@@ -274,7 +275,10 @@ function App() {
   // ─────────────────────────────────────────────────────────────────────────────
   function applyCardToPiece(square) {
     if (!selectedCard) return;
-    if (cardPlayedThisTurn) return;
+    if (cardPlayedThisTurn) {
+      alert("You've already played a card this turn! One card per turn.");
+      return;
+    }
     const piece = game.get(square);
     const currentPlayer = game.turn();
 
@@ -340,7 +344,7 @@ function App() {
         return (
           cap.color === currentPlayer &&
           inRadius &&
-          (!occ || occ.color !== currentPlayer)
+          !occ
         );
       });
       if (avail.length === 0) {
@@ -418,7 +422,7 @@ function App() {
         return (
           cap.color === currentPlayer &&
           inRadius &&
-          (!occ || occ.color !== currentPlayer)
+          !occ
         );
       });
       if (avail.length === 0) {
@@ -1050,11 +1054,13 @@ function App() {
     setGame(gc);
   }
 
-  function startGame(mode, difficulty = null) {
-    const time = (mode === "asura" || mode === "shukracharya") ? 300 : 180;
+  function startGame(mode, difficulty = null, deck = "navagraha") {
+    const time = (mode === "asura" || mode === "shukracharya") ?
+      300 : 180;
     setStartingTime(time); setWhiteTime(time); setBlackTime(time);
     setGameMode(mode); setGameStarted(true); setShowShukraSelect(false);
     if (difficulty) setShukraDifficulty(difficulty);
+    if (mode === "shukracharya") setShukraDeck(deck);
   }
 
   function resetGame() {
@@ -1075,6 +1081,7 @@ function App() {
     setCardPlayedThisTurn(false);
     setGuruDuplicateMode(null);
     setDuplicatePieces({});
+    setShukraDeck("navagraha");
   }
 
   const { background, darkSquare, lightSquare, accent, text } = getTheme(gameMode);
@@ -1177,9 +1184,14 @@ function App() {
                   </>
                 ) : (
                   <div style={{ backgroundColor: "rgba(232,213,163,0.15)", border: "2px solid #e8d5a3", borderRadius: "12px", padding: "16px", textAlign: "center" }}>
-                    <p style={{ color: "#e8d5a3", fontWeight: "bold", fontSize: "13px", marginBottom: "12px", marginTop: 0 }}>Choose your challenge:</p>
-                    {[{ key: "initiate", label: "🌿 Sadhak", sub: "Initiate · ~800 ELO" }, { key: "shishya", label: "🌱 Shishya", sub: "Student · ~1200 ELO" }, { key: "acharya", label: "📚 Acharya", sub: "Teacher · ~1500 ELO" }, { key: "guru", label: "🔱 Guru", sub: "Master · ~2000 ELO" }].map(({ key, label, sub }) => (<div key={key} style={{ marginBottom: "8px" }}>
-                      <button onClick={() => startGame("shukracharya", key)} style={{ padding: "10px 16px", fontSize: "14px", backgroundColor: "#e8d5a3", color: "#1a0a00", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "2px" }}>{label}</button>
+                    <p style={{ color: "#e8d5a3", fontWeight: "bold", fontSize: "13px", marginBottom: "8px", marginTop: 0 }}>Choose your deck:</p>
+                    <div style={{ display: "flex", gap: "8px", marginBottom: "14px", justifyContent: "center" }}>
+                      {[{ id: "navagraha", label: "🌟 Navagraha" }, { id: "asura", label: "👹 Asura" }].map(({ id, label }) => (
+                        <button key={id} onClick={() => setShukraDeck(id)} style={{ padding: "8px 14px", fontSize: "12px", backgroundColor: shukraDeck === id ? "#e8d5a3" : "transparent", color: shukraDeck === id ? "#1a0a00" : "#e8d5a3", border: "2px solid #e8d5a3", borderRadius: "8px", cursor: "pointer", fontWeight: "bold" }}>{label}</button>
+                      ))}
+                    </div>
+                    <p style={{ color: "#e8d5a3", fontWeight: "bold", fontSize: "13px", marginBottom: "12px", marginTop: 0 }}>Choose your challenge:</p>                    {[{ key: "initiate", label: "🌿 Sadhak", sub: "Initiate · ~800 ELO" }, { key: "shishya", label: "🌱 Shishya", sub: "Student · ~1200 ELO" }, { key: "acharya", label: "📚 Acharya", sub: "Teacher · ~1500 ELO" }, { key: "guru", label: "🔱 Guru", sub: "Master · ~2000 ELO" }].map(({ key, label, sub }) => (<div key={key} style={{ marginBottom: "8px" }}>
+                      <button onClick={() => startGame("shukracharya", key, shukraDeck)} style={{ padding: "10px 16px", fontSize: "14px", backgroundColor: "#e8d5a3", color: "#1a0a00", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "2px" }}>{label}</button>
                       <p style={{ fontSize: "13px", color: "#ddd", margin: 0 }}>{sub}</p>
                     </div>
                     ))}

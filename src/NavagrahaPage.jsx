@@ -309,15 +309,15 @@ export default function NavagrahaPage({ onBack }) {
           {/* Intro */}
           <div className={`ng-intro ng-fade-up ${visible ? "show" : ""}`} style={{ transitionDelay: "0.15s" }}>
             <p>
-              The <em>Navagraha</em> (नवग्रह) are the nine celestial bodies of Hindu cosmology — 
-              the seven classical planets plus the two shadow nodes of the Moon. They govern fate, 
-              time, and every aspect of earthly life. Astrologers have charted their movements for 
+              The <em>Navagraha</em> (नवग्रह) are the nine celestial bodies of Hindu cosmology —
+              the seven classical planets plus the two shadow nodes of the Moon. They govern fate,
+              time, and every aspect of earthly life. Astrologers have charted their movements for
               millennia to understand fortune and karma.
             </p>
             <p>
-              In Chessuranga, each Graha descends onto the board as a power card. Place their 
-              <em> yantra</em> (energy tile) on any square, then move a piece into its radius to 
-              receive their blessing. Cards unlock as your pieces grow stronger — capture a pawn 
+              In Chessuranga, each Graha descends onto the board as a power card. Place their
+              <em> yantra</em> (energy tile) on any square, then move a piece into its radius to
+              receive their blessing. Cards unlock as your pieces grow stronger — capture a pawn
               to awaken Tier 1, a knight or bishop for Tier 2, a rook or queen for Tier 3.
             </p>
             <p>
@@ -389,6 +389,42 @@ export default function NavagrahaPage({ onBack }) {
                 </div>
               );
             })}
+            {/* ── Asura Section ── */}
+            <div className={`ng-fade-up ${visible ? "show" : ""}`} style={{ transitionDelay: "0.5s", margin: "60px 0 0", borderTop: "1px solid rgba(255,80,50,0.15)", paddingTop: "48px" }}>
+              <div style={{ textAlign: "center", marginBottom: "32px" }}>
+                <div style={{ fontFamily: "'Cinzel', serif", fontSize: "11px", letterSpacing: "0.3em", color: "#c0522a", textTransform: "uppercase", marginBottom: "12px", opacity: 0.8 }}>असुर · The Demon Lords</div>
+                <h2 style={{ fontFamily: "'Cinzel', serif", fontSize: "clamp(22px, 5vw, 36px)", fontWeight: 700, color: "#e87050", marginBottom: "16px" }}>The Asura</h2>
+                <p style={{ fontSize: "15px", color: "#a08070", maxWidth: "560px", margin: "0 auto", lineHeight: 1.8, fontStyle: "italic" }}>
+                  Nine demon lords drawn from the great epics — the Ramayana, the Mahabharata, the Puranas. Where the Navagraha offer cosmic blessing, the Asura bring raw power, cunning, and chaos.
+                </p>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
+                {[
+                  { emoji: "👑", name: "Ravana", sanskrit: "रावण", domain: "King of Lanka, lord of ten heads", power: "Ten-Headed Queen — moves like a queen for one turn" },
+                  { emoji: "🛡️", name: "Hiranyakashipu", sanskrit: "हिरण्यकशिपु", domain: "The golden-armoured, granted invincibility by Brahma", power: "Brahma's Boon — cannot be captured for 2 turns" },
+                  { emoji: "💫", name: "Shukracharya", sanskrit: "शुक्राचार्य", domain: "Guru of the Asuras, master of dark resurrection", power: "Dark Resurrection — pawns promote to any captured piece type at the halfway rank" },
+                  { emoji: "🐃", name: "Mahishasura", sanskrit: "महिषासुर", domain: "The buffalo demon, conqueror of the heavens", power: "Shapeshift — transform into any piece type you have already captured" },
+                  { emoji: "🙏", name: "Bali", sanskrit: "बलि", domain: "Noble demon king, master of sacrifice and return", power: "Demon's Grace — resurrect a captured piece where it fell" },
+                  { emoji: "👥", name: "Shumbha-Nishumbha", sanskrit: "शुम्भ-निशुम्भ", domain: "The twin demon generals who shook the cosmos", power: "Twin Strike — capture an enemy then snap back to your origin square" },
+                  { emoji: "💀", name: "Tarakasura", sanskrit: "तारकासुर", domain: "The star demon, nearly impossible to destroy", power: "Type Lock — can only be captured by a piece of the same type for 3 turns" },
+                  { emoji: "⚔️", name: "Kali", sanskrit: "काली", domain: "Goddess of destruction, beyond all rule and reason", power: "Wrathful Smite — capture any adjacent piece, ignoring all movement rules" },
+                  { emoji: "🐍", name: "Vritra", sanskrit: "वृत्र", domain: "The serpent of drought, who sealed the rivers of heaven", power: "Rank Blockade — enemy pieces cannot cross this piece's rank for 2 turns" },
+                ].map(a => (
+                  <div key={a.name} style={{ backgroundColor: "rgba(180,50,20,0.06)", border: "1px solid rgba(200,80,40,0.15)", borderRadius: "12px", padding: "18px 20px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px" }}>
+                      <span style={{ fontSize: "24px" }}>{a.emoji}</span>
+                      <div>
+                        <div style={{ fontFamily: "'Cinzel', serif", fontSize: "15px", color: "#e87050", fontWeight: 600 }}>{a.name}</div>
+                        <div style={{ fontSize: "11px", color: "#7a5040", letterSpacing: "0.05em" }}>{a.sanskrit}</div>
+                      </div>
+                    </div>
+                    <div style={{ fontSize: "13px", color: "#906050", marginBottom: "8px", fontStyle: "italic" }}>{a.domain}</div>
+                    <div style={{ fontSize: "13px", color: "#c87050", borderLeft: "2px solid rgba(200,80,40,0.3)", paddingLeft: "10px" }}>{a.power}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
