@@ -1412,9 +1412,10 @@ function App() {
               )}
 
               <div>
-                <h3 style={{ marginBottom: "10px", textAlign: "center", fontSize: "16px" }}>🌟 Navagraha</h3>
+                <h3 style={{ marginBottom: "10px", textAlign: "center", fontSize: "16px" }}>{gameMode === "shukracharya" && shukraDeck === "asura" ? "👹 Asura" : "🌟 Navagraha"}</h3>
                 {[1, 2, 3].map(tier => {
-                  const tierCards = SHARED_DECK.filter(c => c.tier === tier);
+                  const activeDeck = (gameMode === "shukracharya" && shukraDeck === "asura") ? ASURA_DECK : SHARED_DECK;
+                  const tierCards = activeDeck.filter(c => c.tier === tier);
                   const isUnlocked = (tier === 1 && tier1Unlocked) || (tier === 2 && tier2Unlocked) || (tier === 3 && tier3Unlocked);
                   return (
                     <div key={tier} style={{ marginBottom: "15px" }}>
