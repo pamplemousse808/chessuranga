@@ -1829,7 +1829,7 @@ function App() {
               </button>
             </div>
 
-            {/* Card overlay */}
+          {/* Card overlay */}
             <MobileCardOverlay
               show={showCardOverlay}
               onClose={() => setShowCardOverlay(false)}
@@ -1843,6 +1843,7 @@ function App() {
               currentTurn={game.turn()}
               usedCards={usedCards}
               cardCooldowns={cardCooldowns}
+              playerDeck={shukraDeck}
             />
           </div>
         )}
