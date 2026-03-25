@@ -312,9 +312,16 @@ function App() {
     // ─── SWITCH on card id ──────────────────────────────────────────────────────
 
     // ── Direct power cards (assign to poweredPieces immediately) ───────────────
-    // RAHU / RAVANA — phase walk (pass through pieces)
-    if (cardId === "RAHU" || cardId === "RAVANA") {
+    // RAHU — phase walk (pass through pieces)
+    if (cardId === "RAHU") {
       setPoweredPieces(prev => ({ ...prev, [square]: { power: "RAHU", usesLeft: 2 } }));
+      commitCard();
+      return;
+    }
+
+    // RAVANA — moves like a queen for 1 turn
+    if (cardId === "RAVANA") {
+      setPoweredPieces(prev => ({ ...prev, [square]: { power: "RAVANA", usesLeft: 2 } }));
       commitCard();
       return;
     }
@@ -330,33 +337,6 @@ function App() {
     if (cardId === "SURYA" || cardId === "HIRANYA") {
       setPoweredPieces(prev => ({ ...prev, [square]: { power: "SURYA", usesLeft: 4 } }));
       commitCard();
-      return;
-    }
-
-    // SHUKRA (Navagraha) — resurrection
-    if (cardId === "SHUKRA") {
-      const shukraRadius = SHARED_DECK.find(c => c.id === "SHUKRA")?.radius ?? 2;
-      const avail = captureHistory.filter(cap => {
-        const occ = game.get(cap.square);
-        const fileDiff = Math.abs(cap.square.charCodeAt(0) - square.charCodeAt(0));
-        const rankDiff = Math.abs(parseInt(cap.square[1]) - parseInt(square[1]));
-        const inRadius = fileDiff <= shukraRadius && rankDiff <= shukraRadius;
-        return (
-          cap.color === currentPlayer &&
-          inRadius &&
-          !occ
-        );
-      });
-      if (avail.length === 0) {
-        alert("No captured pieces to resurrect in range!");
-        return;
-      }
-      commitCard();
-      setGuruMode({
-        tileSquare: square,
-        playerColor: currentPlayer,
-        availableResurrections: avail,
-      });
       return;
     }
 
@@ -1830,7 +1810,7 @@ function App() {
               </button>
             </div>
 
-          {/* Card overlay */}
+            {/* Card overlay */}
             <MobileCardOverlay
               show={showCardOverlay}
               onClose={() => setShowCardOverlay(false)}
