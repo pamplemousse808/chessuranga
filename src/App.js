@@ -368,7 +368,6 @@ function App() {
         alert("Shukracharya's mirror can only be applied to a pawn!");
         return;
       }
-      const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
       const file = square[0];
       const rank = parseInt(square[1]);
       const direction = piece.color === "w" ? 1 : -1;
@@ -397,7 +396,7 @@ function App() {
       setGame(ng);
       commitCard();
       return;
-    } 
+    }
 
     // ── CHANDRA — clone flow (existing chandraPlacementMode unchanged) ──────────
     if (cardId === "CHANDRA") {
@@ -702,7 +701,7 @@ function App() {
         const fp = gc.fen().split(" "); fp[1] = fp[1] === "w" ? "b" : "w"; gc.load(fp.join(" "));
         setBudhaSquare(to); // lock second move to this square
       }
-    
+
       if (cp) {
         const cpHadKetu = poweredPieces[to]?.power === "KETU";
         const ketuStartSq = poweredPieces[to]?.startSquare; // read BEFORE cleanup
@@ -1102,7 +1101,7 @@ function App() {
 
   Object.keys(poweredPieces).forEach(sq => { const p = poweredPieces[sq]; if (!p?.power) return; const card = SHARED_DECK.find(c => c.id === p.power); if (card) customStyles[sq] = { ...(customStyles[sq] || {}), border: `4px solid ${card.color}`, boxShadow: `0 0 20px ${card.color}, inset 0 0 15px ${card.color}88` }; });
   Object.keys(frozenPieces).forEach(sq => { customStyles[sq] = { ...(customStyles[sq] || {}), border: "4px solid #1f2937", backgroundColor: "rgba(31,41,55,0.7)", boxShadow: "inset 0 0 20px rgba(31,41,55,0.9)" }; });
-Object.keys(tarakaProtected).forEach(sq => { customStyles[sq] = { ...(customStyles[sq] || {}), border: "4px solid #1A1A1A", boxShadow: "0 0 20px #666, inset 0 0 15px rgba(100,100,100,0.5)" }; });  if (guruMode) guruMode.availableResurrections.forEach(r => { customStyles[r.square] = { ...(customStyles[r.square] || {}), backgroundColor: "rgba(168,85,247,0.4)", border: "3px dashed #a855f7", boxShadow: "0 0 20px rgba(168,85,247,0.6)", cursor: "pointer" }; });
+  Object.keys(tarakaProtected).forEach(sq => { customStyles[sq] = { ...(customStyles[sq] || {}), border: "4px solid #1A1A1A", boxShadow: "0 0 20px #666, inset 0 0 15px rgba(100,100,100,0.5)" }; }); if (guruMode) guruMode.availableResurrections.forEach(r => { customStyles[r.square] = { ...(customStyles[r.square] || {}), backgroundColor: "rgba(168,85,247,0.4)", border: "3px dashed #a855f7", boxShadow: "0 0 20px rgba(168,85,247,0.6)", cursor: "pointer" }; });
   if (shaniMode) {
     const borderColor = shaniMode.cardId === "MANGALA" ? "#ef4444" : "#1f2937";
     const bgColor = shaniMode.cardId === "MANGALA"
