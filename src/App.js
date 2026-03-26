@@ -168,7 +168,6 @@ function App() {
     ng.put({ type: piece.type, color: piece.color }, targetSq);
     setGame(ng);
     setDuplicatePieces(prev => ({ ...prev, [targetSq]: { turnsLeft: 4, originalSquare: square } }));
-    console.log("set duplicate at:", targetSq);
     setGuruDuplicateMode(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [guruDuplicateMode?.side]);
@@ -788,7 +787,16 @@ function App() {
             poweredPiecesRef.current[m.to].usesLeft > 0)
         );
         const movesToUse = safeMoves.length > 0 ? safeMoves : moves;
-        const randomMove = movesToUse[Math.floor(Math.random() * movesToUse.length)];
+        // Filter out Taraka-protected squares the bot can't legally capture
+        const validMoves = movesToUse.filter(m => {
+          if (tarakaProtected[m.to]) {
+            const attacker = new Chess(game.fen()).get(m.from);
+            if (attacker?.type !== tarakaProtected[m.to].pieceType) return false;
+          }
+          if (vritraRanks.some(v => v.rank === parseInt(m.to[1]) && v.color !== "w")) return false;
+          return true;
+        });
+        const randomMove = (validMoves.length > 0 ? validMoves : movesToUse)[Math.floor(Math.random() * (validMoves.length > 0 ? validMoves : movesToUse).length)];
         const ng = new Chess(game.fen());
         const rcp = ng.get(randomMove.to);
         const rcpHadKetu = poweredPiecesRef.current[randomMove.to]?.power === "KETU";
@@ -827,6 +835,31 @@ function App() {
         // ✅ Check KETU before the move removes the piece from the board
         const scp = ng.get(fm.to);
         const scpHadKetu = poweredPiecesRef.current[fm.to]?.power === "KETU";
+        // ── TARAKA — bot cannot capture if wrong piece type ──
+        if (scp && tarakaProtected[fm.to]) {
+          const attackerType = ng.get(fm.from)?.type;
+          if (attackerType !== tarakaProtected[fm.to].pieceType) {
+            const alt = ng.moves({ verbose: true }).find(m =>
+              !(tarakaProtected[m.to] && ng.get(m.from)?.type !== tarakaProtected[m.to].pieceType) &&
+              !(poweredPiecesRef.current[m.to]?.power === "SURYA" && poweredPiecesRef.current[m.to].usesLeft > 0) &&
+              !vritraRanks.some(v => v.rank === parseInt(m.to[1]) && v.color !== "b")
+            );
+            if (alt) fm = { from: alt.from, to: alt.to, promotion: alt.promotion || "q" };
+            else { setWaitingForBot(false); return; }
+          }
+        }
+
+        // ── VRITRA — bot cannot move to a blocked rank ──
+        if (vritraRanks.some(v => v.rank === parseInt(fm.to[1]) && v.color !== "b")) {
+          const alt = ng.moves({ verbose: true }).find(m =>
+            !vritraRanks.some(v => v.rank === parseInt(m.to[1]) && v.color !== "b") &&
+            !(tarakaProtected[m.to] && ng.get(m.from)?.type !== tarakaProtected[m.to].pieceType) &&
+            !(poweredPiecesRef.current[m.to]?.power === "SURYA" && poweredPiecesRef.current[m.to].usesLeft > 0)
+          );
+          if (alt) fm = { from: alt.from, to: alt.to, promotion: alt.promotion || "q" };
+          else { setWaitingForBot(false); return; }
+        }
+
         const res = ng.move(fm);
         if (res) {
           if (scp) {
@@ -874,10 +907,7 @@ function App() {
 
     // ── GURU resurrection target selection ─────────────────────────────────────
     if (guruMode) {
-      console.log("guruMode squares:", guruMode.availableResurrections.map(r => r.square));
-      console.log("clicked square:", square);
       const res = guruMode.availableResurrections.filter(r => r.square === square);
-      console.log("matched:", res);
       if (res.length === 1) performResurrection(res[0], square);
       else if (res.length > 1) setGuruPickerMode({ square, options: res });
       return;
