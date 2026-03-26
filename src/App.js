@@ -353,7 +353,6 @@ function App() {
       commitCard();
       return;
     }
-    console.log("tarakaProtected:", tarakaProtected, "to:", to, "from:", from);
     // VRITRA — enemy pieces can't cross this piece's rank for 2 turns
     if (cardId === "VRITRA") {
       const rank = parseInt(square[1]);
