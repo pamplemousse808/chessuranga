@@ -74,8 +74,7 @@ export const ASURA_DECK = [
   // Tier 1
   { id: "RAVANA", name: "Ravana", color: "#8B0000", radius: 3, tier: 1, cost: 8, description: "Moves like a queen for 1 turn — ten heads see all directions", image: "/images/ravana.jpg" },
   { id: "HIRANYA", name: "Hiranya", color: "#B8860B", radius: 2, tier: 1, cost: 8, description: "Cannot be captured for 2 turns — Brahma's boon of invincibility", image: "/images/hiranyakasipu.jpg" },
-  { id: "SHUKRA_ASURA", name: "Shukracharya", color: "#C2185B", radius: 1, tier: 1, cost: 11, description: "Pawns promote to any captured piece type when reaching halfway", image: "/images/shukracharya.jpg" },
-  // Tier 2
+  { id: "SHUKRA_ASURA", name: "Shukracharya", color: "#C2185B", radius: 1, tier: 1, cost: 11, description: "Transform this pawn into the first enemy piece it faces on its file", image: "/images/shukracharya.jpg" },  // Tier 2
   { id: "MAHISHA", name: "Mahishasura", color: "#2D5A1B", radius: 2, tier: 2, cost: 10, description: "Shapeshift into any piece type you have captured", image: "/images/mahishasura.jpg" },
   { id: "BALI", name: "Bali", color: "#6B3FA0", radius: 2, tier: 2, cost: 9, description: "Resurrect a captured piece where it died", image: "/images/bali.jpg" },
   { id: "SHUMBHA", name: "Shumbha-Nishumbha", color: "#7A3B00", radius: 1, tier: 2, cost: 12, description: "Capture an enemy piece then snap back to your origin square", image: "/images/shumbhanishumbha.jpg" },

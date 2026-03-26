@@ -15,7 +15,7 @@ const TRAY_INFO = {
 
   RAVANA: { emoji: "👑", power: "Ten-Headed Queen", detail: "This piece moves like a queen for 1 turn. Ten heads see all directions — no square is safe." },
   HIRANYA: { emoji: "🛡️", power: "Brahma's Boon", detail: "This piece cannot be captured for 2 turns. Hiranyakashipu was granted invincibility — now so are you." },
-  SHUKRA_ASURA: { emoji: "💫", power: "Dark Resurrection", detail: "Your pawns promote to any piece type you've already captured when they reach the halfway rank." },
+  SHUKRA_ASURA: { emoji: "💫", power: "Mirror of Shukra", detail: "Transform this pawn into the first enemy piece it faces on its file. Shukracharya taught the Asuras to mirror divine power." },
   MAHISHA: { emoji: "🐃", power: "Shapeshift", detail: "Transform this piece into any type you have already captured. Mahishasura wore many forms." },
   BALI: { emoji: "🙏", power: "Demon's Grace", detail: "Resurrect a captured piece on the square where it died, but only if the square is empty. Even in defeat, Bali returns. The piece won't be able to move immediately." },
   SHUMBHA: { emoji: "👥", power: "Twin Strike", detail: "Capture an enemy piece then snap back to your origin square. Strike and vanish like the twin demons." },
@@ -63,7 +63,7 @@ export default function MobileCardOverlay({
         <div style={{ width: "40px", height: "4px", backgroundColor: "#334155", borderRadius: "2px", margin: "12px auto 0" }} />
 
         <h3 style={{ color: "#e2e8f0", textAlign: "center", margin: "10px 0 12px", fontSize: "15px", fontFamily: "inherit" }}>
-          ✨ Navagraha Powers
+          {gameMode === "shukracharya" && playerDeck === "asura" ? "👹 Asura Powers" : "✨ Navagraha Powers"}
         </h3>
 
         {/* ── Description Tray ── */}

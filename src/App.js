@@ -362,12 +362,42 @@ function App() {
       return;
     }
 
-    // SHUKRA_ASURA — pawns promote to any captured piece type at halfway
+    // SHUKRA_ASURA — transform pawn into first enemy piece on its file
     if (cardId === "SHUKRA_ASURA") {
-      setPoweredPieces(prev => ({ ...prev, [square]: { power: "SHUKRA_ASURA", usesLeft: 6 } }));
+      if (piece.type !== "p") {
+        alert("Shukracharya's mirror can only be applied to a pawn!");
+        return;
+      }
+      const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
+      const file = square[0];
+      const rank = parseInt(square[1]);
+      const direction = piece.color === "w" ? 1 : -1;
+      let targetPiece = null;
+      for (let r = rank + direction; r >= 1 && r <= 8; r += direction) {
+        const sq = file + r;
+        const p = game.get(sq);
+        if (p) {
+          if (p.color !== piece.color) {
+            if (p.type === "k") {
+              alert("Shukracharya cannot mirror the king!");
+              return;
+            }
+            targetPiece = p;
+          }
+          break;
+        }
+      }
+      if (!targetPiece) {
+        alert("No enemy piece on this file to mirror!");
+        return;
+      }
+      const ng = new Chess(game.fen());
+      ng.remove(square);
+      ng.put({ type: targetPiece.type, color: piece.color }, square);
+      setGame(ng);
       commitCard();
       return;
-    }
+    } 
 
     // ── CHANDRA — clone flow (existing chandraPlacementMode unchanged) ──────────
     if (cardId === "CHANDRA") {
@@ -569,10 +599,10 @@ function App() {
         }
       }
       if (frozenPieces[from]) return null;
-      // ── NEW: VRITRA — White cannot move to a blocked rank ──
-      if (vritraRanks.length > 0 && piece && piece.color === "w") {
+      // ── VRITRA — opponent cannot move to a blocked rank ──
+      if (vritraRanks.length > 0 && piece) {
         const targetRank = parseInt(to[1]);
-        if (vritraRanks.some(v => v.rank === targetRank)) return null;
+        if (vritraRanks.some(v => v.rank === targetRank && v.color !== piece.color)) return null;
       }
       if (cp && poweredPieces[to]?.power === "SURYA" && poweredPieces[to].usesLeft > 0) return null;
 
@@ -626,11 +656,25 @@ function App() {
           else if (piece.type === "k") validStrike = fileDiff <= 1 && rankDiff <= 1;
         }
         if (validStrike && originSquare) {
-          // Remove the captured piece, return striker to origin
-          gc.remove(from);
-          gc.remove(to);
-          gc.put({ type: piece.type, color: piece.color }, originSquare);
-          const fp = gc.fen().split(" "); fp[1] = fp[1] === "w" ? "b" : "w"; gc.load(fp.join(" "));
+          // Step 1: show piece at captured square briefly
+          const gcStep1 = new Chess(game.fen());
+          gcStep1.remove(from);
+          gcStep1.remove(to);
+          gcStep1.put({ type: piece.type, color: piece.color }, to);
+          setGame(gcStep1);
+
+          // Step 2: after 500ms, snap back to origin
+          setTimeout(() => {
+            const gcStep2 = new Chess(gcStep1.fen());
+            gcStep2.remove(to);
+            gcStep2.put({ type: piece.type, color: piece.color }, originSquare);
+            const fp = gcStep2.fen().split(" "); fp[1] = fp[1] === "w" ? "b" : "w"; gcStep2.load(fp.join(" "));
+            setGame(gcStep2);
+            setMoveCount(p => p + 1);
+            setCardPlayedThisTurn(false);
+            tickAsuraCounters();
+          }, 500);
+
           moveWasMade = true;
         }
       }
@@ -658,19 +702,7 @@ function App() {
         const fp = gc.fen().split(" "); fp[1] = fp[1] === "w" ? "b" : "w"; gc.load(fp.join(" "));
         setBudhaSquare(to); // lock second move to this square
       }
-      // ── SHUKRA_ASURA — black pawn promotes at rank 4 ──
-      if (piece.color === "b" && piece.type === "p" && parseInt(to[1]) === 4) {
-        const movedPiece = gc.get(to);
-        if (movedPiece && poweredPieces[from]?.power === "SHUKRA_ASURA") {
-          setShukraAsuraPromo({ square: to, gc });
-          setGame(gc);
-          tickAsuraCounters();
-          setMoveCount(p => p + 1);
-          setCardPlayedThisTurn(false);
-          return gc;
-        }
-      }
-
+    
       if (cp) {
         const cpHadKetu = poweredPieces[to]?.power === "KETU";
         const ketuStartSq = poweredPieces[to]?.startSquare; // read BEFORE cleanup
@@ -1070,8 +1102,7 @@ function App() {
 
   Object.keys(poweredPieces).forEach(sq => { const p = poweredPieces[sq]; if (!p?.power) return; const card = SHARED_DECK.find(c => c.id === p.power); if (card) customStyles[sq] = { ...(customStyles[sq] || {}), border: `4px solid ${card.color}`, boxShadow: `0 0 20px ${card.color}, inset 0 0 15px ${card.color}88` }; });
   Object.keys(frozenPieces).forEach(sq => { customStyles[sq] = { ...(customStyles[sq] || {}), border: "4px solid #1f2937", backgroundColor: "rgba(31,41,55,0.7)", boxShadow: "inset 0 0 20px rgba(31,41,55,0.9)" }; });
-  Object.keys(resurrectedPieces).forEach(sq => { customStyles[sq] = { ...(customStyles[sq] || {}), border: "4px solid #a855f7", boxShadow: "0 0 25px #a855f7, inset 0 0 20px rgba(168,85,247,0.6)", animation: "resurrectPulse 2s infinite" }; });
-  if (guruMode) guruMode.availableResurrections.forEach(r => { customStyles[r.square] = { ...(customStyles[r.square] || {}), backgroundColor: "rgba(168,85,247,0.4)", border: "3px dashed #a855f7", boxShadow: "0 0 20px rgba(168,85,247,0.6)", cursor: "pointer" }; });
+Object.keys(tarakaProtected).forEach(sq => { customStyles[sq] = { ...(customStyles[sq] || {}), border: "4px solid #1A1A1A", boxShadow: "0 0 20px #666, inset 0 0 15px rgba(100,100,100,0.5)" }; });  if (guruMode) guruMode.availableResurrections.forEach(r => { customStyles[r.square] = { ...(customStyles[r.square] || {}), backgroundColor: "rgba(168,85,247,0.4)", border: "3px dashed #a855f7", boxShadow: "0 0 20px rgba(168,85,247,0.6)", cursor: "pointer" }; });
   if (shaniMode) {
     const borderColor = shaniMode.cardId === "MANGALA" ? "#ef4444" : "#1f2937";
     const bgColor = shaniMode.cardId === "MANGALA"
