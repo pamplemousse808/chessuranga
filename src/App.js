@@ -353,7 +353,7 @@ function App() {
       commitCard();
       return;
     }
-
+    console.log("tarakaProtected:", tarakaProtected, "to:", to, "from:", from);
     // VRITRA — enemy pieces can't cross this piece's rank for 2 turns
     if (cardId === "VRITRA") {
       const rank = parseInt(square[1]);
@@ -590,13 +590,13 @@ function App() {
         return null;
       }
 
-      // ── NEW: TARAKASURA — can only be captured by same piece type ──
-      if (cp && tarakaProtected[to]) {
-        const attackerType = game.get(from)?.type;
-        if (attackerType !== tarakaProtected[to].pieceType) {
+      // ── TARAKASURA — can only be captured by same piece type ──
+      if (cp && cp.color !== piece.color && tarakaProtected[to]) {
+        if (piece.type !== tarakaProtected[to].pieceType) {
           return null;
         }
       }
+      console.log("tarakaProtected:", tarakaProtected, "to:", to, "from:", from);
       if (frozenPieces[from]) return null;
       // ── VRITRA — opponent cannot move to a blocked rank ──
       if (vritraRanks.length > 0 && piece) {
@@ -887,7 +887,12 @@ function App() {
         const fromSq = shaniMode.fromSquare;
         const movingPiece = game.get(fromSq);
         if (!movingPiece) { setShaniMode(null); return; }
-        const ng = new Chess(game.fen());
+        // Taraka protection — block if attacker is wrong piece type
+        if (tarakaProtected[square] && movingPiece.type !== tarakaProtected[square].pieceType) {
+          alert("That piece is protected by Tarakasura — only a " + tarakaProtected[square].pieceType.toUpperCase() + " can capture it!");
+          setShaniMode(null);
+          return;
+        } const ng = new Chess(game.fen());
         ng.remove(fromSq);
         ng.remove(square);
         ng.put({ type: movingPiece.type, color: movingPiece.color }, square);
