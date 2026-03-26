@@ -731,7 +731,15 @@ function App() {
           setBlackCaptured([...blackCaptured, cp.type]);
         } checkTierUnlocks(cp.type);
       }
-
+      // ── Move tarakaProtected with the piece ──
+      if (tarakaProtected[from]) {
+        setTarakaProtected(prev => {
+          const updated = { ...prev };
+          updated[to] = updated[from];
+          delete updated[from];
+          return updated;
+        });
+      }
       const np3 = { ...poweredPieces };
       if (cp && np3[to]) delete np3[to];
       if (power) {
@@ -885,13 +893,14 @@ function App() {
         // MANGALA: move the piece to the target square, capturing it
         const fromSq = shaniMode.fromSquare;
         const movingPiece = game.get(fromSq);
-        if (!movingPiece) { setShaniMode(null); return; }
         // Taraka protection — block if attacker is wrong piece type
+        if (!movingPiece) { setShaniMode(null); return; }
         if (tarakaProtected[square] && movingPiece.type !== tarakaProtected[square].pieceType) {
-          alert("That piece is protected by Tarakasura — only a " + tarakaProtected[square].pieceType.toUpperCase() + " can capture it!");
+          alert("Tarakasura's curse — only a " + tarakaProtected[square].pieceType + " can capture this piece!");
           setShaniMode(null);
           return;
-        } const ng = new Chess(game.fen());
+        }
+        const ng = new Chess(game.fen());
         ng.remove(fromSq);
         ng.remove(square);
         ng.put({ type: movingPiece.type, color: movingPiece.color }, square);
