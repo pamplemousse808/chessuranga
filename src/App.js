@@ -1279,8 +1279,8 @@ function App() {
 
               {/* Navagraha Explained */}
               <div style={{ textAlign: "center", maxWidth: "200px" }}>
-                <button onClick={() => setShowNavagraha(true)} style={{ padding: "16px 24px", fontSize: "16px", background: "linear-gradient(135deg, #9333ea, #6b21a8)", color: "#fff", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px", boxShadow: "0 0 20px rgba(147,51,234,0.3)" }}>🌟 Navagraha Explained</button>
-                <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>The nine celestial forces — their mythology and powers explained.</p>
+                <button onClick={() => setShowNavagraha(true)} style={{ padding: "16px 24px", fontSize: "16px", background: "linear-gradient(135deg, #9333ea, #6b21a8)", color: "#fff", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px", boxShadow: "0 0 20px rgba(147,51,234,0.3)" }}>🌟 Navagraha & Asura Lore</button>
+                <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>The celestial and demonic mythology and powers explained.</p>
               </div>
 
               {/* About */}

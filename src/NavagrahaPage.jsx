@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { SHARED_DECK } from "./gameConstants";
+import { SHARED_DECK, ASURA_DECK } from "./gameConstants";
 
 const GRAHA_LORE = {
   SURYA: {
@@ -93,7 +93,98 @@ const GRAHA_LORE = {
     power: "Martyr's Curse — if this piece is captured, you gain 12 seconds and your opponent loses 12. Ketu turns sacrifice into power. The enemy who takes this piece pays dearly for it.",
   },
 };
-
+const ASURA_LORE_LIST = [
+  {
+    id: "RAVANA",
+    name: "Ravana", sanskrit: "रावण", symbol: "👑",
+    title: "King of Lanka", color: "#8B0000",
+    domain: "Sovereignty, ten-headed genius, sorcery, conquest",
+    image: "/images/ravana.jpg",
+    lore: "Ravana was the greatest king Lanka ever knew — scholar, warrior, and devotee of Shiva, possessed of ten heads each holding the knowledge of a lifetime. He was not merely a demon; he was the finest mind of his age, whose pride alone brought him low. On the chessboard, Ravana sees every direction at once.",
+    powerName: "Ten-Headed Queen",
+    power: "The selected piece moves like a queen for one full turn — any direction, any distance. Ten heads, ten perspectives, one unstoppable move.",
+  },
+  {
+    id: "HIRANYA",
+    name: "Hiranyakashipu", sanskrit: "हिरण्यकशिपु", symbol: "🛡️",
+    title: "The Golden-Armoured", color: "#B8860B",
+    domain: "Invincibility, divine defiance, iron will, cosmic pride",
+    image: "/images/hiranyakasipu.jpg",
+    lore: "Hiranyakashipu performed tapas so severe that Brahma himself was forced to grant him a boon of near-total invincibility — not killed by man nor beast, not by day nor night, not inside nor outside. He ruled the cosmos until Vishnu found the one crack in that armour. Until then, no force could touch him.",
+    powerName: "Brahma's Boon",
+    power: "The piece cannot be captured for 2 turns. Every attack slides off. Enemies must simply wait — and hope the boon expires before it's too late.",
+  },
+  {
+    id: "SHUKRA_ASURA",
+    name: "Shukracharya", sanskrit: "शुक्राचार्य", symbol: "💫",
+    title: "Guru of the Asuras", color: "#C2185B",
+    domain: "Dark resurrection, forbidden knowledge, transformation, time",
+    image: "/images/shukracharya.jpg",
+    lore: "Shukracharya alone holds the Mritasanjivani — the secret mantra that defeats death itself. Guru of all demons, he taught them every art, every stratagem. He is the reason the Asuras survive catastrophe after catastrophe. His greatest weapon is the art of becoming something the enemy never expected.",
+    powerName: "Mirror Ascension",
+    power: "Apply to a pawn — it transforms into the first enemy piece on its file. Shukracharya doesn't promote pawns. He replaces them with something worse.",
+  },
+  {
+    id: "MAHISHA",
+    name: "Mahishasura", sanskrit: "महिषासुर", symbol: "🐃",
+    title: "The Buffalo Demon", color: "#2D5A1B",
+    domain: "Shapeshifting, conquest, unstoppable force, divine defiance",
+    image: "/images/mahishasura.jpg",
+    lore: "Mahishasura conquered the heavens by changing shape faster than the gods could strike. Buffalo, lion, man, elephant — he was every creature at once, and none. It took Durga herself, fighting for nine days and nights, to finally pin him down. His power is the power of being impossible to predict.",
+    powerName: "Shapeshift",
+    power: "Transform into any piece type you have already captured from your opponent. The piece moves immediately in its new form. Become what you have already overcome.",
+  },
+  {
+    id: "BALI",
+    name: "Bali", sanskrit: "बलि", symbol: "🙏",
+    title: "The Noble King", color: "#6B3FA0",
+    domain: "Sacrifice, generosity, death and return, cosmic honour",
+    image: "/images/bali.jpg",
+    lore: "Bali was so righteous that Vishnu himself had to intervene to stop his rule — disguised as a dwarf, Vamana, begging for three steps of land before growing to encompass the universe. Even then, Bali gave willingly. His nobility was such that Vishnu granted him sovereignty over the underworld. Death is not the end for one so honoured.",
+    powerName: "Demon's Grace",
+    power: "Resurrect one of your captured pieces on the square where it fell. The returned piece is ready to move immediately — Bali's grace restores without hesitation.",
+  },
+  {
+    id: "SHUMBHA",
+    name: "Shumbha-Nishumbha", sanskrit: "शुम्भ-निशुम्भ", symbol: "👥",
+    title: "The Twin Generals", color: "#7A3B00",
+    domain: "Dual nature, guerrilla warfare, strike and vanish, chaos",
+    image: "/images/shumbhanishumbha.jpg",
+    lore: "Shumbha and Nishumbha were the twin demon generals who drove the gods from heaven and seized the cosmos. They fought not with brute force alone but with cunning — striking from unexpected angles, retreating before the counterattack could land. Together they were nearly impossible to pin down, two minds acting as one terrible weapon.",
+    powerName: "Twin Strike",
+    power: "The piece captures an adjacent enemy then immediately snaps back to its origin square. Strike and vanish — the enemy is gone, and you are exactly where you were.",
+  },
+  {
+    id: "TARAKA",
+    name: "Tarakasura", sanskrit: "तारकासुर", symbol: "💀",
+    title: "The Star Demon", color: "#555555",
+    domain: "Near-invincibility, cosmic terror, divine weakness, endurance",
+    image: "/images/tarakasura.jpg",
+    lore: "Tarakasura received a boon that only the son of Shiva could ever destroy him — and Shiva had sworn celibacy. For an age, Tarakasura was effectively immortal, terrorising the heavens with impunity. He could only be harmed by one specific kind of being. The gods had to engineer Kartikeya's very birth to end his reign.",
+    powerName: "Type Lock",
+    power: "For 3 turns, this piece can only be captured by an enemy piece of the same type. A pawn can only fall to a pawn. A rook only to a rook. Choose your protector wisely.",
+  },
+  {
+    id: "KALI_ASURA",
+    name: "Kali", sanskrit: "काली", symbol: "⚔️",
+    title: "The Dark Mother", color: "#4A0E4E",
+    domain: "Destruction, liberation, divine fury, the end of all things",
+    image: "/images/kali.jpg",
+    lore: "Kali is not a demon — she is the goddess of destruction herself, born from Durga's fury when the battle against Raktabija grew desperate. She drank the demon's blood before it could touch the ground and multiply. She dances on corpses. She wears a garland of severed heads. She operates beyond every rule chess has ever known.",
+    powerName: "Wrathful Smite",
+    power: "Capture any adjacent enemy piece — no movement rules apply. Kali doesn't care whether a bishop moves diagonally or a rook in straight lines. If it's next to her, it dies.",
+  },
+  {
+    id: "VRITRA",
+    name: "Vritra", sanskrit: "वृत्र", symbol: "🐍",
+    title: "The Serpent of Drought", color: "#0A2A4A",
+    domain: "Blockade, cosmic obstruction, the sealed horizon, control",
+    image: "/images/vritra.jpg",
+    lore: "Vritra was the great serpent who coiled around the rivers of heaven and sealed them, plunging the world into drought. Not even Indra, king of the gods, could break through — until Vishnu intervened and Indra struck with a thunderbolt made of sage Dadhichi's bones. Vritra does not fight. He simply blocks, and the world withers.",
+    powerName: "Rank Blockade",
+    power: "For 2 turns, no enemy piece can enter or cross this piece's rank. The entire row becomes a wall. Plan your advance, because no one is getting through.",
+  },
+];
 export default function NavagrahaPage({ onBack }) {
   const [visible, setVisible] = useState(false);
   const [expanded, setExpanded] = useState(null);
@@ -389,42 +480,75 @@ export default function NavagrahaPage({ onBack }) {
                 </div>
               );
             })}
-            {/* ── Asura Section ── */}
-            <div className={`ng-fade-up ${visible ? "show" : ""}`} style={{ transitionDelay: "0.5s", margin: "60px 0 0", borderTop: "1px solid rgba(255,80,50,0.15)", paddingTop: "48px" }}>
-              <div style={{ textAlign: "center", marginBottom: "32px" }}>
-                <div style={{ fontFamily: "'Cinzel', serif", fontSize: "11px", letterSpacing: "0.3em", color: "#c0522a", textTransform: "uppercase", marginBottom: "12px", opacity: 0.8 }}>असुर · The Demon Lords</div>
-                <h2 style={{ fontFamily: "'Cinzel', serif", fontSize: "clamp(22px, 5vw, 36px)", fontWeight: 700, color: "#e87050", marginBottom: "16px" }}>The Asura</h2>
-                <p style={{ fontSize: "15px", color: "#a08070", maxWidth: "560px", margin: "0 auto", lineHeight: 1.8, fontStyle: "italic" }}>
-                  Nine demon lords drawn from the great epics — the Ramayana, the Mahabharata, the Puranas. Where the Navagraha offer cosmic blessing, the Asura bring raw power, cunning, and chaos.
-                </p>
-              </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
-                {[
-                  { emoji: "👑", name: "Ravana", sanskrit: "रावण", domain: "King of Lanka, lord of ten heads", power: "Ten-Headed Queen — moves like a queen for one turn" },
-                  { emoji: "🛡️", name: "Hiranyakashipu", sanskrit: "हिरण्यकशिपु", domain: "The golden-armoured, granted invincibility by Brahma", power: "Brahma's Boon — cannot be captured for 2 turns" },
-                  { emoji: "💫", name: "Shukracharya", sanskrit: "शुक्राचार्य", domain: "Guru of the Asuras, master of dark resurrection", power: "Dark Resurrection — pawns promote to any captured piece type at the halfway rank" },
-                  { emoji: "🐃", name: "Mahishasura", sanskrit: "महिषासुर", domain: "The buffalo demon, conqueror of the heavens", power: "Shapeshift — transform into any piece type you have already captured" },
-                  { emoji: "🙏", name: "Bali", sanskrit: "बलि", domain: "Noble demon king, master of sacrifice and return", power: "Demon's Grace — resurrect a captured piece where it fell" },
-                  { emoji: "👥", name: "Shumbha-Nishumbha", sanskrit: "शुम्भ-निशुम्भ", domain: "The twin demon generals who shook the cosmos", power: "Twin Strike — capture an enemy then snap back to your origin square" },
-                  { emoji: "💀", name: "Tarakasura", sanskrit: "तारकासुर", domain: "The star demon, nearly impossible to destroy", power: "Type Lock — can only be captured by a piece of the same type for 3 turns" },
-                  { emoji: "⚔️", name: "Kali", sanskrit: "काली", domain: "Goddess of destruction, beyond all rule and reason", power: "Wrathful Smite — capture any adjacent piece, ignoring all movement rules" },
-                  { emoji: "🐍", name: "Vritra", sanskrit: "वृत्र", domain: "The serpent of drought, who sealed the rivers of heaven", power: "Rank Blockade — enemy pieces cannot cross this piece's rank for 2 turns" },
-                ].map(a => (
-                  <div key={a.name} style={{ backgroundColor: "rgba(180,50,20,0.06)", border: "1px solid rgba(200,80,40,0.15)", borderRadius: "12px", padding: "18px 20px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px" }}>
-                      <span style={{ fontSize: "24px" }}>{a.emoji}</span>
-                      <div>
-                        <div style={{ fontFamily: "'Cinzel', serif", fontSize: "15px", color: "#e87050", fontWeight: 600 }}>{a.name}</div>
-                        <div style={{ fontSize: "11px", color: "#7a5040", letterSpacing: "0.05em" }}>{a.sanskrit}</div>
+          {/* ── Asura Section ── */}
+          <section className={`ng-fade-up ${visible ? "show" : ""}`} style={{ transitionDelay: "0.5s", marginTop: "80px" }}>
+            <div style={{ textAlign: "center", marginBottom: "48px", borderTop: "1px solid rgba(255,80,50,0.15)", paddingTop: "56px" }}>
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "11px", letterSpacing: "0.3em", color: "#c0522a", textTransform: "uppercase", marginBottom: "12px", opacity: 0.8 }}>असुर · The Demon Lords</div>
+              <h2 style={{ fontFamily: "'Cinzel', serif", fontSize: "clamp(28px, 6vw, 48px)", fontWeight: 700, lineHeight: 1.05, background: "linear-gradient(135deg, #ff6b3d 0%, #c0391b 40%, #e8603a 80%, #ff6b3d 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", marginBottom: "14px" }}>The Asura</h2>
+              <p style={{ fontSize: "17px", fontStyle: "italic", color: "#a08070", maxWidth: "560px", margin: "0 auto 8px", lineHeight: 1.8 }}>
+                Nine demon lords drawn from the great epics. Where the Navagraha offer cosmic blessing, the Asura bring raw power, cunning, and chaos.
+              </p>
+              <div style={{ width: "60px", height: "2px", background: "linear-gradient(90deg, transparent, #c0522a, transparent)", margin: "24px auto 0" }} />
+            </div>
+
+            <div className="ng-grid">
+              {ASURA_LORE_LIST.map(a => {
+                const isOpen = expanded === a.id;
+                const card = ASURA_DECK.find(c => c.id === a.id);
+                const tierLabel = card?.tier === 1 ? "Tier I" : card?.tier === 2 ? "Tier II" : "Tier III";
+                return (
+                  <div
+                    key={a.id}
+                    className={`ng-card ${isOpen ? "open" : ""}`}
+                    style={{
+                      borderColor: isOpen ? `${a.color}55` : "rgba(255,80,50,0.12)",
+                      boxShadow: isOpen ? `0 0 40px ${a.color}22` : "none",
+                    }}
+                    onClick={() => !isOpen && setExpanded(a.id)}
+                  >
+                    <div className="ng-card-img-wrap">
+                      <img src={a.image} alt={a.name} className="ng-card-img" />
+                      <div className="ng-card-img-gradient" style={{ background: "linear-gradient(to bottom, transparent 40%, rgba(6,4,4,0.97) 100%)" }} />
+                      <div className="ng-card-header">
+                        <div className="ng-card-sanskrit" style={{ color: "#c0522a" }}>{a.sanskrit} · {tierLabel}</div>
+                        <div className="ng-card-name">{a.symbol} {a.name}</div>
+                        <div className="ng-card-title">{a.title}</div>
                       </div>
                     </div>
-                    <div style={{ fontSize: "13px", color: "#906050", marginBottom: "8px", fontStyle: "italic" }}>{a.domain}</div>
-                    <div style={{ fontSize: "13px", color: "#c87050", borderLeft: "2px solid rgba(200,80,40,0.3)", paddingLeft: "10px" }}>{a.power}</div>
+
+                    {isOpen ? (
+                      <div className="ng-card-body">
+                        <div className="ng-domain-pills">
+                          {a.domain.split(", ").map(d => (
+                            <span key={d} className="ng-domain-pill" style={{ color: a.color, borderColor: `${a.color}55`, backgroundColor: `${a.color}11` }}>
+                              {d}
+                            </span>
+                          ))}
+                        </div>
+                        <p className="ng-lore">{a.lore}</p>
+                        <div className="ng-power-block" style={{ backgroundColor: `${a.color}0d`, borderColor: a.color }}>
+                          <div className="ng-power-label" style={{ color: a.color }}>Chess Power · {card?.cost}s cost</div>
+                          <div className="ng-power-name" style={{ color: a.color }}>{a.powerName}</div>
+                          <div className="ng-power-desc">{a.power}</div>
+                        </div>
+                        <div style={{ textAlign: "center", marginTop: "20px" }}>
+                          <button
+                            onClick={e => { e.stopPropagation(); setExpanded(null); }}
+                            style={{ background: "none", border: "1px solid rgba(255,80,50,0.2)", color: "#a08070", borderRadius: "20px", padding: "8px 20px", cursor: "pointer", fontFamily: "'Cinzel', serif", fontSize: "11px", letterSpacing: "0.1em" }}
+                          >
+                            ↑ Collapse
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="ng-expand-hint" style={{ color: "#5a3020" }}>{a.domain.split(", ")[0]} · Tap to reveal</div>
+                    )}
                   </div>
-                ))}
-              </div>
+                );
+              })}
             </div>
+          </section>
           </div>
         </div>
 
