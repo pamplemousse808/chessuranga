@@ -492,8 +492,27 @@ export default function PvpTabletLayout({
   setGuruDuplicateMode,
 }) {
   const currentTurn = game.turn();
-  const tabletBoard = Math.min(window.innerWidth - 24, 560);
-
+  const tabletBoard = Math.min(window.innerWidth - 24, 480);
+  const customPieces = {};
+  ["wP", "wN", "wB", "wR", "wQ", "wK", "bP", "bN", "bB", "bR", "bQ", "bK"].forEach(piece => {
+    customPieces[piece] = ({ squareWidth }) => (
+      <div style={{
+        width: squareWidth,
+        height: squareWidth,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: squareWidth * 0.75,
+        transform: piece.startsWith("b") ? "rotate(180deg)" : "none",
+        userSelect: "none",
+      }}>
+        {({
+          wK: "♔", wQ: "♕", wR: "♖", wB: "♗", wN: "♘", wP: "♙",
+          bK: "♚", bQ: "♛", bR: "♜", bB: "♝", bN: "♞", bP: "♟",
+        })[piece]}
+      </div>
+    );
+  });
   const wUsed = whiteUsedCards ?? usedCards ?? [];
   const bUsed = blackUsedCards ?? usedCards ?? [];
 
@@ -633,7 +652,7 @@ export default function PvpTabletLayout({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "6px 16px 4px",
+            padding: "3px 16px 2px",
             backgroundColor: currentTurn === "b" ? "rgba(233,69,96,0.12)" : "transparent",
             transition: "background-color 0.4s",
           }}
@@ -677,12 +696,11 @@ export default function PvpTabletLayout({
         ════════════════════════════════════════ */}
         <div
           style={{
-            flex: 1,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            justifyContent: "center",
-            padding: "4px 0",
+            justifyContent: "flex-start",
+            padding: "2px 0",
             width: "100%",
           }}
         >
@@ -757,13 +775,32 @@ export default function PvpTabletLayout({
               customLightSquareStyle={{ backgroundColor: theme.lightSquare }}
               boardWidth={tabletBoard}
               boardOrientation="white"
-            />
+              customPieces={customPieces} />
           </div>
 
           <button
+            onClick={() => {
+              const el = document.documentElement;
+              if (el.requestFullscreen) el.requestFullscreen();
+              else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+            }}
+            style={{
+              marginTop: "4px",
+              padding: "6px 16px",
+              fontSize: "11px",
+              backgroundColor: "transparent",
+              color: "#444",
+              border: "1px solid #2a2a2a",
+              borderRadius: "20px",
+              cursor: "pointer",
+            }}
+          >
+            ⛶ Fullscreen
+          </button>
+          <button
             onClick={resetGame}
             style={{
-              marginTop: "8px",
+              marginTop: "4px",
               padding: "8px 20px",
               fontSize: "12px",
               backgroundColor: "transparent",
@@ -800,7 +837,7 @@ export default function PvpTabletLayout({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "6px 16px 12px",
+            padding: "3px 16px 4px",
             backgroundColor: currentTurn === "w" ? "rgba(78,204,163,0.12)" : "transparent",
             transition: "background-color 0.4s",
           }}
