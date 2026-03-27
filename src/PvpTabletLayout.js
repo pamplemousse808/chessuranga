@@ -524,11 +524,13 @@ export default function PvpTabletLayout({
           flexDirection: "column",
           alignItems: "center",
           minHeight: "100vh",
+          height: "100vh",
           width: "100%",
           backgroundColor: theme.background,
           color: theme.text,
           userSelect: "none",
           overscrollBehavior: "none",
+          justifyContent: "space-between",
         }}
       >
         {/* ── Chaos popup ── */}
@@ -789,7 +791,7 @@ export default function PvpTabletLayout({
               padding: "6px 16px",
               fontSize: "11px",
               backgroundColor: "transparent",
-              color: "#444",
+              color: "#dadada",
               border: "1px solid #2a2a2a",
               borderRadius: "20px",
               cursor: "pointer",
@@ -804,7 +806,7 @@ export default function PvpTabletLayout({
               padding: "8px 20px",
               fontSize: "12px",
               backgroundColor: "transparent",
-              color: "#555",
+              color: "#dadada",
               border: "1px solid #333",
               borderRadius: "20px",
               cursor: "pointer",
