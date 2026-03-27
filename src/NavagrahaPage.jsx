@@ -480,9 +480,9 @@ export default function NavagrahaPage({ onBack }) {
                 </div>
               );
             })}
-
+          </div>
           {/* ── Asura Section ── */}
-          <section className={`ng-fade-up ${visible ? "show" : ""}`} style={{ transitionDelay: "0.5s", marginTop: "80px" }}>
+          <div className={`ng-fade-up ${visible ? "show" : ""}`} style={{ transitionDelay: "0.5s", marginTop: "80px" }}>
             <div style={{ textAlign: "center", marginBottom: "48px", borderTop: "1px solid rgba(255,80,50,0.15)", paddingTop: "56px" }}>
               <div style={{ fontFamily: "'Cinzel', serif", fontSize: "11px", letterSpacing: "0.3em", color: "#c0522a", textTransform: "uppercase", marginBottom: "12px", opacity: 0.8 }}>असुर · The Demon Lords</div>
               <h2 style={{ fontFamily: "'Cinzel', serif", fontSize: "clamp(28px, 6vw, 48px)", fontWeight: 700, lineHeight: 1.05, background: "linear-gradient(135deg, #ff6b3d 0%, #c0391b 40%, #e8603a 80%, #ff6b3d 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", marginBottom: "14px" }}>The Asura</h2>
@@ -548,15 +548,14 @@ export default function NavagrahaPage({ onBack }) {
                 );
               })}
             </div>
-          </section>
           </div>
-        </div>
 
-        <footer className="ng-footer">
-          ♟ CHESSURANGA — May the Navagraha guide your moves
-          <br />
-          <span style={{ fontSize: "11px", opacity: 0.5 }}>© {new Date().getFullYear()} Chessuranga. All rights reserved.</span>
-        </footer>
+          <footer className="ng-footer">
+            ♟ CHESSURANGA — May the Navagraha guide your moves
+            <br />
+            <span style={{ fontSize: "11px", opacity: 0.5 }}>© {new Date().getFullYear()} Chessuranga. All rights reserved.</span>
+          </footer>
+        </div>
       </div>
     </>
   );
