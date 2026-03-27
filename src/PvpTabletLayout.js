@@ -505,7 +505,9 @@ export default function PvpTabletLayout({
         fontSize: squareWidth * 0.75,
         transform: piece.startsWith("b") ? "rotate(180deg)" : "none",
         userSelect: "none",
-        filter: "drop-shadow(0px 0px 2px rgba(0,0,0,0.9)) drop-shadow(0px 0px 4px rgba(0,0,0,0.7))",
+        filter: piece.startsWith("w")
+          ? "drop-shadow(0px 0px 1px rgba(78,204,163,0.8)) drop-shadow(0px 0px 3px rgba(78,204,163,0.4))"
+          : "drop-shadow(0px 0px 1px rgba(233,69,96,0.8)) drop-shadow(0px 0px 3px rgba(233,69,96,0.4))",
       }}>
         {({
           wK: "♔", wQ: "♕", wR: "♖", wB: "♗", wN: "♘", wP: "♙",
