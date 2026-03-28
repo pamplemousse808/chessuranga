@@ -59,7 +59,7 @@ const getTheme = function (gameMode) {
     case "pvp":
       return {
         background: "#1a1a2e",
-        darkSquare: "#2a2a2a",
+        darkSquare: "#222222",
         lightSquare: "#c0c0c0",
         accent: "#4ecca3",
         text: "#eee",
