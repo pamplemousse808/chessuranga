@@ -171,7 +171,6 @@ export default function DailyPuzzle({ onBack }) {
             setTimeout(() => {
                 setGame(prev => {
                     if (prev.isGameOver()) return prev;
-                    const bg = new Chess(prev.fen());
                     const allMoves = bg.moves({ verbose: true });
                     // Bot respects SURYA — filter out captures of protected pieces
                     const safeMoves = allMoves.filter(m => {
@@ -180,7 +179,17 @@ export default function DailyPuzzle({ onBack }) {
                     });
                     const moveset = safeMoves.length ? safeMoves : allMoves;
                     if (!moveset.length) return prev;
-                    bg.move(moveset[Math.floor(Math.random() * moveset.length)]);
+
+                    // Heuristic: checkmate > captures by value > checks > random
+                    const CAPTURE_VALUE = { q: 9, r: 5, b: 3, n: 3, p: 1, k: 0 };
+                    const checkmates = moveset.filter(m => { const t = new Chess(bg.fen()); t.move(m); return t.isCheckmate(); });
+                    if (checkmates.length) { bg.move(checkmates[0]); }
+                    else {
+                        const captures = moveset.filter(m => m.captured).sort((a, b) => (CAPTURE_VALUE[b.captured] || 0) - (CAPTURE_VALUE[a.captured] || 0));
+                        const checks = moveset.filter(m => { const t = new Chess(bg.fen()); t.move(m); return t.inCheck(); });
+                        const preferred = captures.length ? captures : checks.length ? checks : moveset;
+                        bg.move(preferred[Math.floor(Math.random() * preferred.length)]);
+                    }
                     setMoveHistory(mh => [...mh, { isBot: true }]);
                     if (bg.isCheckmate()) {
                         setPuzzleOver({ result: "failed", moves: newMoveCount });
