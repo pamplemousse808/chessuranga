@@ -18,10 +18,12 @@ export default function DailyPuzzle({ onBack }) {
     const [poweredPieces, setPoweredPieces] = useState({});
     const [frozenPieces, setFrozenPieces] = useState({});
     const [puzzleOver, setPuzzleOver] = useState(null);
-    const [, setCaptureHistory] = useState([]);
+    const [captureHistory, setCaptureHistory] = useState([]);
     const [moveHistory, setMoveHistory] = useState([]);
     const [attempts, setAttempts] = useState(1);
     const [shaniMode, setShaniMode] = useState(null);
+    const [budhaSquare, setBudhaSquare] = useState(null);
+    const [guruPieces, setGuruPieces] = useState({}); // sq -> turnsLeft
 
     const par = dailyData?.par || 3;
 
@@ -35,6 +37,27 @@ export default function DailyPuzzle({ onBack }) {
         } catch (e) { }
         return null;
     });
+
+    // ── Tick frozen pieces down after each player move ───────────────────────
+    useEffect(() => {
+        if (moveCount === 0) return;
+        setFrozenPieces(prev => {
+            const next = { ...prev };
+            Object.keys(next).forEach(sq => {
+                next[sq] = { ...next[sq], turnsLeft: next[sq].turnsLeft - 1 };
+                if (next[sq].turnsLeft <= 0) delete next[sq];
+            });
+            return next;
+        });
+        setGuruPieces(prev => {
+            const next = { ...prev };
+            Object.keys(next).forEach(sq => {
+                next[sq] = next[sq] - 1;
+                if (next[sq] <= 0) delete next[sq];
+            });
+            return next;
+        });
+    }, [moveCount]);
 
     useEffect(() => {
         fetch('/api/daily-puzzle')
@@ -73,6 +96,10 @@ export default function DailyPuzzle({ onBack }) {
         const pc = dailyData?.playerColor || "w";
         const piece = game.get(from); if (!piece || piece.color !== pc) return null;
         if (frozenPieces[from]) return null;
+
+        // BUDHA second-move lock
+        if (budhaSquare && from !== budhaSquare) return null;
+
         const cp = game.get(to);
         const power = poweredPieces[from];
         let gc = new Chess(game.fen()); let moved = false;
@@ -106,6 +133,9 @@ export default function DailyPuzzle({ onBack }) {
             const fp = gc.fen().split(" ");
             fp[1] = pc;
             gc.load(fp.join(" "));
+            setBudhaSquare(to); // lock second move to this piece
+        } else {
+            setBudhaSquare(null);
         }
 
         const np = { ...poweredPieces };
@@ -115,6 +145,11 @@ export default function DailyPuzzle({ onBack }) {
             const nu = power.usesLeft - 1;
             if (nu > 0) np[to] = { ...power, usesLeft: nu };
         }
+        // Move any guru duplicate that was on `from` to `to`
+        const ng = { ...guruPieces };
+        if (ng[from]) { ng[to] = ng[from]; delete ng[from]; }
+        setGuruPieces(ng);
+
         setPoweredPieces(np);
         if (cp) setCaptureHistory(prev => [...prev, { piece: cp.type, square: to, color: cp.color }]);
 
@@ -137,9 +172,15 @@ export default function DailyPuzzle({ onBack }) {
                 setGame(prev => {
                     if (prev.isGameOver()) return prev;
                     const bg = new Chess(prev.fen());
-                    const moves = bg.moves({ verbose: true });
-                    if (!moves.length) return prev;
-                    bg.move(moves[Math.floor(Math.random() * moves.length)]);
+                    const allMoves = bg.moves({ verbose: true });
+                    // Bot respects SURYA — filter out captures of protected pieces
+                    const safeMoves = allMoves.filter(m => {
+                        const target = np[m.to];
+                        return !(target?.power === "SURYA" && target.usesLeft > 0);
+                    });
+                    const moveset = safeMoves.length ? safeMoves : allMoves;
+                    if (!moveset.length) return prev;
+                    bg.move(moveset[Math.floor(Math.random() * moveset.length)]);
                     setMoveHistory(mh => [...mh, { isBot: true }]);
                     if (bg.isCheckmate()) {
                         setPuzzleOver({ result: "failed", moves: newMoveCount });
@@ -155,22 +196,84 @@ export default function DailyPuzzle({ onBack }) {
 
     function onSquareClick(square) {
         if (puzzleOver || game.turn() !== dailyData?.playerColor) return;
+
+        // ── SHANI two-step: waiting for enemy target ─────────────────────────
+        if (shaniMode) {
+            const piece = game.get(square);
+            if (piece && piece.color !== dailyData.playerColor) {
+                setFrozenPieces(prev => ({ ...prev, [square]: { turnsLeft: 2 } }));
+            }
+            setShaniMode(null);
+            return;
+        }
+
+        // ── Card application: tap your own piece to assign power ─────────────
         if (selectedCard) {
             const piece = game.get(square);
             if (!piece || piece.color !== dailyData.playerColor) return;
-            setPoweredPieces(prev => ({ ...prev, [square]: { power: selectedCard.id, usesLeft: selectedCard.id === "BUDHA" ? 2 : selectedCard.id === "SHANI" ? 4 : 4 } }));
+
+            if (selectedCard.id === "SHANI") {
+                // SHANI: record who applied it, then prompt for enemy target
+                setShaniMode({ fromSquare: square });
+                setCardsUsed(prev => [...prev, selectedCard.id]);
+                setAvailableCards(prev => prev.filter(c => c.id !== selectedCard.id));
+                setMoveHistory(prev => [...prev, { isBot: false, cardUsed: selectedCard.id }]);
+                setMoveCount(prev => prev + 1);
+                setSelectedCard(null);
+                return;
+            }
+
+            if (selectedCard.id === "GURU") {
+                // GURU: place a duplicate on an adjacent empty square
+                const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
+                const fi = files.indexOf(square[0]);
+                const rank = parseInt(square[1]);
+                const candidates = [];
+                for (let df = -1; df <= 1; df++) {
+                    for (let dr = -1; dr <= 1; dr++) {
+                        if (df === 0 && dr === 0) continue;
+                        const nf = fi + df, nr = rank + dr;
+                        if (nf >= 0 && nf < 8 && nr >= 1 && nr <= 8) {
+                            const sq = files[nf] + nr;
+                            if (!game.get(sq)) candidates.push(sq);
+                        }
+                    }
+                }
+                if (!candidates.length) { setSelectedCard(null); return; } // no room
+                // Pick the candidate closest to the centre (or just first)
+                const dupSq = candidates[0];
+                const gc = new Chess(game.fen());
+                gc.put({ type: piece.type, color: piece.color }, dupSq);
+                setGame(gc);
+                setGuruPieces(prev => ({ ...prev, [dupSq]: 2 }));
+                setCardsUsed(prev => [...prev, selectedCard.id]);
+                setAvailableCards(prev => prev.filter(c => c.id !== selectedCard.id));
+                setMoveHistory(prev => [...prev, { isBot: false, cardUsed: selectedCard.id }]);
+                setMoveCount(prev => prev + 1);
+                setSelectedCard(null);
+                return;
+            }
+
+            // All other cards: assign power to piece
+            const usesLeft = selectedCard.id === "BUDHA" ? 2 : 2;
+            setPoweredPieces(prev => ({ ...prev, [square]: { power: selectedCard.id, usesLeft } }));
             setCardsUsed(prev => [...prev, selectedCard.id]);
             setAvailableCards(prev => prev.filter(c => c.id !== selectedCard.id));
             setMoveHistory(prev => [...prev, { isBot: false, cardUsed: selectedCard.id }]);
             setMoveCount(prev => prev + 1);
             setSelectedCard(null);
             return;
-        } if (shaniMode) {
-            const target = shaniMode.enemyPieces.find(p => p.square === square);
-            if (target) { setFrozenPieces(prev => ({ ...prev, [square]: { turnsLeft: 4 } })); setShaniMode(null); }
+        }
+
+        // ── BUDHA second-move: lock to budhaSquare ───────────────────────────
+        if (budhaSquare && square !== budhaSquare) return;
+
+        // ── Normal piece selection / move ────────────────────────────────────
+        if (!moveFrom) {
+            const p = game.get(square);
+            if (p && p.color === dailyData?.playerColor && !frozenPieces[square]) setMoveFrom(square);
             return;
         }
-        if (!moveFrom) { const p = game.get(square); if (p && p.color === dailyData?.playerColor && !frozenPieces[square]) setMoveFrom(square); return; }
         const tapped = game.get(square);
         if (tapped && tapped.color === dailyData?.playerColor) { setMoveFrom(square); return; }
         handleDailyMove(moveFrom, square);
@@ -180,6 +283,25 @@ export default function DailyPuzzle({ onBack }) {
     function onPieceDrop(src, tgt) {
         if (puzzleOver || selectedCard || game.turn() !== dailyData?.playerColor) return false;
         const r = handleDailyMove(src, tgt); setMoveFrom(""); return r !== null;
+    }
+
+    function resetPuzzle() {
+        const g = new Chess();
+        g.load(dailyData.fen);
+        setGame(g);
+        setMoveFrom("");
+        setMoveCount(0);
+        setCardsUsed([]);
+        setAvailableCards(dailyData.dailyCards);
+        setSelectedCard(null);
+        setPoweredPieces({});
+        setFrozenPieces({});
+        setGuruPieces({});
+        setBudhaSquare(null);
+        setShaniMode(null);
+        setMoveHistory([]);
+        setCaptureHistory([]);
+        setAttempts(a => a + 1);
     }
 
     function buildShareText() {
@@ -195,7 +317,26 @@ export default function DailyPuzzle({ onBack }) {
         const card = SHARED_DECK.find(c => c.id === p.power);
         if (card) customStyles[sq] = { ...(customStyles[sq] || {}), border: `4px solid ${card.color}`, boxShadow: `0 0 20px ${card.color}` };
     });
+    // Highlight guru duplicates
+    Object.keys(guruPieces).forEach(sq => {
+        customStyles[sq] = { ...(customStyles[sq] || {}), border: "4px solid #a855f7", boxShadow: "0 0 20px #a855f7", opacity: 0.75 };
+    });
+    // Highlight frozen pieces
+    Object.keys(frozenPieces).forEach(sq => {
+        customStyles[sq] = { ...(customStyles[sq] || {}), border: "4px solid #60a5fa", boxShadow: "0 0 16px #60a5fa" };
+    });
     if (moveFrom) customStyles[moveFrom] = { ...(customStyles[moveFrom] || {}), backgroundColor: "rgba(255,255,0,0.5)" };
+
+    // Status banner text
+    const statusBanner = shaniMode
+        ? "❄️ Tap an enemy piece to freeze"
+        : selectedCard?.id === "GURU"
+            ? "🪐 Tap one of your pieces to duplicate"
+            : selectedCard
+                ? `✨ ${selectedCard.name} selected — tap one of your pieces`
+                : budhaSquare
+                    ? "⚡ Budha: make your second move"
+                    : null;
 
     const isMobile = window.innerWidth < 768;
     const boardSize = isMobile ? Math.min(window.innerWidth - 32, 420) : 600;
@@ -280,7 +421,11 @@ export default function DailyPuzzle({ onBack }) {
                             </div>
                         );
                     })}
-                    {selectedCard && <div style={{ width: "100%", fontSize: "11px", color: "#ffd700", textAlign: "center", padding: "6px", border: "1px solid #ffd700", borderRadius: "6px" }}>✨ Tap one of your pieces to place {selectedCard.name}</div>}
+                    {statusBanner && (
+                        <div style={{ width: "100%", fontSize: "11px", color: "#ffd700", textAlign: "center", padding: "6px", border: "1px solid #ffd700", borderRadius: "6px" }}>
+                            {statusBanner}
+                        </div>
+                    )}
                 </div>
 
                 {/* Board */}
@@ -295,20 +440,24 @@ export default function DailyPuzzle({ onBack }) {
                         })}
                     </div>
 
-                    <Chessboard position={game.fen()} onPieceDrop={onPieceDrop} onSquareClick={onSquareClick} customSquareStyles={customStyles} customDarkSquareStyle={{ backgroundColor: "#4a3060" }} customLightSquareStyle={{ backgroundColor: "#d4c5e8" }} boardWidth={boardSize} boardOrientation={dailyData?.playerColor === 'b' ? 'black' : 'white'} arePiecesDraggable={!puzzleOver && game.turn() === dailyData?.playerColor} />
+                    <Chessboard
+                        position={game.fen()}
+                        onPieceDrop={onPieceDrop}
+                        onSquareClick={onSquareClick}
+                        customSquareStyles={customStyles}
+                        customDarkSquareStyle={{ backgroundColor: "#4a3060" }}
+                        customLightSquareStyle={{ backgroundColor: "#d4c5e8" }}
+                        boardWidth={boardSize}
+                        boardOrientation={dailyData?.playerColor === 'b' ? 'black' : 'white'}
+                        arePiecesDraggable={!puzzleOver && game.turn() === dailyData?.playerColor}
+                    />
 
                     <div style={{ marginTop: "10px", fontSize: "13px", color: "#d4ccda", textAlign: "center" }}>
                         {!puzzleOver && (game.turn() === dailyData?.playerColor ? "Your move — find checkmate!" : "⏳ Thinking...")}
                         {game.inCheck() && !puzzleOver && <span style={{ color: "#ff6b6b", marginLeft: "8px" }}>⚠️ Check!</span>}
                     </div>
                     {!puzzleOver && moveCount > 0 && (
-                        <button onClick={() => {
-                            const g = new Chess(); g.load(dailyData.fen); setGame(g);
-                            setMoveFrom(""); setMoveCount(0); setCardsUsed([]);
-                            setAvailableCards(dailyData.dailyCards); setSelectedCard(null);
-                            setPoweredPieces({});  
-                            setMoveHistory([]); setAttempts(a => a + 1);
-                        }} style={{ marginTop: "8px", padding: "6px 14px", backgroundColor: "transparent", border: "1px solid #2a1a30", borderRadius: "8px", color: "#e5dfeb", cursor: "pointer", fontSize: "11px" }}>
+                        <button onClick={resetPuzzle} style={{ marginTop: "8px", padding: "6px 14px", backgroundColor: "transparent", border: "1px solid #2a1a30", borderRadius: "8px", color: "#e5dfeb", cursor: "pointer", fontSize: "11px" }}>
                             ↩ Restart puzzle
                         </button>
                     )}
@@ -351,13 +500,7 @@ export default function DailyPuzzle({ onBack }) {
                             <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
                                 <button onClick={onBack} style={{ padding: "11px 20px", backgroundColor: "transparent", border: "2px solid #4a3060", borderRadius: "10px", color: "#a88a5a", cursor: "pointer", fontSize: "13px" }}>← Menu</button>
                                 <button onClick={() => { try { navigator.clipboard.writeText(shareText); alert("Copied to clipboard!"); } catch (e) { alert(shareText); } }} style={{ padding: "11px 22px", backgroundColor: "#ffd700", border: "none", borderRadius: "10px", color: "#000", cursor: "pointer", fontSize: "14px", fontWeight: "bold" }}>Copy & Share 📤</button>
-                                <button onClick={() => {
-                                    const g = new Chess(); g.load(dailyData.fen); setGame(g);
-                                    setMoveFrom(""); setMoveCount(0); setCardsUsed([]);
-                                    setAvailableCards(dailyData.dailyCards); setSelectedCard(null);
-                                    setPoweredPieces({}); 
-                                    setPuzzleOver(null); setMoveHistory([]); setAttempts(a => a + 1);
-                                }} style={{ padding: "11px 20px", backgroundColor: "transparent", border: "2px solid #4a3060", borderRadius: "10px", color: "#a88a5a", cursor: "pointer", fontSize: "13px" }}>Try Again 🔄</button>
+                                <button onClick={() => { resetPuzzle(); setPuzzleOver(null); }} style={{ padding: "11px 20px", backgroundColor: "transparent", border: "2px solid #4a3060", borderRadius: "10px", color: "#a88a5a", cursor: "pointer", fontSize: "13px" }}>Try Again 🔄</button>
                             </div>
                         </> : <>
                             <div style={{ fontSize: "56px", marginBottom: "8px" }}>💫</div>
@@ -369,13 +512,7 @@ export default function DailyPuzzle({ onBack }) {
                             </p>
                             <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
                                 <button onClick={onBack} style={{ padding: "12px 20px", backgroundColor: "transparent", border: "2px solid #4a3060", borderRadius: "10px", color: "#a88a5a", cursor: "pointer", fontSize: "13px" }}>← Menu</button>
-                                <button onClick={() => {
-                                    const g = new Chess(); g.load(dailyData.fen); setGame(g);
-                                    setMoveFrom(""); setMoveCount(0); setCardsUsed([]);
-                                    setAvailableCards(dailyData.dailyCards); setSelectedCard(null);
-                                    setPoweredPieces({}); 
-                                    setPuzzleOver(null); setMoveHistory([]); setAttempts(a => a + 1);
-                                }} style={{ padding: "12px 22px", backgroundColor: "#e94560", border: "none", borderRadius: "10px", color: "#fff", cursor: "pointer", fontSize: "14px", fontWeight: "bold" }}>
+                                <button onClick={() => { resetPuzzle(); setPuzzleOver(null); }} style={{ padding: "12px 22px", backgroundColor: "#e94560", border: "none", borderRadius: "10px", color: "#fff", cursor: "pointer", fontSize: "14px", fontWeight: "bold" }}>
                                     Try Again 🔄
                                 </button>
                             </div>
