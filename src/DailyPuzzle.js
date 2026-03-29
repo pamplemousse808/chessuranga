@@ -18,7 +18,7 @@ export default function DailyPuzzle({ onBack }) {
     const [poweredPieces, setPoweredPieces] = useState({});
     const [frozenPieces, setFrozenPieces] = useState({});
     const [puzzleOver, setPuzzleOver] = useState(null);
-    const [captureHistory, setCaptureHistory] = useState([]);
+    const [, setCaptureHistory] = useState([]);
     const [moveHistory, setMoveHistory] = useState([]);
     const [attempts, setAttempts] = useState(1);
     const [shaniMode, setShaniMode] = useState(null);
