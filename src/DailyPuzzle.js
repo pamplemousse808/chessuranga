@@ -171,6 +171,7 @@ export default function DailyPuzzle({ onBack }) {
             setTimeout(() => {
                 setGame(prev => {
                     if (prev.isGameOver()) return prev;
+                    const bg = new Chess(prev.fen());
                     const allMoves = bg.moves({ verbose: true });
                     // Bot respects SURYA — filter out captures of protected pieces
                     const safeMoves = allMoves.filter(m => {
