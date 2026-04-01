@@ -313,7 +313,7 @@ function App() {
     // ── Direct power cards (assign to poweredPieces immediately) ───────────────
     // RAHU — phase walk (pass through pieces)
     if (cardId === "RAHU") {
-      setPoweredPieces(prev => ({ ...prev, [square]: { power: "RAHU", usesLeft: 2 } }));
+      setPoweredPieces(prev => ({ ...prev, [square]: { power: "RAHU", usesLeft: 4 } }));
       commitCard();
       return;
     }
@@ -327,7 +327,7 @@ function App() {
 
     // KETU — martyr's curse 
     if (cardId === "KETU") {
-      setPoweredPieces(prev => ({ ...prev, [square]: { power: "KETU", usesLeft: 6, startSquare: square } }));
+      setPoweredPieces(prev => ({ ...prev, [square]: { power: "KETU", usesLeft: 4, startSquare: square } }));
       commitCard();
       return;
     }
