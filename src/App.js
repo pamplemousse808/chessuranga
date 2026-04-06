@@ -903,8 +903,14 @@ function App() {
     }
 
     // ── BUDHA: lock second move to the powered piece ────────────────────────────
-    if (budhaSquare && square !== budhaSquare) return;
-
+    // If budhaSquare is active: only allow tapping the budha piece to select it,
+    // or tapping a destination when the budha piece is already selected.
+    if (budhaSquare && square !== budhaSquare && moveFrom !== budhaSquare) return;
+    if (budhaSquare && moveFrom === budhaSquare) {
+      // Force the move — don't allow re-selecting a different piece
+      const tappedFriendly = game.get(square);
+      if (tappedFriendly && tappedFriendly.color === game.turn() && square !== budhaSquare) return;
+    }
     // ── GURU resurrection target selection ─────────────────────────────────────
     if (guruMode) {
       const res = guruMode.availableResurrections.filter(r => r.square === square);

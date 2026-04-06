@@ -276,8 +276,13 @@ export default function DailyPuzzle({ onBack }) {
         }
 
         // ── BUDHA second-move: lock to budhaSquare ───────────────────────────
-        if (budhaSquare && square !== budhaSquare) return;
-
+        // Block tapping anything other than the budha piece, unless it's already selected
+        if (budhaSquare && square !== budhaSquare && moveFrom !== budhaSquare) return;
+        // Once budha piece is selected, block re-selecting a different friendly piece
+        if (budhaSquare && moveFrom === budhaSquare) {
+            const tappedFriendly = game.get(square);
+            if (tappedFriendly && tappedFriendly.color === dailyData?.playerColor && square !== budhaSquare) return;
+        }
         // ── Normal piece selection / move ────────────────────────────────────
         if (!moveFrom) {
             const p = game.get(square);
