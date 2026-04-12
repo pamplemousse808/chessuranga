@@ -1243,7 +1243,7 @@ function App() {
                   <div style={{ backgroundColor: "#1a0a00", border: "2px solid #e8d5a3", borderRadius: "12px", padding: "16px", textAlign: "left" }}>
                     <p style={{ color: "#e8d5a3", fontWeight: "bold", fontSize: "13px", marginBottom: "8px", marginTop: 0 }}>Choose your deck:</p>
                     <div style={{ display: "flex", gap: "6px", marginBottom: "12px", flexWrap: "wrap" }}>
-                      {[{ id: "navagraha", label: "🌟 Navagraha" }, { id: "asura", label: "👹 Asura" }, { id: "mixed", label: "⚖️ Mixed" }].map(({ id, label }) => (
+                      {[{ id: "navagraha", label: "🌟 Navagraha" }, { id: "asura", label: "👹 Asura" }].map(({ id, label }) => (
                         <button key={id} onClick={() => setShukraDeck(id)} style={{ padding: "6px 10px", fontSize: "12px", backgroundColor: shukraDeck === id ? "#e8d5a3" : "transparent", color: shukraDeck === id ? "#1a0a00" : "#e8d5a3", border: "2px solid #e8d5a3", borderRadius: "8px", cursor: "pointer", fontWeight: "bold" }}>{label}</button>
                       ))}
                     </div>
@@ -1271,7 +1271,7 @@ function App() {
             <div style={{ display: "flex", gap: "20px", justifyContent: "center", flexWrap: "wrap", marginBottom: "40px", alignItems: "flex-start" }}>
               <div style={{ textAlign: "center", maxWidth: "200px" }}>
                 <button onClick={() => startGame("pvp")} style={{ padding: "16px 24px", fontSize: "16px", backgroundColor: "#4ecca3", color: "#000", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px" }}>🌟 Tablet Mode VS Friend</button>
-                <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>180-second bullet chess with celestial powers</p>
+                <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>Play local 1v1 against a friend</p>
               </div>
               <div style={{ textAlign: "center", maxWidth: "200px" }}>
                 <button onClick={() => setShowNavagraha(true)} style={{ padding: "16px 24px", fontSize: "16px", backgroundColor: "#a855f7", color: "#fff", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px" }}>🌟 Navagraha & Asura Lore</button>
@@ -1330,12 +1330,15 @@ function App() {
                     <div>
                       <div style={{ fontSize: "11px", color: "#e8d5a3", fontWeight: "bold", marginBottom: "8px" }}>Choose deck:</div>
                       <div style={{ display: "flex", gap: "4px", marginBottom: "8px", flexWrap: "wrap" }}>
-                        {[{ id: "navagraha", label: "🌟" }, { id: "asura", label: "👹" }, { id: "mixed", label: "⚖️" }].map(({ id, label }) => (
+                        {[{ id: "navagraha", label: "🌟" }, { id: "asura", label: "👹" }].map(({ id, label }) => (
                           <button key={id} onClick={() => setShukraDeck(id)} style={{ padding: "4px 8px", fontSize: "14px", backgroundColor: shukraDeck === id ? "#e8d5a3" : "transparent", color: shukraDeck === id ? "#1a0a00" : "#e8d5a3", border: "1px solid #e8d5a3", borderRadius: "6px", cursor: "pointer" }}>{label}</button>
                         ))}
                       </div>
-                      {[{ key: "initiate", label: "🌿 Sadhak" }, { key: "shishya", label: "🌱 Shishya" }, { key: "acharya", label: "📚 Acharya" }, { key: "guru", label: "🔱 Guru" }].map(({ key, label }) => (
-                        <button key={key} onClick={() => startGame("shukracharya", key, shukraDeck)} style={{ display: "block", width: "100%", padding: "6px 8px", fontSize: "12px", backgroundColor: "#e8d5a3", color: "#1a0a00", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold", marginBottom: "4px" }}>{label}</button>
+                      {[{ key: "initiate", label: "🌿 Sadhak", sub: "~800 ELO" }, { key: "shishya", label: "🌱 Shishya", sub: "~1200 ELO" }, { key: "acharya", label: "📚 Acharya", sub: "~1500 ELO" }, { key: "guru", label: "🔱 Guru", sub: "~2000 ELO" }].map(({ key, label, sub }) => (
+                        <div key={key} style={{ marginBottom: "4px" }}>
+                          <button onClick={() => startGame("shukracharya", key, shukraDeck)} style={{ display: "block", width: "100%", padding: "6px 8px", fontSize: "12px", backgroundColor: "#e8d5a3", color: "#1a0a00", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}>{label}</button>
+                          <div style={{ fontSize: "10px", color: "#ccc", marginTop: "1px" }}>{sub}</div>
+                        </div>
                       ))}
                       <button onClick={() => setShowShukraSelect(false)} style={{ fontSize: "10px", background: "none", border: "none", color: "#aaa", cursor: "pointer", textDecoration: "underline", marginTop: "4px" }}>← back</button>
                     </div>
@@ -1353,7 +1356,7 @@ function App() {
                 <button onClick={() => startGame("pvp")} style={{ background: "rgba(0,0,0,0.55)", border: "1px solid rgba(78,204,163,0.4)", borderRadius: "14px", padding: "16px 12px", cursor: "pointer", textAlign: "left", backdropFilter: "blur(4px)" }}>
                   <div style={{ fontSize: "22px", marginBottom: "6px" }}>🌟</div>
                   <div style={{ fontFamily: "'Cinzel', serif", fontSize: "13px", fontWeight: "bold", color: "#4ecca3", marginBottom: "4px" }}>Tablet Mode VS Friend</div>
-                  <div style={{ fontSize: "11px", color: "#a7f3d0", lineHeight: "1.4" }}>180-second bullet chess with celestial powers</div>
+                  <div style={{ fontSize: "11px", color: "#a7f3d0", lineHeight: "1.4" }}>Play local 1v1 aginst a friend</div>
                 </button>
 
                 {/* Navagraha Lore */}
