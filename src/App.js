@@ -1304,11 +1304,6 @@ function App() {
             {/* Content */}
             <div style={{ position: "relative", zIndex: 1, padding: "20px 16px 32px", display: "flex", flexDirection: "column", gap: "12px" }}>
 
-              {/* Logo wordmark */}
-              <div style={{ textAlign: "center", marginBottom: "8px" }}>
-                <span style={{ fontFamily: "'Cinzel', serif", fontSize: "28px", fontWeight: "900", color: "#ffd700", textShadow: "0 0 20px rgba(255,215,0,0.6), 0 2px 4px rgba(0,0,0,0.8)", letterSpacing: "0.1em" }}>CHESSURANGA</span>
-              </div>
-
               {/* Daily Puzzle — full width featured */}
               <button onClick={() => setGameMode("daily")} style={{ width: "100%", padding: "18px 20px", background: "linear-gradient(135deg, rgba(255,215,0,0.25), rgba(245,158,11,0.25))", border: "2px solid rgba(255,215,0,0.6)", borderRadius: "16px", cursor: "pointer", textAlign: "left", backdropFilter: "blur(4px)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -1324,7 +1319,7 @@ function App() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
 
                 {/* Shukracharya */}
-                <div style={{ background: "rgba(232,213,163,0.15)", border: "1px solid rgba(232,213,163,0.4)", borderRadius: "14px", padding: "16px 12px", backdropFilter: "blur(4px)" }}>
+                <div style={{ background: "rgba(0,0,0,0.55)", border: "1px solid rgba(232,213,163,0.4)", borderRadius: "14px", padding: "16px 12px", backdropFilter: "blur(4px)" }}>
                   {!showShukraSelect ? (
                     <button onClick={() => setShowShukraSelect(true)} style={{ background: "none", border: "none", cursor: "pointer", width: "100%", textAlign: "left", padding: 0 }}>
                       <div style={{ fontSize: "22px", marginBottom: "6px" }}>☄️</div>
@@ -1348,21 +1343,21 @@ function App() {
                 </div>
 
                 {/* Asura Horde */}
-                <button onClick={() => startGame("asura")} style={{ background: "rgba(255,68,68,0.2)", border: "1px solid rgba(255,68,68,0.5)", borderRadius: "14px", padding: "16px 12px", cursor: "pointer", textAlign: "left", backdropFilter: "blur(4px)" }}>
+                <button onClick={() => startGame("asura")} style={{ background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,68,68,0.5)", borderRadius: "14px", padding: "16px 12px", cursor: "pointer", textAlign: "left", backdropFilter: "blur(4px)" }}>
                   <div style={{ fontSize: "22px", marginBottom: "6px" }}>👹</div>
                   <div style={{ fontFamily: "'Cinzel', serif", fontSize: "13px", fontWeight: "bold", color: "#ff6b6b", marginBottom: "4px" }}>Fight the Asura Horde</div>
                   <div style={{ fontSize: "11px", color: "#fca5a5", lineHeight: "1.4" }}>They are endless. They are relentless. Are you ready?</div>
                 </button>
 
                 {/* Tablet Mode */}
-                <button onClick={() => startGame("pvp")} style={{ background: "rgba(78,204,163,0.15)", border: "1px solid rgba(78,204,163,0.4)", borderRadius: "14px", padding: "16px 12px", cursor: "pointer", textAlign: "left", backdropFilter: "blur(4px)" }}>
+                <button onClick={() => startGame("pvp")} style={{ background: "rgba(0,0,0,0.55)", border: "1px solid rgba(78,204,163,0.4)", borderRadius: "14px", padding: "16px 12px", cursor: "pointer", textAlign: "left", backdropFilter: "blur(4px)" }}>
                   <div style={{ fontSize: "22px", marginBottom: "6px" }}>🌟</div>
                   <div style={{ fontFamily: "'Cinzel', serif", fontSize: "13px", fontWeight: "bold", color: "#4ecca3", marginBottom: "4px" }}>Tablet Mode VS Friend</div>
                   <div style={{ fontSize: "11px", color: "#a7f3d0", lineHeight: "1.4" }}>180-second bullet chess with celestial powers</div>
                 </button>
 
                 {/* Navagraha Lore */}
-                <button onClick={() => setShowNavagraha(true)} style={{ background: "rgba(168,85,247,0.15)", border: "1px solid rgba(168,85,247,0.4)", borderRadius: "14px", padding: "16px 12px", cursor: "pointer", textAlign: "left", backdropFilter: "blur(4px)" }}>
+                <button onClick={() => setShowNavagraha(true)} style={{ background: "rgba(0,0,0,0.55)", border: "1px solid rgba(168,85,247,0.4)", borderRadius: "14px", padding: "16px 12px", cursor: "pointer", textAlign: "left", backdropFilter: "blur(4px)" }}>
                   <div style={{ fontSize: "22px", marginBottom: "6px" }}>✨</div>
                   <div style={{ fontFamily: "'Cinzel', serif", fontSize: "13px", fontWeight: "bold", color: "#c084fc", marginBottom: "4px" }}>Navagraha & Asura Lore</div>
                   <div style={{ fontSize: "11px", color: "#d8b4fe", lineHeight: "1.4" }}>The celestial and demonic mythology and powers explained.</div>
@@ -1371,8 +1366,8 @@ function App() {
 
               {/* Bottom links */}
               <div style={{ display: "flex", gap: "10px", marginTop: "4px" }}>
-                <button onClick={() => setShowHowToPlay(true)} style={{ flex: 1, padding: "12px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "12px", color: "#e5e7eb", fontSize: "13px", cursor: "pointer", backdropFilter: "blur(4px)" }}>📖 How to Play</button>
-                <button onClick={() => setShowAbout(true)} style={{ flex: 1, padding: "12px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "12px", color: "#e5e7eb", fontSize: "13px", cursor: "pointer", backdropFilter: "blur(4px)" }}>📖 About</button>
+                <button onClick={() => setShowHowToPlay(true)} style={{ flex: 1, padding: "12px", background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "12px", color: "#e5e7eb", fontSize: "13px", cursor: "pointer", backdropFilter: "blur(4px)" }}>📖 How to Play</button>
+                <button onClick={() => setShowAbout(true)} style={{ flex: 1, padding: "12px", background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "12px", color: "#e5e7eb", fontSize: "13px", cursor: "pointer", backdropFilter: "blur(4px)" }}>📖 About</button>
               </div>
             </div>
           </div>
