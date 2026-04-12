@@ -80,7 +80,7 @@ function App() {
   // Mobile UI state
   const [showCardOverlay, setShowCardOverlay] = useState(false);
   const { stockfish, stockfishRef, stockfishMoveRef } = useStockfish(gameMode, gameStarted, shukraDifficulty);
-
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
 
   useEffect(() => {
     if (gameMode === "asura" && gameStarted && Object.keys(asuraLives).length === 0) {
@@ -1203,6 +1203,7 @@ function App() {
   if (showAbout) return <AboutPage onBack={() => setShowAbout(false)} />;
   if (showNavagraha) return <NavagrahaPage onBack={() => setShowNavagraha(false)} />;
   if (gameMode === "daily") return <DailyPuzzle onBack={() => setGameMode(null)} />;
+  if (showHowToPlay) return <HowToPlay onBack={() => setShowHowToPlay(false)} />;
 
   // Route to daily puzzle
   if (gameMode === "daily") return <DailyPuzzle onBack={() => setGameMode(null)} />;
@@ -1228,13 +1229,10 @@ function App() {
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", backgroundColor: theme.background, color: theme.text, padding: isMobile ? "8px" : "20px" }}>
 
         {/* ── Mode selection ── */}
-        {!gameStarted && (
-          <div style={{ textAlign: "center", maxWidth: isMobile ? "100%" : "900px", margin: "0 auto", padding: isMobile ? "0 8px" : "0" }}>
+        {!gameStarted && !isMobile && (
+          <div style={{ textAlign: "center", maxWidth: "900px", margin: "0 auto", padding: "0" }}>
             <img src="/images/chessuranga.jpg?v=2" alt="Chessuranga" style={{ width: "100%", borderRadius: "16px", display: "block", marginBottom: "24px", boxShadow: "0 0 60px rgba(100,60,255,0.4)" }} />
-            {/* Row 1: Shukracharya, Daily Puzzle, Asura */}
-            <div style={{ display: "flex", gap: isMobile ? "12px" : "20px", justifyContent: "center", flexWrap: "wrap", marginBottom: "16px", alignItems: "flex-start" }}>
-
-              {/* Shukracharya */}
+            <div style={{ display: "flex", gap: "20px", justifyContent: "center", flexWrap: "wrap", marginBottom: "16px", alignItems: "flex-start" }}>
               <div style={{ textAlign: "center", maxWidth: "200px" }}>
                 {!showShukraSelect ? (
                   <>
@@ -1242,64 +1240,141 @@ function App() {
                     <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>Guru of the Asuras. Face the master behind the horde in a 1v1.</p>
                   </>
                 ) : (
-                  <div style={{ backgroundColor: "rgba(232,213,163,0.15)", border: "2px solid #e8d5a3", borderRadius: "12px", padding: "16px", textAlign: "center" }}>
+                  <div style={{ backgroundColor: "#1a0a00", border: "2px solid #e8d5a3", borderRadius: "12px", padding: "16px", textAlign: "left" }}>
                     <p style={{ color: "#e8d5a3", fontWeight: "bold", fontSize: "13px", marginBottom: "8px", marginTop: 0 }}>Choose your deck:</p>
-                    <div style={{ display: "flex", gap: "8px", marginBottom: "14px", justifyContent: "center" }}>
-                      {[{ id: "navagraha", label: "🌟 Navagraha" }, { id: "asura", label: "👹 Asura" }].map(({ id, label }) => (
-                        <button key={id} onClick={() => setShukraDeck(id)} style={{ padding: "8px 14px", fontSize: "12px", backgroundColor: shukraDeck === id ? "#e8d5a3" : "transparent", color: shukraDeck === id ? "#1a0a00" : "#e8d5a3", border: "2px solid #e8d5a3", borderRadius: "8px", cursor: "pointer", fontWeight: "bold" }}>{label}</button>
+                    <div style={{ display: "flex", gap: "6px", marginBottom: "12px", flexWrap: "wrap" }}>
+                      {[{ id: "navagraha", label: "🌟 Navagraha" }, { id: "asura", label: "👹 Asura" }, { id: "mixed", label: "⚖️ Mixed" }].map(({ id, label }) => (
+                        <button key={id} onClick={() => setShukraDeck(id)} style={{ padding: "6px 10px", fontSize: "12px", backgroundColor: shukraDeck === id ? "#e8d5a3" : "transparent", color: shukraDeck === id ? "#1a0a00" : "#e8d5a3", border: "2px solid #e8d5a3", borderRadius: "8px", cursor: "pointer", fontWeight: "bold" }}>{label}</button>
                       ))}
                     </div>
-                    <p style={{ color: "#e8d5a3", fontWeight: "bold", fontSize: "13px", marginBottom: "12px", marginTop: 0 }}>Choose your challenge:</p>                    {[{ key: "initiate", label: "🌿 Sadhak", sub: "Initiate · ~800 ELO" }, { key: "shishya", label: "🌱 Shishya", sub: "Student · ~1200 ELO" }, { key: "acharya", label: "📚 Acharya", sub: "Teacher · ~1500 ELO" }, { key: "guru", label: "🔱 Guru", sub: "Master · ~2000 ELO" }].map(({ key, label, sub }) => (<div key={key} style={{ marginBottom: "8px" }}>
-                      <button onClick={() => startGame("shukracharya", key, shukraDeck)} style={{ padding: "10px 16px", fontSize: "14px", backgroundColor: "#e8d5a3", color: "#1a0a00", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "2px" }}>{label}</button>
-                      <p style={{ fontSize: "13px", color: "#ddd", margin: 0 }}>{sub}</p>
-                    </div>
+                    <p style={{ color: "#e8d5a3", fontWeight: "bold", fontSize: "13px", marginBottom: "12px", marginTop: 0 }}>Choose your challenge:</p>
+                    {[{ key: "initiate", label: "🌿 Sadhak", sub: "Initiate · ~800 ELO" }, { key: "shishya", label: "🌱 Shishya", sub: "Student · ~1200 ELO" }, { key: "acharya", label: "📚 Acharya", sub: "Teacher · ~1500 ELO" }, { key: "guru", label: "🔱 Guru", sub: "Master · ~2000 ELO" }].map(({ key, label, sub }) => (
+                      <div key={key} style={{ marginBottom: "8px" }}>
+                        <button onClick={() => startGame("shukracharya", key, shukraDeck)} style={{ padding: "10px 16px", fontSize: "14px", backgroundColor: "#e8d5a3", color: "#1a0a00", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "2px" }}>{label}</button>
+                        <p style={{ fontSize: "13px", color: "#ddd", margin: 0 }}>{sub}</p>
+                      </div>
                     ))}
                     <button onClick={() => setShowShukraSelect(false)} style={{ marginTop: "6px", fontSize: "11px", background: "none", border: "none", color: "#aaa", cursor: "pointer", textDecoration: "underline" }}>← back</button>
                   </div>
                 )}
               </div>
-
-              {/* Daily Puzzle */}
               <div style={{ textAlign: "center", maxWidth: "200px" }}>
                 <button onClick={() => setGameMode("daily")} style={{ padding: "16px 24px", fontSize: "16px", background: "linear-gradient(135deg, #ffd700, #f59e0b)", color: "#1a0a00", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px", boxShadow: "0 0 20px rgba(255,215,0,0.35)" }}>🌟 Daily Puzzle</button>
                 <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>New puzzle every day. Find mate with today's 3 cosmic cards. Share your score.</p>
                 <p style={{ fontSize: "10px", color: "#ffd700", margin: "4px 0 0 0" }}>#{getDailyPuzzleNumber()} today</p>
               </div>
-
-              {/* Asura */}
               <div style={{ textAlign: "center", maxWidth: "200px" }}>
                 <button onClick={() => startGame("asura")} style={{ padding: "16px 24px", fontSize: "16px", backgroundColor: "#ff4444", color: "#fff", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px" }}>👹 Fight the Asura Horde</button>
                 <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>They are endless. They are relentless. Are you ready?</p>
               </div>
-
             </div>
-
-            {/* Row 2: vs Friend, About */}
-            <div style={{ display: "flex", gap: isMobile ? "12px" : "20px", justifyContent: "center", flexWrap: "wrap", marginBottom: "40px", alignItems: "flex-start" }}>
-
-              {/* PvP */}
+            <div style={{ display: "flex", gap: "20px", justifyContent: "center", flexWrap: "wrap", marginBottom: "40px", alignItems: "flex-start" }}>
               <div style={{ textAlign: "center", maxWidth: "200px" }}>
                 <button onClick={() => startGame("pvp")} style={{ padding: "16px 24px", fontSize: "16px", backgroundColor: "#4ecca3", color: "#000", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px" }}>🌟 Tablet Mode VS Friend</button>
-                <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>Play local 1v1 with a friend</p>
+                <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>180-second bullet chess with celestial powers</p>
               </div>
-
-              {/* Navagraha Explained */}
               <div style={{ textAlign: "center", maxWidth: "200px" }}>
-                <button onClick={() => setShowNavagraha(true)} style={{ padding: "16px 24px", fontSize: "16px", background: "linear-gradient(135deg, #9333ea, #6b21a8)", color: "#fff", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px", boxShadow: "0 0 20px rgba(147,51,234,0.3)" }}>🌟 Navagraha & Asura Lore</button>
+                <button onClick={() => setShowNavagraha(true)} style={{ padding: "16px 24px", fontSize: "16px", backgroundColor: "#a855f7", color: "#fff", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px" }}>🌟 Navagraha & Asura Lore</button>
                 <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>The celestial and demonic mythology and powers explained.</p>
               </div>
-
-              {/* About */}
               <div style={{ textAlign: "center", maxWidth: "200px" }}>
-                <button onClick={() => setShowAbout(true)} style={{ padding: "16px 24px", fontSize: "16px", backgroundColor: "#1e293b", color: "#e2e8f0", border: "1px solid #334155", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px" }}>📖 About</button>
+                <button onClick={() => setShowHowToPlay(true)} style={{ padding: "16px 24px", fontSize: "16px", backgroundColor: "#334155", color: "#fff", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px" }}>📖 How to Play</button>
+                <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>Learn the cosmic card powers and game rules.</p>
+              </div>
+              <div style={{ textAlign: "center", maxWidth: "200px" }}>
+                <button onClick={() => setShowAbout(true)} style={{ padding: "16px 24px", fontSize: "16px", backgroundColor: "#1e293b", color: "#fff", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", width: "100%", marginBottom: "8px" }}>📖 About</button>
                 <p style={{ fontSize: "11px", color: "#ddd", lineHeight: "1.4", margin: 0 }}>The story behind the game — and the cosmic forces within it.</p>
               </div>
-
             </div>
-            <HowToPlay />
-            <p style={{ textAlign: "center", fontSize: "11px", color: "#444", marginTop: "40px", fontFamily: "Cinzel, serif", letterSpacing: "0.08em" }}>
-              © {new Date().getFullYear()} Chessuranga. All rights reserved.
-            </p>
+          </div>
+        )}
+
+        {/* ── MOBILE MENU ── */}
+        {!gameStarted && isMobile && (
+          <div style={{ position: "relative", width: "100%", minHeight: "100vh", overflow: "hidden" }}>
+            {/* Background artwork */}
+            <img
+              src="/images/chessuranga.jpg?v=2"
+              alt=""
+              style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }}
+            />
+            {/* Dark overlay */}
+            <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.4)" }} />
+
+            {/* Content */}
+            <div style={{ position: "relative", zIndex: 1, padding: "20px 16px 32px", display: "flex", flexDirection: "column", gap: "12px" }}>
+
+              {/* Logo wordmark */}
+              <div style={{ textAlign: "center", marginBottom: "8px" }}>
+                <span style={{ fontFamily: "'Cinzel', serif", fontSize: "28px", fontWeight: "900", color: "#ffd700", textShadow: "0 0 20px rgba(255,215,0,0.6), 0 2px 4px rgba(0,0,0,0.8)", letterSpacing: "0.1em" }}>CHESSURANGA</span>
+              </div>
+
+              {/* Daily Puzzle — full width featured */}
+              <button onClick={() => setGameMode("daily")} style={{ width: "100%", padding: "18px 20px", background: "linear-gradient(135deg, rgba(255,215,0,0.25), rgba(245,158,11,0.25))", border: "2px solid rgba(255,215,0,0.6)", borderRadius: "16px", cursor: "pointer", textAlign: "left", backdropFilter: "blur(4px)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div>
+                    <div style={{ fontFamily: "'Cinzel', serif", fontSize: "18px", fontWeight: "bold", color: "#ffd700", marginBottom: "4px" }}>🌟 Daily Puzzle</div>
+                    <div style={{ fontSize: "12px", color: "#e5e7eb", lineHeight: "1.4" }}>New puzzle every day. Find mate with today's 3 cosmic cards. Share your score.</div>
+                  </div>
+                  <div style={{ fontSize: "11px", color: "#ffd700", fontWeight: "bold", marginLeft: "12px", whiteSpace: "nowrap" }}>#{getDailyPuzzleNumber()}<br />today</div>
+                </div>
+              </button>
+
+              {/* 2x2 grid */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+
+                {/* Shukracharya */}
+                <div style={{ background: "rgba(232,213,163,0.15)", border: "1px solid rgba(232,213,163,0.4)", borderRadius: "14px", padding: "16px 12px", backdropFilter: "blur(4px)" }}>
+                  {!showShukraSelect ? (
+                    <button onClick={() => setShowShukraSelect(true)} style={{ background: "none", border: "none", cursor: "pointer", width: "100%", textAlign: "left", padding: 0 }}>
+                      <div style={{ fontSize: "22px", marginBottom: "6px" }}>☄️</div>
+                      <div style={{ fontFamily: "'Cinzel', serif", fontSize: "13px", fontWeight: "bold", color: "#e8d5a3", marginBottom: "4px" }}>Face Shukracharya</div>
+                      <div style={{ fontSize: "11px", color: "#d1c4a8", lineHeight: "1.4" }}>Guru of the Asuras. Face the master behind the horde in a 1v1.</div>
+                    </button>
+                  ) : (
+                    <div>
+                      <div style={{ fontSize: "11px", color: "#e8d5a3", fontWeight: "bold", marginBottom: "8px" }}>Choose deck:</div>
+                      <div style={{ display: "flex", gap: "4px", marginBottom: "8px", flexWrap: "wrap" }}>
+                        {[{ id: "navagraha", label: "🌟" }, { id: "asura", label: "👹" }, { id: "mixed", label: "⚖️" }].map(({ id, label }) => (
+                          <button key={id} onClick={() => setShukraDeck(id)} style={{ padding: "4px 8px", fontSize: "14px", backgroundColor: shukraDeck === id ? "#e8d5a3" : "transparent", color: shukraDeck === id ? "#1a0a00" : "#e8d5a3", border: "1px solid #e8d5a3", borderRadius: "6px", cursor: "pointer" }}>{label}</button>
+                        ))}
+                      </div>
+                      {[{ key: "initiate", label: "🌿 Sadhak" }, { key: "shishya", label: "🌱 Shishya" }, { key: "acharya", label: "📚 Acharya" }, { key: "guru", label: "🔱 Guru" }].map(({ key, label }) => (
+                        <button key={key} onClick={() => startGame("shukracharya", key, shukraDeck)} style={{ display: "block", width: "100%", padding: "6px 8px", fontSize: "12px", backgroundColor: "#e8d5a3", color: "#1a0a00", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold", marginBottom: "4px" }}>{label}</button>
+                      ))}
+                      <button onClick={() => setShowShukraSelect(false)} style={{ fontSize: "10px", background: "none", border: "none", color: "#aaa", cursor: "pointer", textDecoration: "underline", marginTop: "4px" }}>← back</button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Asura Horde */}
+                <button onClick={() => startGame("asura")} style={{ background: "rgba(255,68,68,0.2)", border: "1px solid rgba(255,68,68,0.5)", borderRadius: "14px", padding: "16px 12px", cursor: "pointer", textAlign: "left", backdropFilter: "blur(4px)" }}>
+                  <div style={{ fontSize: "22px", marginBottom: "6px" }}>👹</div>
+                  <div style={{ fontFamily: "'Cinzel', serif", fontSize: "13px", fontWeight: "bold", color: "#ff6b6b", marginBottom: "4px" }}>Fight the Asura Horde</div>
+                  <div style={{ fontSize: "11px", color: "#fca5a5", lineHeight: "1.4" }}>They are endless. They are relentless. Are you ready?</div>
+                </button>
+
+                {/* Tablet Mode */}
+                <button onClick={() => startGame("pvp")} style={{ background: "rgba(78,204,163,0.15)", border: "1px solid rgba(78,204,163,0.4)", borderRadius: "14px", padding: "16px 12px", cursor: "pointer", textAlign: "left", backdropFilter: "blur(4px)" }}>
+                  <div style={{ fontSize: "22px", marginBottom: "6px" }}>🌟</div>
+                  <div style={{ fontFamily: "'Cinzel', serif", fontSize: "13px", fontWeight: "bold", color: "#4ecca3", marginBottom: "4px" }}>Tablet Mode VS Friend</div>
+                  <div style={{ fontSize: "11px", color: "#a7f3d0", lineHeight: "1.4" }}>180-second bullet chess with celestial powers</div>
+                </button>
+
+                {/* Navagraha Lore */}
+                <button onClick={() => setShowNavagraha(true)} style={{ background: "rgba(168,85,247,0.15)", border: "1px solid rgba(168,85,247,0.4)", borderRadius: "14px", padding: "16px 12px", cursor: "pointer", textAlign: "left", backdropFilter: "blur(4px)" }}>
+                  <div style={{ fontSize: "22px", marginBottom: "6px" }}>✨</div>
+                  <div style={{ fontFamily: "'Cinzel', serif", fontSize: "13px", fontWeight: "bold", color: "#c084fc", marginBottom: "4px" }}>Navagraha & Asura Lore</div>
+                  <div style={{ fontSize: "11px", color: "#d8b4fe", lineHeight: "1.4" }}>The celestial and demonic mythology and powers explained.</div>
+                </button>
+              </div>
+
+              {/* Bottom links */}
+              <div style={{ display: "flex", gap: "10px", marginTop: "4px" }}>
+                <button onClick={() => setShowHowToPlay(true)} style={{ flex: 1, padding: "12px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "12px", color: "#e5e7eb", fontSize: "13px", cursor: "pointer", backdropFilter: "blur(4px)" }}>📖 How to Play</button>
+                <button onClick={() => setShowAbout(true)} style={{ flex: 1, padding: "12px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "12px", color: "#e5e7eb", fontSize: "13px", cursor: "pointer", backdropFilter: "blur(4px)" }}>📖 About</button>
+              </div>
+            </div>
           </div>
         )}
 
