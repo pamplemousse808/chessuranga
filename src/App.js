@@ -1231,7 +1231,7 @@ function App() {
         {/* ── Mode selection ── */}
         {!gameStarted && !isMobile && (
           <div style={{ textAlign: "center", maxWidth: "900px", margin: "0 auto", padding: "0" }}>
-            <img src="/images/chessuranga.jpg?v=2" alt="Chessuranga" style={{ width: "100%", borderRadius: "16px", display: "block", marginBottom: "24px", boxShadow: "0 0 60px rgba(100,60,255,0.4)" }} />
+            <img src="/images/chessurangamobile.jpg" alt="Chessuranga" style={{ width: "100%", borderRadius: "16px", display: "block", marginBottom: "24px", boxShadow: "0 0 60px rgba(100,60,255,0.4)" }} />
             <div style={{ display: "flex", gap: "20px", justifyContent: "center", flexWrap: "wrap", marginBottom: "16px", alignItems: "flex-start" }}>
               <div style={{ textAlign: "center", maxWidth: "200px" }}>
                 {!showShukraSelect ? (
