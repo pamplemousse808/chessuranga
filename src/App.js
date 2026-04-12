@@ -1329,9 +1329,12 @@ function App() {
                   ) : (
                     <div>
                       <div style={{ fontSize: "11px", color: "#e8d5a3", fontWeight: "bold", marginBottom: "8px" }}>Choose deck:</div>
-                      <div style={{ display: "flex", gap: "4px", marginBottom: "8px", flexWrap: "wrap" }}>
-                        {[{ id: "navagraha", label: "🌟" }, { id: "asura", label: "👹" }].map(({ id, label }) => (
-                          <button key={id} onClick={() => setShukraDeck(id)} style={{ padding: "4px 8px", fontSize: "14px", backgroundColor: shukraDeck === id ? "#e8d5a3" : "transparent", color: shukraDeck === id ? "#1a0a00" : "#e8d5a3", border: "1px solid #e8d5a3", borderRadius: "6px", cursor: "pointer" }}>{label}</button>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginBottom: "8px" }}>
+                        {[{ id: "navagraha", label: "🌟", name: "Navagraha" }, { id: "asura", label: "👹", name: "Asura" }].map(({ id, label, name }) => (
+                          <button key={id} onClick={() => setShukraDeck(id)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 10px", fontSize: "12px", backgroundColor: shukraDeck === id ? "#e8d5a3" : "transparent", color: shukraDeck === id ? "#1a0a00" : "#e8d5a3", border: "1px solid #e8d5a3", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}>
+                            <span>{label}</span>
+                            <span>{name}</span>
+                          </button>
                         ))}
                       </div>
                       {[{ key: "initiate", label: "🌿 Sadhak", sub: "~800 ELO" }, { key: "shishya", label: "🌱 Shishya", sub: "~1200 ELO" }, { key: "acharya", label: "📚 Acharya", sub: "~1500 ELO" }, { key: "guru", label: "🔱 Guru", sub: "~2000 ELO" }].map(({ key, label, sub }) => (
