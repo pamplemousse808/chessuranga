@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Chessuranga</string>
+    <string name="title_activity_main">chessuranga</string>
+    <string name="package_name">com.chessuranga.app</string>
+    <string name="custom_url_scheme">com.chessuranga.app</string>
+</resources>

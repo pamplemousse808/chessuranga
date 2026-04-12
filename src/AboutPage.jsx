@@ -458,14 +458,19 @@ export default function AboutPage({ onBack }) {
             <p className="kofi-body">
               And if you like the game and want to help fund the servers, or help me make the multiplayer and hire a designer for actual art, here's a button...</p>
             { }
-            <a
-              href="https://ko-fi.com/chessuranga"
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={async () => {
+                try {
+                  const { Browser } = await import('@capacitor/browser');
+                  await Browser.open({ url: 'https://ko-fi.com/chessuranga' });
+                } catch {
+                  window.open('https://ko-fi.com/chessuranga', '_blank');
+                }
+              }}
               className="kofi-btn"
             >
               ☕ Fuel the Navagraha
-            </a>
+            </button>
           </section>
         </div>
 

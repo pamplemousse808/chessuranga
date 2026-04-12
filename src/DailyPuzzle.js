@@ -60,7 +60,7 @@ export default function DailyPuzzle({ onBack }) {
     }, [moveCount]);
 
     useEffect(() => {
-        fetch('/api/daily-puzzle')
+        fetch('https://chessuranga.com/api/daily-puzzle')
             .then(r => r.json())
             .then(data => {
                 const g = new Chess(data.fen);
