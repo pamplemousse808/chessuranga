@@ -481,6 +481,7 @@ export default function PvpTabletLayout({
   blackCaptured,
   specialModeLabel,
   setChandraPlacementMode,
+  chandraPlacementMode,
   setGuruMode,
   setShaniMode,
   resetGame,
