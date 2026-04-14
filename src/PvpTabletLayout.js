@@ -507,7 +507,7 @@ export default function PvpTabletLayout({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontSize: squareWidth * 0.75,
+        fontSize: squareWidth * 0.88,
         transform: piece.startsWith("b") ? "rotate(180deg)" : "none",
         userSelect: "none",
         filter: piece.startsWith("w")

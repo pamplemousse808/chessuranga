@@ -155,17 +155,27 @@ function App() {
     const targetFileIdx = side === "left" ? fileIdx - 1 : fileIdx + 1;
     if (targetFileIdx < 0 || targetFileIdx > 7) {
       alert("No space to spawn duplicate on that side!");
-      setGuruDuplicateMode(null);
+      setGuruDuplicateMode(prev => ({ ...prev, side: null }));
       return;
     }
     const targetSq = files[targetFileIdx] + rank;
     if (game.get(targetSq)) {
       alert("That square is occupied!");
-      setGuruDuplicateMode(null);
+      setGuruDuplicateMode(prev => ({ ...prev, side: null }));
       return;
     }
     const ng = new Chess(game.fen());
     ng.put({ type: piece.type, color: piece.color }, targetSq);
+    // Check this doesn't give check to the opponent
+    const oppTest = new Chess(ng.fen());
+    const fp = oppTest.fen().split(" ");
+    fp[1] = fp[1] === "w" ? "b" : "w";
+    oppTest.load(fp.join(" "));
+    if (oppTest.inCheck()) {
+      alert("Guru's duplicate cannot give check!");
+      setGuruDuplicateMode(prev => ({ ...prev, side: null }));
+      return;
+    }
     setGame(ng);
     setDuplicatePieces(prev => ({ ...prev, [targetSq]: { turnsLeft: 4, originalSquare: square } }));
     setGuruDuplicateMode(null);
