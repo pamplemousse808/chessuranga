@@ -652,9 +652,46 @@ export default function PvpTabletLayout({
 
         {/* ── Chandra confirm placement ── */}
         {chandraPlacementMode?.mirages?.length > 0 && (
-          <div style={{ position: "fixed", bottom: "120px", left: "50%", transform: "translateX(-50%)", backgroundColor: "#0f172a", border: "2px solid #e5e7eb", borderRadius: "12px", padding: "12px 20px", zIndex: 1000, textAlign: "center" }}>
+          <div style={{ position: "fixed", bottom: "110px", left: "50%", transform: "translateX(-50%)", backgroundColor: "#0f172a", border: "2px solid #e5e7eb", borderRadius: "14px", padding: "14px 18px", zIndex: 1000, textAlign: "center", width: "88vw", maxWidth: "360px" }}>
             <div style={{ transform: currentTurn === "b" ? "rotate(180deg)" : "none" }}>
-              <div style={{ fontSize: "13px", color: "#e5e7eb", marginBottom: "10px" }}>🌙 {chandraPlacementMode.mirages.length} clone{chandraPlacementMode.mirages.length > 1 ? "s" : ""} placed — confirm?</div>
+              <div style={{ fontSize: "13px", color: "#e5e7eb", marginBottom: "10px" }}>
+                🌙 {chandraPlacementMode.mirages.length} clone{chandraPlacementMode.mirages.length > 1 ? "s" : ""} placed — teleport real piece?
+              </div>
+              <div style={{ fontSize: "11px", color: "#aaa", marginBottom: "6px" }}>
+                Teleport to: <span style={{ color: "#ffd700" }}>{chandraPlacementMode.teleportTo || "(stay)"}</span>
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", justifyContent: "center", marginBottom: "10px" }}>
+                {['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map(file => {
+                  const sq = file + chandraPlacementMode.rank;
+                  const isCurrentReal = sq === chandraPlacementMode.square;
+                  const isMirage = chandraPlacementMode.mirages.includes(sq);
+                  const hasOtherPiece = game.get(sq) && !isCurrentReal;
+                  if (chandraPlacementMode.piece.type === 'b') {
+                    const files2 = ["a", "b", "c", "d", "e", "f", "g", "h"];
+                    const of2 = files2.indexOf(chandraPlacementMode.square[0]);
+                    const oLight = (of2 + chandraPlacementMode.rank) % 2 === 0;
+                    const cf2 = files2.indexOf(file);
+                    if (oLight !== ((cf2 + chandraPlacementMode.rank) % 2 === 0)) return null;
+                  }
+                  const disabled = isCurrentReal || isMirage || hasOtherPiece;
+                  const isSelected = sq === chandraPlacementMode.teleportTo;
+                  return (
+                    <button key={file} onClick={() => {
+                      if (!disabled) setChandraPlacementMode(prev => ({ ...prev, teleportTo: prev.teleportTo === sq ? null : sq }));
+                    }} style={{
+                      padding: "5px 8px", fontSize: "11px",
+                      backgroundColor: isSelected ? "#ffd700" : disabled ? "#333" : "#555",
+                      color: isSelected ? "#000" : "#fff",
+                      border: isCurrentReal ? "1px solid #ffd700" : "none",
+                      borderRadius: "4px",
+                      cursor: disabled ? "not-allowed" : "pointer",
+                      opacity: disabled ? 0.4 : 1,
+                    }}>
+                      {file}{chandraPlacementMode.rank}
+                    </button>
+                  );
+                })}
+              </div>
               <button onClick={confirmChandraPlacement} style={{ padding: "8px 20px", backgroundColor: "#e5e7eb", color: "#000", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "bold", marginRight: "8px" }}>✓ Confirm</button>
               <button onClick={() => setChandraPlacementMode(null)} style={{ padding: "8px 16px", backgroundColor: "transparent", color: "#aaa", border: "1px solid #555", borderRadius: "8px", cursor: "pointer" }}>Cancel</button>
             </div>

@@ -1713,7 +1713,9 @@ function App() {
             setMahishasuraMode={setMahishasuraMode}
             confirmMahishaShift={confirmMahishaShift}
             confirmChandraPlacement={confirmChandraPlacement}
-             />
+            guruDuplicateMode={guruDuplicateMode}
+            setGuruDuplicateMode={setGuruDuplicateMode}
+          />
         )}
 
         {/* ════════════════════════════════════
