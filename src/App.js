@@ -1709,7 +1709,11 @@ function App() {
             setShowChaosPopup={setShowChaosPopup}
             lastWhiteCard={lastWhiteCard}
             lastBlackCard={lastBlackCard}
-          />
+            mahishasuraMode={mahishasuraMode}
+            setMahishasuraMode={setMahishasuraMode}
+            confirmMahishaShift={confirmMahishaShift}
+            confirmChandraPlacement={confirmChandraPlacement}
+             />
         )}
 
         {/* ════════════════════════════════════

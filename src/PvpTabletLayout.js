@@ -490,6 +490,10 @@ export default function PvpTabletLayout({
   lastBlackCard,
   guruDuplicateMode,
   setGuruDuplicateMode,
+  mahishasuraMode,
+  setMahishasuraMode,
+  confirmMahishaShift,
+  confirmChandraPlacement,
 }) {
   const currentTurn = game.turn();
   const tabletBoard = Math.min(window.innerWidth - 24, 480);
@@ -627,6 +631,35 @@ export default function PvpTabletLayout({
           </div>
         )}
 
+        {/* ── Mahishasura shapeshift picker ── */}
+        {mahishasuraMode?.availableTypes?.length > 0 && (
+          <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", backgroundColor: "#0f172a", border: "2px solid #2D5A1B", borderRadius: "16px", padding: "20px 24px", zIndex: 1000, textAlign: "center", boxShadow: "0 0 40px rgba(45,90,27,0.5)", width: "88vw", maxWidth: "340px" }}>
+            <div style={{ transform: currentTurn === "b" ? "rotate(180deg)" : "none" }}>
+              <div style={{ fontSize: "16px", fontWeight: "bold", color: "#4ade80", marginBottom: "8px" }}>🐃 Mahishasura — Shapeshift</div>
+              <div style={{ fontSize: "13px", color: "#aaa", marginBottom: "16px" }}>Choose a captured piece type to become:</div>
+              <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
+                {mahishasuraMode.availableTypes.map(type => (
+                  <button key={type} onClick={() => confirmMahishaShift(type)} style={{ padding: "14px 20px", fontSize: "28px", backgroundColor: "rgba(45,90,27,0.3)", border: "2px solid #4ade80", borderRadius: "12px", cursor: "pointer", color: "#fff" }}>
+                    {({ p: "♟", n: "♞", b: "♝", r: "♜", q: "♛" })[type]}
+                  </button>
+                ))}
+              </div>
+              <button onClick={() => setMahishasuraMode(null)} style={{ marginTop: "16px", fontSize: "12px", background: "none", border: "none", color: "#aaa", cursor: "pointer", textDecoration: "underline" }}>cancel</button>
+            </div>
+          </div>
+        )}
+
+        {/* ── Chandra confirm placement ── */}
+        {chandraPlacementMode?.mirages?.length > 0 && (
+          <div style={{ position: "fixed", bottom: "120px", left: "50%", transform: "translateX(-50%)", backgroundColor: "#0f172a", border: "2px solid #e5e7eb", borderRadius: "12px", padding: "12px 20px", zIndex: 1000, textAlign: "center" }}>
+            <div style={{ transform: currentTurn === "b" ? "rotate(180deg)" : "none" }}>
+              <div style={{ fontSize: "13px", color: "#e5e7eb", marginBottom: "10px" }}>🌙 {chandraPlacementMode.mirages.length} clone{chandraPlacementMode.mirages.length > 1 ? "s" : ""} placed — confirm?</div>
+              <button onClick={confirmChandraPlacement} style={{ padding: "8px 20px", backgroundColor: "#e5e7eb", color: "#000", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "bold", marginRight: "8px" }}>✓ Confirm</button>
+              <button onClick={() => setChandraPlacementMode(null)} style={{ padding: "8px 16px", backgroundColor: "transparent", color: "#aaa", border: "1px solid #555", borderRadius: "8px", cursor: "pointer" }}>Cancel</button>
+            </div>
+          </div>
+        )}
+
         {guruDuplicateMode && !guruDuplicateMode.side && (
           <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", backgroundColor: "#0f172a", border: "2px solid #a855f7", borderRadius: "16px", padding: "20px 24px", zIndex: 1000, textAlign: "center", boxShadow: "0 0 40px rgba(168,85,247,0.5)", width: "88vw", maxWidth: "340px" }}>
             <div style={{ transform: currentTurn === "b" ? "rotate(180deg)" : "none" }}>
@@ -740,6 +773,7 @@ export default function PvpTabletLayout({
                     setChandraPlacementMode(null);
                     setGuruMode(null);
                     setShaniMode(null);
+                    if (setMahishasuraMode) setMahishasuraMode(null);
                   }}
                   style={{
                     fontSize: "11px",
