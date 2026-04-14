@@ -1236,7 +1236,7 @@ function App() {
         * { box-sizing: border-box; }
       `}</style>
 
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", backgroundColor: theme.background, color: theme.text, padding: isMobile ? "8px" : "20px", paddingTop: isMobile ? "12vh" : "20px"}}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", backgroundColor: theme.background, color: theme.text, padding: isMobile ? "8px" : "20px"}}>
 
         {/* ── Mode selection ── */}
         {!gameStarted && !isMobile && (
