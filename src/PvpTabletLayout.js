@@ -194,15 +194,15 @@ function LastCardBanner({ lastCard, lastCardEmoji, opponentColor, flipped }) {
         />
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: "10px", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: "1px" }}>
+        <div style={{ fontSize: "10px", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: "1px" }}>
           {label}
         </div>
         <div style={{ fontSize: "13px", fontWeight: "700", color: lastCard.color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
           {lastCardEmoji} {lastCard.name}
         </div>
-      </div>
-      <div style={{ fontSize: "11px", color: "#475569", whiteSpace: "nowrap" }}>
-        {lastCard.description.split(" ").slice(0, 5).join(" ")}…
+        <div style={{ fontSize: "11px", color: "#94a3b8", marginTop: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          {lastCard.description.split(" ").slice(0, 7).join(" ")}…
+        </div>
       </div>
     </div>
   );
@@ -274,11 +274,11 @@ function PvpCardTray({
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         <div
           style={{
-            fontSize: "11px",
+            fontSize: "13px",
             fontWeight: "700",
             letterSpacing: "0.1em",
             textTransform: "uppercase",
-            color: isMyTurn ? accent : "rgba(255,255,255,0.3)",
+            color: isMyTurn ? accent : "rgba(255,255,255,0.6)",
             minWidth: "60px",
             whiteSpace: "pre-line",
           }}
@@ -511,7 +511,7 @@ export default function PvpTabletLayout({
         transform: piece.startsWith("b") ? "rotate(180deg)" : "none",
         userSelect: "none",
         filter: piece.startsWith("w")
-          ? "drop-shadow(0px 0px 1px rgba(78,204,163,0.8)) drop-shadow(0px 0px 3px rgba(78,204,163,0.4))"
+          ? "drop-shadow(0px 1px 2px rgba(0,0,0,0.9)) drop-shadow(0px 0px 6px rgba(0,0,0,0.6))"
           : "drop-shadow(0px 0px 1px rgba(233,69,96,0.8)) drop-shadow(0px 0px 3px rgba(233,69,96,0.4))",
       }}>
         {({
@@ -733,7 +733,7 @@ export default function PvpTabletLayout({
             transition: "background-color 0.4s",
           }}
         >
-          <div style={{ fontSize: "13px", color: "#888" }}>
+          <div style={{ fontSize: "15px", color: "#fff" }}>
             ⬛ Black
             <span style={{ marginLeft: "8px", fontSize: "11px" }}>
               {blackCaptured.slice(-8).map((p, i) => (
@@ -919,7 +919,7 @@ export default function PvpTabletLayout({
             transition: "background-color 0.4s",
           }}
         >
-          <div style={{ fontSize: "13px", color: "#ccc" }}>
+          <div style={{ fontSize: "15px", color: "#fff" }}>
             ⬜ White
             <span style={{ marginLeft: "8px", fontSize: "11px" }}>
               {whiteCaptured.slice(-8).map((p, i) => (
