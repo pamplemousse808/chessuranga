@@ -30,7 +30,7 @@ export default function AboutPage({ onBack }) {
         .about-nav-title { font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 0.2em; color: #c8973a; text-transform: uppercase; }
         .about-nav-back { font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 0.12em; color: #060810; background: #c8973a; padding: 8px 20px; border-radius: 50px; border: none; cursor: pointer; }
         .about-content { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; padding: 0 24px 120px; }
-        .about-hero { text-align: center; padding: 64px 0 48px; border-bottom: 1px solid rgba(255,215,100,0.12); }
+        .about-hero { text-align: center; padding: 32px 0 24px; border-bottom: 1px solid rgba(255,215,100,0.12); }
         .about-hero-title { font-family: 'Cinzel', serif; font-size: clamp(32px, 7vw, 60px); font-weight: 700; background: linear-gradient(135deg, #ffd966 0%, #f0a500 40%, #e8c87a 80%, #ffd966 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 16px; }
         .about-hero-sub { font-size: 18px; font-style: italic; color: #a89060; }
         .about-divider { width: 60px; height: 2px; background: linear-gradient(90deg, transparent, #c8973a, transparent); margin: 24px auto 0; }
@@ -62,7 +62,7 @@ export default function AboutPage({ onBack }) {
 
           <div className={`about-hero fade-up delay-1 ${visible ? "show" : ""}`}>
             <h1 className="about-hero-title">Chessuranga</h1>
-            <p className="about-hero-sub">Where chess began. Reimagined.</p>
+            <p className="about-hero-sub">We all need chess with special moves.</p>
             <div className="about-divider" />
           </div>
 
