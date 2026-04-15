@@ -10,7 +10,7 @@ const GRAHA_LORE = {
     symbol: "☀️",
     color: "#fbbf24",
     lore: "Surya is the eye of the cosmos — the source of all light and life. King of the Navagraha, he rides a golden chariot drawn by seven horses across the sky each day. He governs willpower, authority, and the soul itself. Where Surya shines, nothing can be hidden.",
-    power: "Invincibility — the piece cannot be captured for 2 moves. Surya's radiance is so overwhelming that enemies cannot approach. A piece bathed in sunlight becomes untouchable, burning the hand of any who try to seize it.",
+    power: "Invincibility — the piece cannot be captured for 2 moves.",
   },
   CHANDRA: {
     sanskrit: "चन्द्र",
@@ -20,7 +20,7 @@ const GRAHA_LORE = {
     symbol: "🌙",
     color: "#e5e7eb",
     lore: "Chandra is the lord of illusion and the master of reflection. His light is borrowed — a beautiful deception that shapes the tides and dreams. In Hindu cosmology he is fickle, waxing and waning, never quite what he appears. His greatest power is that no one can tell the real from the reflected.",
-    power: "Clones — place 1 or 2 mirror images on the same rank. Enemies won't know which is real until it's too late. The clones move alongside the true piece, and only by capturing the real one does the illusion shatter.",
+    power: "Create 1-2 mirages of a piece, and if you want, teleport the piece to another (legal) square along that rank. Mirages can't move and when you move your real piece, they will disappear.",
   },
   MANGALA: {
     sanskrit: "मंगल",
@@ -30,7 +30,7 @@ const GRAHA_LORE = {
     symbol: "🔥",
     color: "#ef4444",
     lore: "Mangala is the god of war — fierce, red, relentless. He was born from the blood of Shiva and embodies raw martial power. Where other gods counsel patience, Mangala strikes first. He governs soldiers, weapons, and the burning need to win at any cost.",
-    power: "Smite — capture any adjacent enemy piece regardless of normal movement rules. Mangala doesn't care about chess geometry. If an enemy is close enough to smell, it's close enough to destroy.",
+    power: "Capture any adjacent enemy piece regardless of normal movement rules.",
   },
   BUDHA: {
     sanskrit: "बुध",
@@ -40,7 +40,7 @@ const GRAHA_LORE = {
     symbol: "⚡",
     color: "#3b82f6",
     lore: "Budha is the swift-footed son of Chandra, the messenger who carries thought between the worlds. He governs wit, commerce, and the speed of the mind. In a single breath he can be in two places. His blessing is the gift of the second thought — the move you didn't know you had.",
-    power: "Double Move — take two consecutive moves instead of one. If the first move captures a piece, the turn ends. Budha rewards the mind that plans two steps ahead.",
+    power: "Double Move — take two consecutive moves instead of one. If the first move captures a piece, the turn ends.",
   },
   GURU: {
     sanskrit: "गुरु",
@@ -50,7 +50,7 @@ const GRAHA_LORE = {
     symbol: "🪐",
     color: "#a855f7",
     lore: "Guru — Jupiter — is the greatest of teachers. He is the preceptor of the gods themselves, vast as the planet that bears his name. He embodies blessings, abundance, and the expansion of all things good. His most sacred power is the reversal of death — for true wisdom knows that endings are only beginnings.",
-    power: "Resurrection — bring back a captured piece to where it died. The resurrected piece is spiritually renewed but cannot move immediately, as even Guru's grace requires a moment of stillness.",
+    power: "Spawn a real duplicate left or right — it moves and can capture for 2 turns before it dissolves.",
   },
   SHUKRA: {
     sanskrit: "शुक्र",
@@ -60,7 +60,7 @@ const GRAHA_LORE = {
     symbol: "💫",
     color: "#ec4899",
     lore: "Shukra is the guru of the Asuras — the demons' own teacher — and the only one who knows the secret of Mritasanjivani, the art of restoring the dead. He governs pleasure, luxury, and the harvest of time. His blessing multiplies everything it touches. To earn Shukra's favour is to make the most of every moment.",
-    power: "Time Harvest — triple the time earned on your next 2 captures. Shukra teaches that a single well-timed strike is worth more than a dozen ordinary ones.",
+    power: "Resurrect a captured piece to where it died (if the square is vacant). The resurrected piece cannot move immediately.",
   },
   SHANI: {
     sanskrit: "शनि",
@@ -70,7 +70,7 @@ const GRAHA_LORE = {
     symbol: "❄️",
     color: "#1f2937",
     lore: "Shani is the god of karma and consequence — slow, inevitable, cold. His gaze is feared above all others; legend says even the gods avert their eyes when Shani looks upon them. He does not destroy out of anger, but out of cosmic law. What Shani freezes, stays frozen until justice is served.",
-    power: "Freeze — immobilise an enemy piece for 2 turns. The piece is locked in place, unable to move, attack, or escape. Even kings have cowered before Shani's gaze.",
+    power: "Immobilise an enemy piece for 2 turns. The piece is locked in place, unable to move, attack, or escape.",
   },
   RAHU: {
     sanskrit: "राहु",
@@ -80,7 +80,7 @@ const GRAHA_LORE = {
     symbol: "🔮",
     color: "#9333ea",
     lore: "Rahu is the severed head of the demon Svarbhānu, who drank the nectar of immortality and was cut in two by Vishnu's discus. He exists without a body — a shadow that swallows the sun and moon during eclipses. Rahu governs obsession, foreign things, and the power to pass through what should stop you.",
-    power: "Phase Walk — pass through other pieces for 2 moves. Like a shadow passing through walls, Rahu ignores blocking pieces entirely. An unstoppable ghost on the board.",
+    power: "Phase Walk — pass through other pieces for 2 moves. Like a shadow passing through walls, Rahu ignores blocking pieces entirely.",
   },
   KETU: {
     sanskrit: "केतु",
@@ -90,7 +90,7 @@ const GRAHA_LORE = {
     symbol: "☄️",
     color: "#f97316",
     lore: "Ketu is the headless body of the same demon — a comet tail racing through the cosmos. Where Rahu obsesses over the future, Ketu represents release and liberation through sacrifice. He governs past karma, spiritual detachment, and the willingness to suffer now for transcendence later. Capturing Ketu's vessel is a curse in disguise.",
-    power: "Martyr's Curse — if this piece is captured, you gain 12 seconds and your opponent loses 12. Ketu turns sacrifice into power. The enemy who takes this piece pays dearly for it.",
+    power: "Bless a piece and if it is captured, it returns to the activation square instead of dying.",
   },
 };
 const ASURA_LORE_LIST = [
@@ -102,7 +102,7 @@ const ASURA_LORE_LIST = [
     image: "/images/ravana.jpg",
     lore: "Ravana was the greatest king Lanka ever knew — scholar, warrior, and devotee of Shiva, possessed of ten heads each holding the knowledge of a lifetime. He was not merely a demon; he was the finest mind of his age, whose pride alone brought him low. On the chessboard, Ravana sees every direction at once.",
     powerName: "Ten-Headed Queen",
-    power: "The selected piece moves like a queen for one full turn — any direction, any distance. Ten heads, ten perspectives, one unstoppable move.",
+    power: "The selected piece moves like a queen for one full turn.",
   },
   {
     id: "HIRANYA",
@@ -112,7 +112,7 @@ const ASURA_LORE_LIST = [
     image: "/images/hiranyakasipu.jpg",
     lore: "Hiranyakashipu performed tapas so severe that Brahma himself was forced to grant him a boon of near-total invincibility — not killed by man nor beast, not by day nor night, not inside nor outside. He ruled the cosmos until Vishnu found the one crack in that armour. Until then, no force could touch him.",
     powerName: "Brahma's Boon",
-    power: "The piece cannot be captured for 2 turns. Every attack slides off. Enemies must simply wait — and hope the boon expires before it's too late.",
+    power: "The piece cannot be captured for 2 turns. Every attack slides off.",
   },
   {
     id: "SHUKRA_ASURA",
@@ -122,7 +122,7 @@ const ASURA_LORE_LIST = [
     image: "/images/shukracharya.jpg",
     lore: "Shukracharya alone holds the Mritasanjivani — the secret mantra that defeats death itself. Guru of all demons, he taught them every art, every stratagem. He is the reason the Asuras survive catastrophe after catastrophe. His greatest weapon is the art of becoming something the enemy never expected.",
     powerName: "Mirror Ascension",
-    power: "Apply to a pawn — it transforms into the first enemy piece on its file. Shukracharya doesn't promote pawns. He replaces them with something worse.",
+    power: "Apply to a pawn — it transforms it into the first enemy piece on its file.",
   },
   {
     id: "MAHISHA",
@@ -132,7 +132,7 @@ const ASURA_LORE_LIST = [
     image: "/images/mahishasura.jpg",
     lore: "Mahishasura conquered the heavens by changing shape faster than the gods could strike. Buffalo, lion, man, elephant — he was every creature at once, and none. It took Durga herself, fighting for nine days and nights, to finally pin him down. His power is the power of being impossible to predict.",
     powerName: "Shapeshift",
-    power: "Transform into any piece type you have already captured from your opponent. The piece moves immediately in its new form. Become what you have already overcome.",
+    power: "Transform into any piece type you have already captured from your opponent. The piece moves immediately in its new form. Become what you have overcome.",
   },
   {
     id: "BALI",
@@ -142,7 +142,7 @@ const ASURA_LORE_LIST = [
     image: "/images/bali.jpg",
     lore: "Bali was so righteous that Vishnu himself had to intervene to stop his rule — disguised as a dwarf, Vamana, begging for three steps of land before growing to encompass the universe. Even then, Bali gave willingly. His nobility was such that Vishnu granted him sovereignty over the underworld. Death is not the end for one so honoured.",
     powerName: "Demon's Grace",
-    power: "Resurrect one of your captured pieces on the square where it fell. The returned piece is ready to move immediately — Bali's grace restores without hesitation.",
+    power: "Resurrect one of your captured pieces on the square where it fell (if the tile is vacant). The returned piece cannot move immediately.",
   },
   {
     id: "SHUMBHA",
@@ -152,7 +152,7 @@ const ASURA_LORE_LIST = [
     image: "/images/shumbhanishumbha.jpg",
     lore: "Shumbha and Nishumbha were the twin demon generals who drove the gods from heaven and seized the cosmos. They fought not with brute force alone but with cunning — striking from unexpected angles, retreating before the counterattack could land. Together they were nearly impossible to pin down, two minds acting as one terrible weapon.",
     powerName: "Twin Strike",
-    power: "The piece captures an adjacent enemy then immediately snaps back to its origin square. Strike and vanish — the enemy is gone, and you are exactly where you were.",
+    power: "The chosen piece captures an adjacent enemy then immediately snaps back to its origin square. Strike and vanish — the enemy is gone, and you are back where you began.",
   },
   {
     id: "TARAKA",
@@ -162,7 +162,7 @@ const ASURA_LORE_LIST = [
     image: "/images/tarakasura.jpg",
     lore: "Tarakasura received a boon that only the son of Shiva could ever destroy him — and Shiva had sworn celibacy. For an age, Tarakasura was effectively immortal, terrorising the heavens with impunity. He could only be harmed by one specific kind of being. The gods had to engineer Kartikeya's very birth to end his reign.",
     powerName: "Type Lock",
-    power: "For 3 turns, this piece can only be captured by an enemy piece of the same type. A pawn can only fall to a pawn. A rook only to a rook. Choose your protector wisely.",
+    power: "For 3 turns, this piece can only be captured by an enemy piece of the same type.",
   },
   {
     id: "KALI_ASURA",
@@ -172,7 +172,7 @@ const ASURA_LORE_LIST = [
     image: "/images/kali.jpg",
     lore: "Kali is not a demon — she is the goddess of destruction herself, born from Durga's fury when the battle against Raktabija grew desperate. She drank the demon's blood before it could touch the ground and multiply. She dances on corpses. She wears a garland of severed heads. She operates beyond every rule chess has ever known.",
     powerName: "Wrathful Smite",
-    power: "Capture any adjacent enemy piece — no movement rules apply. Kali doesn't care whether a bishop moves diagonally or a rook in straight lines. If it's next to her, it dies.",
+    power: "Capture any adjacent enemy piece — no movement rules apply.",
   },
   {
     id: "VRITRA",

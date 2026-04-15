@@ -143,6 +143,24 @@ function App() {
     // VRITRA decay
     const updatedVritra = vritraRanks.filter(v => v.turnsLeft - 0.5 > 0).map(v => ({ ...v, turnsLeft: v.turnsLeft - 0.5 }));
     setVritraRanks(updatedVritra);
+
+    // GURU duplicate decay (all modes)
+    setDuplicatePieces(prev => {
+      const next = {};
+      Object.entries(prev).forEach(([sq, val]) => {
+        const newTurns = val.turnsLeft - 0.5;
+        if (newTurns > 0) {
+          next[sq] = { ...val, turnsLeft: newTurns };
+        } else {
+          setGame(g => {
+            const ng = new Chess(g.fen());
+            ng.remove(sq);
+            return ng;
+          });
+        }
+      });
+      return next;
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moveCount]);
 
@@ -1236,7 +1254,7 @@ function App() {
         * { box-sizing: border-box; }
       `}</style>
 
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", backgroundColor: theme.background, color: theme.text, padding: isMobile ? "8px" : "20px"}}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", backgroundColor: theme.background, color: theme.text, padding: isMobile ? "8px" : "20px" }}>
 
         {/* ── Mode selection ── */}
         {!gameStarted && !isMobile && (
