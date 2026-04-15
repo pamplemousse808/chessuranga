@@ -79,10 +79,10 @@ export default function AboutPage({ onBack }) {
           </section>
 
           <section className={`about-section fade-up delay-2 ${visible ? "show" : ""}`}>
-            <div className="section-label">The Making</div>
-            <h2 className="section-title">Four modes and weeks of <em>how does all this work</em></h2>
+            <div className="section-label">The Origin</div>
+            <h2 className="section-title">Just weeks of <em>how does all this work</em></h2>
             <div className="section-body">
-              <p>I've always been obsessed with games — always thinking about wouldn't it be cool if you could do this or that. About 18 months ago, I was playing a lot of Marvel Snap and bullet chess, and thought it would be amazing to combine the two.</p>
+              <p>I've always been obsessed with games and their mechanics, thinking about wouldn't it be cool if you could do this or that. About 18 months ago, I was playing a lot of Marvel Snap and bullet chess, and thought it would be amazing to combine the two.</p>
               <p>But I can't code at all, so it was just a pipe dream. Then Claude Code dropped and here we are.</p>
             </div>
           </section>
@@ -105,13 +105,14 @@ export default function AboutPage({ onBack }) {
 
           <section className={`about-section fade-up delay-4 ${visible ? "show" : ""}`} style={{textAlign:"center"}}>
             <div className="section-label">Get in Touch</div>
-            <h2 className="section-title">I'm just a one man band</h2>
+            <h2 className="section-title">All feedback welcome</h2>
             <div className="section-body" style={{maxWidth:"480px",margin:"0 auto"}}>
-              <p>All feedback welcome — bugs, ideas, thoughts, or just to tell me Guru is OP. And if you've enjoyed the game and want to help fund the next chapter:</p>
+              <p>I'm just a one man band here, so if you see any bugs, or have ideas/thoughts about the game, I'd love to hear it.</p>
             </div>
             <p style={{marginTop:"20px"}}>
               <a href="https://www.linkedin.com/in/jmewhyte/" target="_blank" rel="noopener noreferrer" style={{color:"#c8973a",textDecoration:"none",fontStyle:"italic",fontSize:"20px"}}>Say hi on LinkedIn →</a>
             </p>
+            <p>And if you've enjoyed the game and want to help fund the next chapter:</p>
             <button onClick={openKofi} className="kofi-btn">☕ Fuel the Navagraha</button>
           </section>
 
