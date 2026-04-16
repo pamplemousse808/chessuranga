@@ -1145,7 +1145,7 @@ function App() {
 
   function startGame(mode, difficulty = null, deck = null) {
     const isAsura = mode === "asura" || (mode === "shukracharya" && deck === "asura");
-    const splashImg = isAsura ? "/images/splash-asura.png" : "/images/splash-navagraha.png";
+    const splashImg = isAsura ? "/images/splash-asura.jpg" : "/images/splash-navagraha.jpg";
     setLaunchSplash(splashImg);
     setTimeout(() => {
       setLaunchSplash(null);
