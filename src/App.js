@@ -1259,6 +1259,17 @@ function App() {
           50% { opacity: 0.7; }
         }
         * { box-sizing: border-box; }
+
+        @keyframes splashFade {
+          0% { opacity: 0; }
+          20% { opacity: 1; }
+          80% { opacity: 1; }
+          100% { opacity: 0; }
+        }
+        @keyframes splashZoom {
+          0% { transform: scale(1); }
+          100% { transform: scale(1.08); }
+        }
       `}</style>
 
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", backgroundColor: theme.background, color: theme.text, padding: isMobile ? "8px" : "20px" }}>
@@ -2025,8 +2036,14 @@ function App() {
           </div>
         )}
         {launchSplash && (
-          <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "#000" }}>
-            <img src={launchSplash} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <div style={{
+            position: "fixed", inset: 0, zIndex: 9999, background: "#000",
+            animation: "splashFade 1s ease-in-out forwards"
+          }}>
+            <img src={launchSplash} alt="" style={{
+              width: "100%", height: "100%", objectFit: "cover",
+              animation: "splashZoom 1s ease-in-out forwards"
+            }} />
           </div>
         )}
       </div >
