@@ -81,6 +81,7 @@ function App() {
   const [showCardOverlay, setShowCardOverlay] = useState(false);
   const { stockfish, stockfishRef, stockfishMoveRef } = useStockfish(gameMode, gameStarted, shukraDifficulty);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
+  const [launchSplash, setLaunchSplash] = useState(null);
 
   useEffect(() => {
     if (gameMode === "asura" && gameStarted && Object.keys(asuraLives).length === 0) {
@@ -1142,15 +1143,21 @@ function App() {
     setGame(gc);
   }
 
-  function startGame(mode, difficulty = null, deck = "navagraha") {
-    const time = (mode === "asura" || mode === "shukracharya") ?
-      300 : 180;
-    setStartingTime(time); setWhiteTime(time); setBlackTime(time);
-    setGameMode(mode); setGameStarted(true); setShowShukraSelect(false);
-    if (difficulty) setShukraDifficulty(difficulty);
-    if (mode === "shukracharya") setShukraDeck(deck);
-  }
+  function startGame(mode, difficulty = null, deck = null) {
+    const isAsura = mode === "asura" || (mode === "shukracharya" && deck === "asura");
+    const splashImg = isAsura ? "/images/splash-asura.png" : "/images/splash-navagraha.png";
+    setLaunchSplash(splashImg);
+    setTimeout(() => {
+      setLaunchSplash(null);
+      const time = (mode === "asura" || mode === "shukracharya") ?
+        300 : 180;
+      setStartingTime(time); setWhiteTime(time); setBlackTime(time);
+      setGameMode(mode); setGameStarted(true); setShowShukraSelect(false);
+      if (difficulty) setShukraDifficulty(difficulty);
+      if (mode === "shukracharya") setShukraDeck(deck);
 
+    }, 1000);
+  }
   function resetGame() {
     setGame(new Chess()); setWhiteTime(startingTime); setBlackTime(startingTime);
     setGameOver(false); setWinner(null); setGameStarted(false); setGameMode(null); setMoveFrom("");
@@ -2015,6 +2022,11 @@ function App() {
               cardCooldowns={cardCooldowns}
               playerDeck={shukraDeck}
             />
+          </div>
+        )}
+        {launchSplash && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "#000" }}>
+            <img src={launchSplash} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
         )}
       </div >
