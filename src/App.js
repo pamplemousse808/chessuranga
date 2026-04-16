@@ -1147,16 +1147,17 @@ function App() {
     const isAsura = mode === "asura" || (mode === "shukracharya" && deck === "asura");
     const splashImg = isAsura ? "/images/splash-asura.jpg" : "/images/splash-navagraha.jpg";
     setLaunchSplash(splashImg);
+    // Start game immediately in background
+    const time = (mode === "asura" || mode === "shukracharya") ? 300 : 180;
+    setStartingTime(time); setWhiteTime(time); setBlackTime(time);
+    setGameMode(mode); setGameStarted(true); setShowShukraSelect(false);
+    if (difficulty) setShukraDifficulty(difficulty);
+    if (mode === "shukracharya") setShukraDeck(deck);
+
+    // Then just clear the splash after 1 second
     setTimeout(() => {
       setLaunchSplash(null);
-      const time = (mode === "asura" || mode === "shukracharya") ?
-        300 : 180;
-      setStartingTime(time); setWhiteTime(time); setBlackTime(time);
-      setGameMode(mode); setGameStarted(true); setShowShukraSelect(false);
-      if (difficulty) setShukraDifficulty(difficulty);
-      if (mode === "shukracharya") setShukraDeck(deck);
-
-    }, 1300);
+    }, 1000);
   }
   function resetGame() {
     setGame(new Chess()); setWhiteTime(startingTime); setBlackTime(startingTime);
