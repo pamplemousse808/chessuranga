@@ -1156,7 +1156,7 @@ function App() {
       if (difficulty) setShukraDifficulty(difficulty);
       if (mode === "shukracharya") setShukraDeck(deck);
 
-    }, 1000);
+    }, 1300);
   }
   function resetGame() {
     setGame(new Chess()); setWhiteTime(startingTime); setBlackTime(startingTime);
@@ -1262,13 +1262,14 @@ function App() {
 
         @keyframes splashFade {
           0% { opacity: 0; }
-          20% { opacity: 1; }
-          80% { opacity: 1; }
+          15% { opacity: 1; }
+          75% { opacity: 1; }
           100% { opacity: 0; }
         }
+
         @keyframes splashZoom {
           0% { transform: scale(1); }
-          100% { transform: scale(1.08); }
+          100% { transform: scale(1.06); }
         }
       `}</style>
 
@@ -2042,7 +2043,8 @@ function App() {
           }}>
             <img src={launchSplash} alt="" style={{
               width: "100%", height: "100%", objectFit: "cover",
-              animation: "splashZoom 1s ease-in-out forwards"
+              animation: "splashZoom 1s ease-in-out forwards",
+              mixBlendMode: "normal"
             }} />
           </div>
         )}
