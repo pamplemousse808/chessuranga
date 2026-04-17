@@ -1307,8 +1307,8 @@ function App() {
 
               {/* Title */}
               <div>
-                <h1 style={{ fontFamily: "Cinzel, serif", fontSize: "42px", background: "linear-gradient(135deg, #ffd700, #ff8c00)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", margin: 0, lineHeight: 1.1 }}>CHESSURANGA</h1>
-                <p style={{ color: "#aaa", fontSize: "14px", marginTop: "8px", fontFamily: "Crimson Pro, serif", margin: "8px 0 0 0" }}>Chess meets Hindu mythology. Two factions. Nine cosmic cards each.</p>
+                <h1 style={{ fontFamily: "Jaini Purva, serif", fontSize: "42px", background: "linear-gradient(135deg, #ffd700, #ff8c00)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", margin: 0, lineHeight: 1.1 }}>CHESSURANGA</h1>
+                <p style={{ color: "#aaa", fontSize: "14px", marginTop: "8px", fontFamily: "Crimson Pro, serif", margin: "8px 0 0 0" }}>Chess meets Hindu mythology and magic powers.</p>
               </div>
 
               {/* Shukracharya */}

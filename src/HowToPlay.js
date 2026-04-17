@@ -22,11 +22,11 @@ export default function HowToPlay({ onBack }) {
             radial-gradient(1px 1px at 91% 33%, #fff7 0%, transparent 100%),
             radial-gradient(1px 1px at 23% 88%, #fff6 0%, transparent 100%); }
         .htp-nav { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; background: rgba(6,8,16,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,215,100,0.1); }
-        .htp-nav-title { font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 0.2em; color: #c8973a; text-transform: uppercase; }
+        .htp-nav-title { font-family: 'Jaini Purva', serif; font-size: 13px; letter-spacing: 0.2em; color: #c8973a; text-transform: uppercase; }
         .htp-nav-back { font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 0.12em; color: #060810; background: #c8973a; padding: 8px 20px; border-radius: 50px; border: none; cursor: pointer; }
         .htp-content { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; padding: 0 24px 120px; }
         .htp-hero { text-align: center; padding: 64px 0 48px; border-bottom: 1px solid rgba(255,215,100,0.12); }
-        .htp-hero-title { font-family: 'Cinzel', serif; font-size: clamp(32px, 7vw, 60px); font-weight: 700; background: linear-gradient(135deg, #ffd966 0%, #f0a500 40%, #e8c87a 80%, #ffd966 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 16px; }
+        .htp-hero-title { font-family: 'Jaini Purva', serif; font-size: clamp(32px, 7vw, 60px); font-weight: 700; background: linear-gradient(135deg, #ffd966 0%, #f0a500 40%, #e8c87a 80%, #ffd966 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 16px; }
         .htp-hero-sub { font-size: 18px; font-style: italic; color: #a89060; }
         .htp-divider { width: 60px; height: 2px; background: linear-gradient(90deg, transparent, #c8973a, transparent); margin: 24px auto 0; }
         .fade-up { opacity: 0; transform: translateY(28px); transition: opacity 0.8s ease, transform 0.8s ease; }
@@ -72,7 +72,7 @@ export default function HowToPlay({ onBack }) {
               <div className="section-label">Welcome</div>
               <h2 className="section-title">Chess with cosmic powers</h2>
               <div className="section-body">
-                <p>Chessuranga is chess with special moves based on ancient Indian deities and demons. As pieces are taken, you unlock the help of either the Navagraha — the nine celestial bodies of Hindu cosmology — or the Asura, the demon lords who oppose them.</p>
+                <p>Chessuranga is chess with magic powers based on ancient Indian deities and demons. As pieces are taken, you unlock the help of either the Navagraha — the nine celestial bodies of Hindu cosmology — or the Asura, the demon lords who oppose them.</p>
               </div>
             </>
           )}
