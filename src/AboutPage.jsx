@@ -62,7 +62,7 @@ export default function AboutPage({ onBack }) {
 
           <div className={`about-hero fade-up delay-1 ${visible ? "show" : ""}`}>
             <h1 className="about-hero-title">Chessuranga</h1>
-            <p className="about-hero-sub">We all need chess with special moves.</p>
+            <p className="about-hero-sub">We all need chess with magic powers.</p>
             <div className="about-divider" />
           </div>
 
