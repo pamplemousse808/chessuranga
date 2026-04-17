@@ -1173,7 +1173,7 @@ function App() {
     // Then just clear the splash after 1 second
     setTimeout(() => {
       setLaunchSplash(null);
-    }, 1300);
+    }, 1600);
   }
   function resetGame() {
     setGame(new Chess()); setWhiteTime(startingTime); setBlackTime(startingTime);
