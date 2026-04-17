@@ -550,9 +550,25 @@ function App() {
 
   function handleMove(from, to, promotion = "q") {
     try {
-      if (resurrectedPieces[from] || resurrectedPieces[to]) return null;
-      if (chandraMode && chandraMode.mirages.includes(from)) return null;
+      if (resurrectedPieces[from]) return null;
 
+      // If enemy is capturing a locked resurrected piece, allow it but clear the lock
+      if (resurrectedPieces[to]) {
+        const lockedPiece = game.get(to);
+        const movingPiece = game.get(from);
+        if (lockedPiece && movingPiece && lockedPiece.color !== movingPiece.color) {
+          // Enemy capture — proceed, and clear the resurrection lock
+          setResurrectedPieces(prev => {
+            const updated = { ...prev };
+            delete updated[to];
+            return updated;
+          });
+          // fall through to normal move handling
+        } else {
+          return null; // same-color interaction, keep blocking
+        }
+      }
+      if (chandraMode && chandraMode.mirages.includes(from)) return null;
       if (chandraMode && from === chandraMode.realSquare) {
         const cleanGame = new Chess(game.fen());
         chandraMode.mirages.forEach(sq => { if (cleanGame.get(sq)) cleanGame.remove(sq); });
@@ -1145,7 +1161,7 @@ function App() {
 
   function startGame(mode, difficulty = null, deck = null) {
     const isAsura = mode === "asura" || (mode === "shukracharya" && deck === "asura");
-    const splashImg = isAsura ? "/images/splash-asura.jpg" : "/images/splash-navagraha.jpg";
+    const splashImg = isAsura ? "/images/splash.jpg" : "/images/splash.jpg";
     setLaunchSplash(splashImg);
     // Start game immediately in background
     const time = (mode === "asura" || mode === "shukracharya") ? 300 : 180;
@@ -1157,7 +1173,7 @@ function App() {
     // Then just clear the splash after 1 second
     setTimeout(() => {
       setLaunchSplash(null);
-    }, 1000);
+    }, 1300);
   }
   function resetGame() {
     setGame(new Chess()); setWhiteTime(startingTime); setBlackTime(startingTime);
@@ -1342,7 +1358,7 @@ function App() {
           <div style={{ position: "relative", width: "100%", minHeight: "100vh", overflow: "hidden" }}>
             {/* Background artwork */}
             <img
-              src="/images/chessurangamobile.jpg?v=2"
+              src="/images/splash.jpg?v=3"
               alt=""
               style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }}
             />
