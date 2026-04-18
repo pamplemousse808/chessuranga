@@ -1446,7 +1446,7 @@ function App() {
               </div>
 
               {/* Daily Puzzle — full width featured */}
-              <button onClick={() => setGameMode("daily")} style={{ marginTop: "90px", width: "100%", padding: "18px 20px", background: "linear-gradient(135deg, rgba(255,215,0,0.25), rgba(245,158,11,0.25))", border: "2px solid rgba(255,215,0,0.6)", borderRadius: "16px", cursor: "pointer", textAlign: "left", backdropFilter: "blur(4px)" }}>
+              <button onClick={() => setGameMode("daily")} style={{ marginTop: "75px", width: "100%", padding: "18px 20px", background: "linear-gradient(135deg, rgba(255,215,0,0.25), rgba(245,158,11,0.25))", border: "2px solid rgba(255,215,0,0.6)", borderRadius: "16px", cursor: "pointer", textAlign: "left", backdropFilter: "blur(4px)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <div>
                     <div style={{ fontFamily: "'Cinzel', serif", fontSize: "18px", fontWeight: "bold", color: "#ffd700", marginBottom: "4px" }}>🌟 Daily Puzzle</div>
