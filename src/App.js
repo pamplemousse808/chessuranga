@@ -1447,7 +1447,7 @@ function App() {
 
               {/* Floating logo */}
               <img
-                src="/images/chessurangalogo.jpg"
+                src="/images/chessurangalogo.jpg?v=1"
                 alt="Chessuranga"
                 style={{ width: "85%", margin: "0 auto", display: "block" }}
               />
