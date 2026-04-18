@@ -1434,7 +1434,7 @@ function App() {
                 <button onClick={() => startGame("pvp")} style={{ background: "rgba(0,0,0,0.55)", border: "1px solid rgba(78,204,163,0.4)", borderRadius: "14px", padding: "16px 12px", cursor: "pointer", textAlign: "left", backdropFilter: "blur(4px)" }}>
                   <div style={{ fontSize: "22px", marginBottom: "6px" }}>🌟</div>
                   <div style={{ fontFamily: "'Cinzel', serif", fontSize: "13px", fontWeight: "bold", color: "#4ecca3", marginBottom: "4px" }}>Tablet Mode VS Friend</div>
-                  <div style={{ fontSize: "11px", color: "#a7f3d0", lineHeight: "1.4" }}>Play local 1v1 aginst a friend</div>
+                  <div style={{ fontSize: "11px", color: "#a7f3d0", lineHeight: "1.4" }}>Play local 1v1 against a friend</div>
                 </button>
 
                 {/* Navagraha Lore */}
@@ -1444,9 +1444,9 @@ function App() {
                   <div style={{ fontSize: "11px", color: "#d8b4fe", lineHeight: "1.4" }}>The celestial and demonic mythology and powers explained.</div>
                 </button>
               </div>
-              
+
               {/* Daily Puzzle — full width featured */}
-              <button onClick={() => setGameMode("daily")} style={{ width: "100%", padding: "18px 20px", background: "linear-gradient(135deg, rgba(255,215,0,0.25), rgba(245,158,11,0.25))", border: "2px solid rgba(255,215,0,0.6)", borderRadius: "16px", cursor: "pointer", textAlign: "left", backdropFilter: "blur(4px)" }}>
+              <button onClick={() => setGameMode("daily")} style={{ marginTop: "30px", width: "100%", padding: "18px 20px", background: "linear-gradient(135deg, rgba(255,215,0,0.25), rgba(245,158,11,0.25))", border: "2px solid rgba(255,215,0,0.6)", borderRadius: "16px", cursor: "pointer", textAlign: "left", backdropFilter: "blur(4px)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <div>
                     <div style={{ fontFamily: "'Cinzel', serif", fontSize: "18px", fontWeight: "bold", color: "#ffd700", marginBottom: "4px" }}>🌟 Daily Puzzle</div>
