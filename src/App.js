@@ -1390,17 +1390,6 @@ function App() {
             {/* Content */}
             <div style={{ position: "relative", zIndex: 1, padding: "20px 16px 32px", display: "flex", flexDirection: "column", gap: "12px" }}>
 
-              {/* Daily Puzzle — full width featured */}
-              <button onClick={() => setGameMode("daily")} style={{ width: "100%", padding: "18px 20px", background: "linear-gradient(135deg, rgba(255,215,0,0.25), rgba(245,158,11,0.25))", border: "2px solid rgba(255,215,0,0.6)", borderRadius: "16px", cursor: "pointer", textAlign: "left", backdropFilter: "blur(4px)" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div>
-                    <div style={{ fontFamily: "'Cinzel', serif", fontSize: "18px", fontWeight: "bold", color: "#ffd700", marginBottom: "4px" }}>🌟 Daily Puzzle</div>
-                    <div style={{ fontSize: "12px", color: "#e5e7eb", lineHeight: "1.4" }}>New puzzle every day. Find mate with today's 3 cosmic cards. Share your score.</div>
-                  </div>
-                  <div style={{ fontSize: "11px", color: "#ffd700", fontWeight: "bold", marginLeft: "12px", whiteSpace: "nowrap" }}>#{getDailyPuzzleNumber()}<br />today</div>
-                </div>
-              </button>
-
               {/* 2x2 grid */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
 
@@ -1455,6 +1444,17 @@ function App() {
                   <div style={{ fontSize: "11px", color: "#d8b4fe", lineHeight: "1.4" }}>The celestial and demonic mythology and powers explained.</div>
                 </button>
               </div>
+              
+              {/* Daily Puzzle — full width featured */}
+              <button onClick={() => setGameMode("daily")} style={{ width: "100%", padding: "18px 20px", background: "linear-gradient(135deg, rgba(255,215,0,0.25), rgba(245,158,11,0.25))", border: "2px solid rgba(255,215,0,0.6)", borderRadius: "16px", cursor: "pointer", textAlign: "left", backdropFilter: "blur(4px)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div>
+                    <div style={{ fontFamily: "'Cinzel', serif", fontSize: "18px", fontWeight: "bold", color: "#ffd700", marginBottom: "4px" }}>🌟 Daily Puzzle</div>
+                    <div style={{ fontSize: "12px", color: "#e5e7eb", lineHeight: "1.4" }}>New puzzle every day. Find mate with today's 3 cosmic cards. Share your score.</div>
+                  </div>
+                  <div style={{ fontSize: "11px", color: "#ffd700", fontWeight: "bold", marginLeft: "12px", whiteSpace: "nowrap" }}>#{getDailyPuzzleNumber()}<br />today</div>
+                </div>
+              </button>
 
               {/* Bottom links */}
               <div style={{ display: "flex", gap: "10px", marginTop: "4px" }}>
