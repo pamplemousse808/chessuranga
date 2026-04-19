@@ -213,7 +213,8 @@ function App() {
   useEffect(() => {
     const handler = CapApp.addListener('backButton', ({ canGoBack }) => {
       if (gameStarted) {
-        resetGame();
+        const confirm = window.confirm("Return to home screen?");
+        if (confirm) resetGame();
       } else if (gameMode === "daily") {
         setGameMode(null);
       } else if (showAbout || showNavagraha || showHowToPlay) {
