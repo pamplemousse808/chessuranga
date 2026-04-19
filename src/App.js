@@ -1388,7 +1388,7 @@ function App() {
             <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.4)" }} />
 
             {/* Content */}
-            <div style={{ position: "relative", zIndex: 1, padding: "20px 16px 32px", paddingTop: "25px", display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div style={{ position: "relative", zIndex: 1, padding: "20px 16px 32px", paddingTop: "50px", display: "flex", flexDirection: "column", gap: "12px" }}>
 
               {/* 2x2 grid */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
@@ -1449,7 +1449,7 @@ function App() {
               <img
                 src="/images/chessurangalogo.png"
                 alt="Chessuranga"
-                style={{ width: "85%", margin: "0 auto", display: "block", mixBlendMode: "screen" }} />
+                style={{ width: "95%", margin: "0 auto", display: "block", mixBlendMode: "screen" }} />
 
               {/* Daily Puzzle — full width featured */}
               <button onClick={() => setGameMode("daily")} style={{ width: "100%", padding: "18px 20px", background: "linear-gradient(135deg, rgba(255,215,0,0.25), rgba(245,158,11,0.25))", border: "2px solid rgba(255,215,0,0.6)", borderRadius: "16px", cursor: "pointer", textAlign: "left", backdropFilter: "blur(4px)" }}>
