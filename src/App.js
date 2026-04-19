@@ -11,6 +11,7 @@ import MobileCardOverlay from "./MobileCardOverlay";
 import PvpTabletLayout from "./PvpTabletLayout";
 import DailyPuzzle from "./DailyPuzzle";
 import NavagrahaPage from "./NavagrahaPage";
+import { App as CapApp } from '@capacitor/app';
 
 // ── Mobile detection ──────────────────────────────────────────────────────────
 function useIsMobile() {
@@ -208,6 +209,21 @@ function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [game, gameStarted, gameOver, gameMode, waitingForBot, stockfish]);
+
+  useEffect(() => {
+    const handler = CapApp.addListener('backButton', ({ canGoBack }) => {
+      if (gameStarted) {
+        resetGame();
+      } else if (showAbout || showNavagraha || showHowToPlay) {
+        setShowAbout(false);
+        setShowNavagraha(false);
+        setShowHowToPlay(false);
+      } else {
+        CapApp.exitApp();
+      }
+    });
+    return () => handler.then(h => h.remove());
+  }, [gameStarted, showAbout, showNavagraha, showHowToPlay]);
 
   function addTime(player, seconds) { if (player === "w") setWhiteTime(p => Math.min(p + seconds, startingTime)); else setBlackTime(p => Math.min(p + seconds, startingTime)); }
   function subtractTime(player, seconds) { if (player === "w") setWhiteTime(p => Math.max(p - seconds, 0)); else setBlackTime(p => Math.max(p - seconds, 0)); }
@@ -1449,7 +1465,7 @@ function App() {
               <img
                 src="/images/chessurangalogo.png"
                 alt="Chessuranga"
-                style={{ width: "95%", margin: "0 auto", display: "block", mixBlendMode: "screen" }} />
+                style={{ width: "100%", margin: "0 auto", display: "block", mixBlendMode: "screen" }} />
 
               {/* Daily Puzzle — full width featured */}
               <button onClick={() => setGameMode("daily")} style={{ width: "100%", padding: "18px 20px", background: "linear-gradient(135deg, rgba(255,215,0,0.25), rgba(245,158,11,0.25))", border: "2px solid rgba(255,215,0,0.6)", borderRadius: "16px", cursor: "pointer", textAlign: "left", backdropFilter: "blur(4px)" }}>
