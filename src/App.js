@@ -214,6 +214,8 @@ function App() {
     const handler = CapApp.addListener('backButton', ({ canGoBack }) => {
       if (gameStarted) {
         resetGame();
+      } else if (gameMode === "daily") {
+        setGameMode(null);
       } else if (showAbout || showNavagraha || showHowToPlay) {
         setShowAbout(false);
         setShowNavagraha(false);
@@ -223,7 +225,7 @@ function App() {
       }
     });
     return () => handler.then(h => h.remove());
-  }, [gameStarted, showAbout, showNavagraha, showHowToPlay]);
+  }, [gameStarted, gameMode, showAbout, showNavagraha, showHowToPlay]);
 
   function addTime(player, seconds) { if (player === "w") setWhiteTime(p => Math.min(p + seconds, startingTime)); else setBlackTime(p => Math.min(p + seconds, startingTime)); }
   function subtractTime(player, seconds) { if (player === "w") setWhiteTime(p => Math.max(p - seconds, 0)); else setBlackTime(p => Math.max(p - seconds, 0)); }
