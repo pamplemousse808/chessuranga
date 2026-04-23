@@ -226,6 +226,7 @@ function App() {
       }
     });
     return () => handler.then(h => h.remove());
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameStarted, gameMode, showAbout, showNavagraha, showHowToPlay]);
 
   function addTime(player, seconds) { if (player === "w") setWhiteTime(p => Math.min(p + seconds, startingTime)); else setBlackTime(p => Math.min(p + seconds, startingTime)); }
