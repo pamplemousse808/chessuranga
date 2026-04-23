@@ -103,23 +103,26 @@ export default function AboutPage({ onBack }) {
             </ul>
           </section>
 
-          <section className={`about-section fade-up delay-4 ${visible ? "show" : ""}`} style={{textAlign:"center"}}>
+          <section className={`about-section fade-up delay-4 ${visible ? "show" : ""}`} style={{ textAlign: "center" }}>
             <div className="section-label">Get in Touch</div>
             <h2 className="section-title">All feedback welcome</h2>
-            <div className="section-body" style={{maxWidth:"480px",margin:"0 auto"}}>
+            <div className="section-body" style={{ maxWidth: "480px", margin: "0 auto" }}>
               <p>I'm just a one man band here, so if you see any bugs, or have ideas/thoughts about the game, I'd love to hear it.</p>
             </div>
-            <p style={{marginTop:"5px"}}>
-              <a href="https://www.linkedin.com/in/jmewhyte/" target="_blank" rel="noopener noreferrer" style={{color:"#c8973a",textDecoration:"underline",fontStyle:"italic", fontSize:"20px"}}>Say hi!</a>
+            <p style={{ marginTop: "5px" }}>
+              <a href="https://www.linkedin.com/in/jmewhyte/" target="_blank" rel="noopener noreferrer" style={{ color: "#c8973a", textDecoration: "underline", fontStyle: "italic", fontSize: "20px" }}>Say hi!</a>
             </p>
-            <p style={{marginTop:"10px"}}>and if you've enjoyed the game and want to help fund the next chapter:</p>
+            <p style={{ marginTop: "10px" }}>and if you've enjoyed the game and want to help fund the next chapter:</p>
             <button onClick={openKofi} className="kofi-btn">☕ Fuel the Navagraha</button>
           </section>
 
         </div>
         <footer className="footer">
-          ♟ CHESSURANGA — May the Navagraha guide your moves<br/>
-          <span style={{fontSize:"11px",opacity:0.5}}>© {new Date().getFullYear()} Chessuranga. All rights reserved.</span>
+          ♟ CHESSURANGA — May the Navagraha guide your moves
+          <br />
+          <span style={{ fontSize: "11px", opacity: 0.5 }}>© {new Date().getFullYear()} Chessuranga. All rights reserved.</span>
+          <br />
+          <a href="/privacy.html" target="_blank" rel="noopener noreferrer" style={{ fontSize: "11px", opacity: 0.4, color: "#c8973a" }}>Privacy Policy</a>
         </footer>
       </div>
     </>
