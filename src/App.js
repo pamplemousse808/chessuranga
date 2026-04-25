@@ -39,6 +39,7 @@ function App() {
   const [moveCount, setMoveCount] = useState(0);
   const [shukraDifficulty, setShukraDifficulty] = useState(null);
   const [showShukraSelect, setShowShukraSelect] = useState(false);
+  const [showPvpTimeSelect, setShowPvpTimeSelect] = useState(false);
   const [guruPickerMode, setGuruPickerMode] = useState(null);
   const [gameMode, setGameMode] = useState(null);
   const [whiteCaptured, setWhiteCaptured] = useState([]);
@@ -83,6 +84,7 @@ function App() {
   const { stockfish, stockfishRef, stockfishMoveRef } = useStockfish(gameMode, gameStarted, shukraDifficulty);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [launchSplash, setLaunchSplash] = useState(null);
+
 
   useEffect(() => {
     if (gameMode === "asura" && gameStarted && Object.keys(asuraLives).length === 0) {
@@ -226,7 +228,7 @@ function App() {
       }
     });
     return () => handler.then(h => h.remove());
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameStarted, gameMode, showAbout, showNavagraha, showHowToPlay]);
 
   function addTime(player, seconds) { if (player === "w") setWhiteTime(p => Math.min(p + seconds, startingTime)); else setBlackTime(p => Math.min(p + seconds, startingTime)); }
@@ -1184,8 +1186,7 @@ function App() {
     const splashImg = isAsura ? "/images/splash.jpg" : "/images/splash.jpg";
     setLaunchSplash(splashImg);
     // Start game immediately in background
-    const time = (mode === "asura" || mode === "shukracharya") ? 300 : 180;
-    setStartingTime(time); setWhiteTime(time); setBlackTime(time);
+    const time = (mode === "asura" || mode === "shukracharya") ? 300 : (mode === "pvp" && difficulty ? difficulty : 180); setStartingTime(time); setWhiteTime(time); setBlackTime(time);
     setGameMode(mode); setGameStarted(true); setShowShukraSelect(false);
     if (difficulty) setShukraDifficulty(difficulty);
     if (mode === "shukracharya") setShukraDeck(deck);
@@ -1373,7 +1374,7 @@ function App() {
 
               {/* Secondary 2x2 grid */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                <button onClick={() => startGame("pvp")} style={{ padding: "12px 16px", fontSize: "14px", backgroundColor: "#4ecca3", color: "#000", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", textAlign: "left" }}>
+                <button onClick={() => setShowPvpTimeSelect(true)} style={{ padding: "12px 16px", fontSize: "14px", backgroundColor: "#4ecca3", color: "#000", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", textAlign: "left" }}>
                   🌞 Tablet Mode VS Friend
                   <div style={{ fontSize: "10px", fontWeight: "normal", marginTop: "2px" }}>Play local 1v1 against a friend</div>
                 </button>
@@ -1451,7 +1452,7 @@ function App() {
                 </button>
 
                 {/* Tablet Mode */}
-                <button onClick={() => startGame("pvp")} style={{ background: "rgba(0,0,0,0.55)", border: "1px solid rgba(78,204,163,0.4)", borderRadius: "14px", padding: "16px 12px", cursor: "pointer", textAlign: "left", backdropFilter: "blur(4px)" }}>
+                <button onClick={() => setShowPvpTimeSelect(true)} style={{ background: "rgba(0,0,0,0.55)", border: "1px solid rgba(78,204,163,0.4)", borderRadius: "14px", padding: "16px 12px", cursor: "pointer", textAlign: "left", backdropFilter: "blur(4px)" }}>
                   <div style={{ fontSize: "22px", marginBottom: "6px" }}>🌟</div>
                   <div style={{ fontFamily: "'Cinzel', serif", fontSize: "13px", fontWeight: "bold", color: "#4ecca3", marginBottom: "4px" }}>Tablet Mode VS Friend</div>
                   <div style={{ fontSize: "11px", color: "#a7f3d0", lineHeight: "1.4" }}>Play local 1v1 against a friend</div>
@@ -1487,6 +1488,52 @@ function App() {
                 <button onClick={() => setShowHowToPlay(true)} style={{ flex: 1, padding: "12px", background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "12px", color: "#e5e7eb", fontSize: "13px", cursor: "pointer", backdropFilter: "blur(4px)" }}>📖 How to Play</button>
                 <button onClick={() => setShowAbout(true)} style={{ flex: 1, padding: "12px", background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "12px", color: "#e5e7eb", fontSize: "13px", cursor: "pointer", backdropFilter: "blur(4px)" }}>📖 About</button>
               </div>
+            </div>
+          </div>
+        )}
+{showPvpTimeSelect && (
+          <div style={{
+            position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.85)",
+            display: "flex", alignItems: "center", justifyContent: "center", zIndex: 999
+          }}>
+            <div style={{
+              backgroundColor: "#16213e", border: "2px solid #4ecca3",
+              borderRadius: "18px", padding: "32px 28px", textAlign: "center",
+              maxWidth: "320px", width: "90%"
+            }}>
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: "20px", color: "#4ecca3", marginBottom: "8px" }}>
+                ⚔️ Choose Game Time
+              </div>
+              <div style={{ fontSize: "13px", color: "#888", marginBottom: "24px" }}>
+                Each player gets this much time
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                {[
+                  { label: "⚡ Blitz", sub: "3 minutes", secs: 180 },
+                  { label: "🕹️ Standard", sub: "5 minutes", secs: 300 },
+                  { label: "🧘 Long", sub: "10 minutes", secs: 600 },
+                ].map(({ label, sub, secs }) => (
+                  <button
+                    key={secs}
+                    onClick={() => { setShowPvpTimeSelect(false); startGame("pvp", secs); }}
+                    style={{
+                      padding: "14px 20px", fontSize: "15px", fontWeight: "bold",
+                      backgroundColor: "rgba(78,204,163,0.12)", color: "#4ecca3",
+                      border: "2px solid rgba(78,204,163,0.4)", borderRadius: "12px",
+                      cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center"
+                    }}
+                  >
+                    <span>{label}</span>
+                    <span style={{ fontSize: "13px", color: "#888" }}>{sub}</span>
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => setShowPvpTimeSelect(false)}
+                style={{ marginTop: "20px", fontSize: "12px", background: "none", border: "none", color: "#555", cursor: "pointer" }}
+              >
+                ✕ Cancel
+              </button>
             </div>
           </div>
         )}
