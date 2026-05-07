@@ -72,16 +72,6 @@ const PHASES = [
 // Black: pawn e5, knight f6, bishop d6 (removed — using c7 queen), queen c7
 const INITIAL_FEN = "2q5/8/3b1n2/1N2p1B1/3P4/8/PPP2PPP/R1BQK2R w KQ - 0 1";
 
-// Bot reply moves per phase (simple retreats)
-const BOT_REPLIES = {
-  capture_pawn:  null,          // bot moves after Surya use
-  use_surya:     "d6c7",        // bishop shuffles — but we trigger after card use
-  capture_knight: null,
-  use_guru:      "c7d7",
-  capture_queen: null,
-  use_mangala:   null,
-};
-
 export default function Tutorial({ onBack }) {
   const [game, setGame]               = useState(new Chess(INITIAL_FEN));
   const [phaseIdx, setPhaseIdx]       = useState(0);
