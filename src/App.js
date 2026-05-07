@@ -1497,6 +1497,11 @@ function App() {
                 <button onClick={() => setShowHowToPlay(true)} style={{ flex: 1, padding: "12px", background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "12px", color: "#e5e7eb", fontSize: "13px", cursor: "pointer", backdropFilter: "blur(4px)" }}>📖 How to Play</button>
                 <button onClick={() => setShowAbout(true)} style={{ flex: 1, padding: "12px", background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "12px", color: "#e5e7eb", fontSize: "13px", cursor: "pointer", backdropFilter: "blur(4px)" }}>📖 About</button>
               </div>
+              {/* Tutorial button */}
+              <button onClick={() => setShowTutorial(true)} style={{ width: "100%", padding: "12px 16px", fontSize: "14px", backgroundColor: "#c8973a", color: "#060810", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", textAlign: "left", marginTop: "10px" }}>
+                ✨ Interactive Tutorial
+                <div style={{ fontSize: "10px", fontWeight: "normal", marginTop: "2px", opacity: 0.7 }}>Learn to summon the Navagraha step by step</div>
+              </button>
             </div>
           </div>
         )}

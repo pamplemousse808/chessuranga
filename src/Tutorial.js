@@ -3,265 +3,265 @@ import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
 
 // ─── Tutorial card definitions ───────────────────────────────────────────────
-const SURYA  = { id: "SURYA",   name: "Surya",   color: "#fbbf24", tier: 1, cost: 8,  description: "Can't be captured for 2 moves",                                                              image: "/images/surya.jpg"   };
-const GURU   = { id: "GURU",    name: "Guru",    color: "#a855f7", tier: 2, cost: 9,  description: "Spawn a real duplicate left or right — it moves and can capture for 2 turns before it dissolves", image: "/images/guru.jpg"    };
-const MANGALA= { id: "MANGALA", name: "Mangala", color: "#ef4444", tier: 3, cost: 12, description: "Capture any adjacent piece",                                                                  image: "/images/mangala.jpg" };
+const SURYA = { id: "SURYA", name: "Surya", color: "#fbbf24", tier: 1, cost: 8, description: "Can't be captured for 2 moves", image: "/images/surya.jpg" };
+const GURU = { id: "GURU", name: "Guru", color: "#a855f7", tier: 2, cost: 9, description: "Spawn a real duplicate left or right — it moves and can capture for 2 turns before it dissolves", image: "/images/guru.jpg" };
+const MANGALA = { id: "MANGALA", name: "Mangala", color: "#ef4444", tier: 3, cost: 12, description: "Capture any adjacent piece", image: "/images/mangala.jpg" };
 
 // ─── Tutorial phases ──────────────────────────────────────────────────────────
 const PHASES = [
-  {
-    id: "capture_pawn",
-    title: "Capture the pawn",
-    body: "Move your pawn on d4 to capture the black pawn on e5. This will unlock your first celestial power.",
-    arrow: null,
-    highlightSquares: ["d4", "e5"],
-    tier1: false, tier2: false, tier3: false,
-  },
-  {
-    id: "use_surya",
-    title: "Surya has awakened",
-    body: "You've unlocked a Tier 1 power. Tap Āhvān to open your cards, then select Surya and choose a piece to protect.",
-    arrow: "ahvan",
-    highlightSquares: [],
-    tier1: true, tier2: false, tier3: false,
-  },
-  {
-    id: "capture_knight",
-    title: "Press the attack",
-    body: "Now capture the knight on f6 with your bishop on g5. A Tier 2 power will awaken.",
-    arrow: null,
-    highlightSquares: ["g5", "f6"],
-    tier1: true, tier2: false, tier3: false,
-  },
-  {
-    id: "use_guru",
-    title: "Guru stirs",
-    body: "Tier 2 unlocked. Open Āhvān, select Guru, and spawn a duplicate of one of your pieces.",
-    arrow: "ahvan",
-    highlightSquares: [],
-    tier1: true, tier2: true, tier3: false,
-  },
-  {
-    id: "capture_queen",
-    title: "Strike the queen",
-    body: "Capture the queen on c7 with your knight on b5. The mightiest Tier 3 power will be yours.",
-    arrow: null,
-    highlightSquares: ["b5", "c7"],
-    tier1: true, tier2: true, tier3: false,
-  },
-  {
-    id: "use_mangala",
-    title: "Mangala is unleashed",
-    body: "Tier 3 unlocked. Open Āhvān, select Mangala, and capture any piece adjacent to your chosen warrior.",
-    arrow: "ahvan",
-    highlightSquares: [],
-    tier1: true, tier2: true, tier3: true,
-  },
-  {
-    id: "complete",
-    title: "You are ready",
-    body: "You've wielded the celestial powers. The cosmos awaits.",
-    arrow: null,
-    highlightSquares: [],
-    tier1: true, tier2: true, tier3: true,
-  },
+    {
+        id: "capture_pawn",
+        title: "Capture the pawn",
+        body: "Move your pawn on d4 to capture the black pawn on e5. This will unlock your first celestial power.",
+        arrow: null,
+        highlightSquares: ["d4", "e5"],
+        tier1: false, tier2: false, tier3: false,
+    },
+    {
+        id: "use_surya",
+        title: "Surya has awakened",
+        body: "You've unlocked a Tier 1 power. Tap Āhvān to open your cards, then select Surya and choose a piece to protect.",
+        arrow: "ahvan",
+        highlightSquares: [],
+        tier1: true, tier2: false, tier3: false,
+    },
+    {
+        id: "capture_knight",
+        title: "Press the attack",
+        body: "Now capture the knight on f6 with your bishop on g5. A Tier 2 power will awaken.",
+        arrow: null,
+        highlightSquares: ["g5", "f6"],
+        tier1: true, tier2: false, tier3: false,
+    },
+    {
+        id: "use_guru",
+        title: "Guru stirs",
+        body: "Tier 2 unlocked. Open Āhvān, select Guru, and spawn a duplicate of one of your pieces.",
+        arrow: "ahvan",
+        highlightSquares: [],
+        tier1: true, tier2: true, tier3: false,
+    },
+    {
+        id: "capture_queen",
+        title: "Strike the queen",
+        body: "Capture the queen on c7 with your knight on b5. The mightiest Tier 3 power will be yours.",
+        arrow: null,
+        highlightSquares: ["b5", "c7"],
+        tier1: true, tier2: true, tier3: false,
+    },
+    {
+        id: "use_mangala",
+        title: "Mangala is unleashed",
+        body: "Tier 3 unlocked. Open Āhvān, select Mangala, and capture any piece adjacent to your chosen warrior.",
+        arrow: "ahvan",
+        highlightSquares: [],
+        tier1: true, tier2: true, tier3: true,
+    },
+    {
+        id: "complete",
+        title: "You are ready",
+        body: "You've wielded the celestial powers. The cosmos awaits.",
+        arrow: null,
+        highlightSquares: [],
+        tier1: true, tier2: true, tier3: true,
+    },
 ];
 
 // ─── Initial FEN: mid-game position ──────────────────────────────────────────
 // White: Ra1 Nb5 Bc1 Bg5 Qd1 Ke1 pawns on a2 b2 c2 d4 f2 g2 h2
 // Black: pawn e5, knight f6, bishop d6 (removed — using c7 queen), queen c7
-const INITIAL_FEN = "2q1k3/8/3b1n2/1N2p1B1/3P4/8/PPP2PPP/R1BQK2R w KQ - 0 1";
+const INITIAL_FEN = "2q1k3/1N6/3b1n2/4p1B1/3P4/8/PPP2PPP/R1BQK2R w KQ - 0 1";
 
 export default function Tutorial({ onBack }) {
-  const [game, setGame]               = useState(new Chess(INITIAL_FEN));
-  const [phaseIdx, setPhaseIdx]       = useState(0);
-  const [showOverlay, setShowOverlay] = useState(false);
-  const [selectedCard, setSelectedCard] = useState(null);
-  const [activationMode, setActivationMode] = useState(false);
-  const [poweredSquares, setPoweredSquares] = useState({});   // square → card id
-  const [flash, setFlash]             = useState(null);       // { msg, color }
-  const [boardWidth, setBoardWidth]   = useState(360);
-  const [visible, setVisible]         = useState(false);
+    const [game, setGame] = useState(new Chess(INITIAL_FEN));
+    const [phaseIdx, setPhaseIdx] = useState(0);
+    const [showOverlay, setShowOverlay] = useState(false);
+    const [selectedCard, setSelectedCard] = useState(null);
+    const [activationMode, setActivationMode] = useState(false);
+    const [poweredSquares, setPoweredSquares] = useState({});   // square → card id
+    const [flash, setFlash] = useState(null);       // { msg, color }
+    const [boardWidth, setBoardWidth] = useState(360);
+    const [visible, setVisible] = useState(false);
 
-  const phase = PHASES[phaseIdx];
+    const phase = PHASES[phaseIdx];
 
-  useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 60);
-    return () => clearTimeout(t);
-  }, []);
+    useEffect(() => {
+        const t = setTimeout(() => setVisible(true), 60);
+        return () => clearTimeout(t);
+    }, []);
 
-  useEffect(() => {
-    const update = () => {
-      const w = Math.min(window.innerWidth, 480);
-      setBoardWidth(w - 16);
-    };
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
-
-  // ── Flash helper ────────────────────────────────────────────────────────────
-  const showFlash = (msg, color = "#fbbf24") => {
-    setFlash({ msg, color });
-    setTimeout(() => setFlash(null), 2000);
-  };
-
-  // ── Bot auto-reply ──────────────────────────────────────────────────────────
-  const botReply = useCallback((g, move) => {
-    if (!move) return;
-    setTimeout(() => {
-      const clone = new Chess(g.fen());
-      try {
-        clone.move({ from: move.slice(0,2), to: move.slice(2,4) });
-        setGame(clone);
-      } catch (_) {}
-    }, 800);
-  }, []);
-
-  // ── Advance phase ───────────────────────────────────────────────────────────
-  const advance = useCallback((currentPhaseId, g) => {
-    const nextIdx = PHASES.findIndex(p => p.id === currentPhaseId) + 1;
-    if (nextIdx < PHASES.length) {
-      setPhaseIdx(nextIdx);
-      // trigger bot reply for card-use phases
-      if (currentPhaseId === "use_surya")   botReply(g, "d6c5");
-      if (currentPhaseId === "use_guru")    botReply(g, "c7d7");
-    }
-  }, [botReply]);
-
-  // ── Piece drop ──────────────────────────────────────────────────────────────
-  const onPieceDrop = useCallback((sourceSquare, targetSquare) => {
-    // Activation mode: Mangala adjacent capture
-    if (activationMode && selectedCard?.id === "MANGALA") {
-      const files = "abcdefgh";
-      const sf = files.indexOf(sourceSquare[0]);
-      const sr = parseInt(sourceSquare[1]);
-      const tf = files.indexOf(targetSquare[0]);
-      const tr = parseInt(targetSquare[1]);
-      const adjacent = Math.abs(sf - tf) <= 1 && Math.abs(sr - tr) <= 1;
-      if (!adjacent) { showFlash("Must be adjacent!", "#ef4444"); return false; }
-      const clone = new Chess(game.fen());
-      const target = clone.get(targetSquare);
-      if (!target || target.color === "w") { showFlash("No enemy piece there!", "#ef4444"); return false; }
-      // Force-remove the target piece and keep attacker
-      clone.remove(targetSquare);
-      showFlash("Mangala strikes! ⚡", "#ef4444");
-      setGame(clone);
-      setActivationMode(false);
-      setSelectedCard(null);
-      advance("use_mangala", clone);
-      return true;
-    }
-
-    // Normal move
-    const clone = new Chess(game.fen());
-    let move;
-    try {
-      move = clone.move({ from: sourceSquare, to: targetSquare, promotion: "q" });
-    } catch (_) { return false; }
-    if (!move) return false;
-
-    setGame(clone);
-
-    // Check expected captures
-    if (phase.id === "capture_pawn" && sourceSquare === "d4" && targetSquare === "e5") {
-      showFlash("Pawn captured! Surya awakens ✨", "#fbbf24");
-      setTimeout(() => advance("capture_pawn", clone), 400);
-    } else if (phase.id === "capture_knight" && sourceSquare === "g5" && targetSquare === "f6") {
-      showFlash("Knight captured! Guru stirs 🪐", "#a855f7");
-      setTimeout(() => advance("capture_knight", clone), 400);
-    } else if (phase.id === "capture_queen" && sourceSquare === "b5" && targetSquare === "c7") {
-      showFlash("Queen captured! Mangala unleashed 🔥", "#ef4444");
-      setTimeout(() => advance("capture_queen", clone), 400);
-    }
-
-    return true;
-  }, [game, phase, activationMode, selectedCard, advance]);
-
-  // ── Square click (activation mode for Surya / Guru) ─────────────────────────
-  const onSquareClick = useCallback((square) => {
-    if (!activationMode || !selectedCard) return;
-    const piece = game.get(square);
-    if (!piece || piece.color !== "w") { showFlash("Pick one of your pieces!", "#888"); return; }
-
-    if (selectedCard.id === "SURYA") {
-      setPoweredSquares(prev => ({ ...prev, [square]: "SURYA" }));
-      showFlash("Surya shields this piece ☀️", "#fbbf24");
-      setActivationMode(false);
-      setSelectedCard(null);
-      advance("use_surya", game);
-    } else if (selectedCard.id === "GURU") {
-      // Place a duplicate pawn adjacent if possible (simplified)
-      const files = "abcdefgh";
-      const fi = files.indexOf(square[0]);
-      const rank = square[1];
-      const leftFile  = fi > 0 ? files[fi - 1] : null;
-      const rightFile = fi < 7 ? files[fi + 1] : null;
-      const target = rightFile || leftFile;
-      if (target) {
-        const clone = new Chess(game.fen());
-        const p = clone.get(square);
-        const dest = `${target}${rank}`;
-        if (!clone.get(dest)) {
-          clone.put({ type: p.type, color: "w" }, dest);
-          setGame(clone);
-          showFlash("Duplicate summoned! 🪐", "#a855f7");
-        } else {
-          showFlash("No space to duplicate!", "#888");
-        }
-      }
-      setActivationMode(false);
-      setSelectedCard(null);
-      advance("use_guru", game);
-    }
-  }, [activationMode, selectedCard, game, advance]);
-
-  // ── Custom square styles ─────────────────────────────────────────────────────
-  const customSquareStyles = {};
-  if (phase.highlightSquares) {
-    phase.highlightSquares.forEach((sq, i) => {
-      customSquareStyles[sq] = {
-        backgroundColor: i === 0 ? "rgba(251,191,36,0.45)" : "rgba(239,68,68,0.45)",
-        borderRadius: "4px",
-      };
-    });
-  }
-  Object.keys(poweredSquares).forEach(sq => {
-    customSquareStyles[sq] = {
-      ...customSquareStyles[sq],
-      boxShadow: "inset 0 0 0 3px #fbbf24",
-      borderRadius: "4px",
-    };
-  });
-  if (activationMode) {
-    // Highlight all white pieces as clickable
-    const board = game.board();
-    board.forEach(row => row.forEach(cell => {
-      if (cell && cell.color === "w") {
-        customSquareStyles[cell.square] = {
-          backgroundColor: "rgba(251,191,36,0.3)",
-          boxShadow: "inset 0 0 0 2px #fbbf24",
-          borderRadius: "4px",
-          cursor: "pointer",
+    useEffect(() => {
+        const update = () => {
+            const w = Math.min(window.innerWidth, 480);
+            setBoardWidth(w - 16);
         };
-      }
-    }));
-  }
+        update();
+        window.addEventListener("resize", update);
+        return () => window.removeEventListener("resize", update);
+    }, []);
 
-  // ── Available cards based on phase ──────────────────────────────────────────
-  const availableCards = [];
-  if (phase.tier1) availableCards.push(SURYA);
-  if (phase.tier2) availableCards.push(GURU);
-  if (phase.tier3) availableCards.push(MANGALA);
+    // ── Flash helper ────────────────────────────────────────────────────────────
+    const showFlash = (msg, color = "#fbbf24") => {
+        setFlash({ msg, color });
+        setTimeout(() => setFlash(null), 2000);
+    };
 
-  const isComplete = phase.id === "complete";
+    // ── Bot auto-reply ──────────────────────────────────────────────────────────
+    const botReply = useCallback((g, move) => {
+        if (!move) return;
+        setTimeout(() => {
+            const clone = new Chess(g.fen());
+            try {
+                clone.move({ from: move.slice(0, 2), to: move.slice(2, 4) });
+                setGame(clone);
+            } catch (_) { }
+        }, 800);
+    }, []);
 
-  // ── Tier badge ───────────────────────────────────────────────────────────────
-  const tierLabel = (t) => ({ 1: "I", 2: "II", 3: "III" }[t]);
+    // ── Advance phase ───────────────────────────────────────────────────────────
+    const advance = useCallback((currentPhaseId, g) => {
+        const nextIdx = PHASES.findIndex(p => p.id === currentPhaseId) + 1;
+        if (nextIdx < PHASES.length) {
+            setPhaseIdx(nextIdx);
+            // trigger bot reply for card-use phases
+            if (currentPhaseId === "use_surya") botReply(g, "d6c5");
+            if (currentPhaseId === "use_guru") botReply(g, "c7d7");
+        }
+    }, [botReply]);
 
-  return (
-    <>
-      <style>{`
+    // ── Piece drop ──────────────────────────────────────────────────────────────
+    const onPieceDrop = useCallback((sourceSquare, targetSquare) => {
+        // Activation mode: Mangala adjacent capture
+        if (activationMode && selectedCard?.id === "MANGALA") {
+            const files = "abcdefgh";
+            const sf = files.indexOf(sourceSquare[0]);
+            const sr = parseInt(sourceSquare[1]);
+            const tf = files.indexOf(targetSquare[0]);
+            const tr = parseInt(targetSquare[1]);
+            const adjacent = Math.abs(sf - tf) <= 1 && Math.abs(sr - tr) <= 1;
+            if (!adjacent) { showFlash("Must be adjacent!", "#ef4444"); return false; }
+            const clone = new Chess(game.fen());
+            const target = clone.get(targetSquare);
+            if (!target || target.color === "w") { showFlash("No enemy piece there!", "#ef4444"); return false; }
+            // Force-remove the target piece and keep attacker
+            clone.remove(targetSquare);
+            showFlash("Mangala strikes! ⚡", "#ef4444");
+            setGame(clone);
+            setActivationMode(false);
+            setSelectedCard(null);
+            advance("use_mangala", clone);
+            return true;
+        }
+
+        // Normal move
+        const clone = new Chess(game.fen());
+        let move;
+        try {
+            move = clone.move({ from: sourceSquare, to: targetSquare, promotion: "q" });
+        } catch (_) { return false; }
+        if (!move) return false;
+
+        setGame(clone);
+
+        // Check expected captures
+        if (phase.id === "capture_pawn" && sourceSquare === "d4" && targetSquare === "e5") {
+            showFlash("Pawn captured! Surya awakens ✨", "#fbbf24");
+            setTimeout(() => advance("capture_pawn", clone), 400);
+        } else if (phase.id === "capture_knight" && sourceSquare === "g5" && targetSquare === "f6") {
+            showFlash("Knight captured! Guru stirs 🪐", "#a855f7");
+            setTimeout(() => advance("capture_knight", clone), 400);
+        } else if (phase.id === "capture_queen" && sourceSquare === "b5" && targetSquare === "c7") {
+            showFlash("Queen captured! Mangala unleashed 🔥", "#ef4444");
+            setTimeout(() => advance("capture_queen", clone), 400);
+        }
+
+        return true;
+    }, [game, phase, activationMode, selectedCard, advance]);
+
+    // ── Square click (activation mode for Surya / Guru) ─────────────────────────
+    const onSquareClick = useCallback((square) => {
+        if (!activationMode || !selectedCard) return;
+        const piece = game.get(square);
+        if (!piece || piece.color !== "w") { showFlash("Pick one of your pieces!", "#888"); return; }
+
+        if (selectedCard.id === "SURYA") {
+            setPoweredSquares(prev => ({ ...prev, [square]: "SURYA" }));
+            showFlash("Surya shields this piece ☀️", "#fbbf24");
+            setActivationMode(false);
+            setSelectedCard(null);
+            advance("use_surya", game);
+        } else if (selectedCard.id === "GURU") {
+            // Place a duplicate pawn adjacent if possible (simplified)
+            const files = "abcdefgh";
+            const fi = files.indexOf(square[0]);
+            const rank = square[1];
+            const leftFile = fi > 0 ? files[fi - 1] : null;
+            const rightFile = fi < 7 ? files[fi + 1] : null;
+            const target = rightFile || leftFile;
+            if (target) {
+                const clone = new Chess(game.fen());
+                const p = clone.get(square);
+                const dest = `${target}${rank}`;
+                if (!clone.get(dest)) {
+                    clone.put({ type: p.type, color: "w" }, dest);
+                    setGame(clone);
+                    showFlash("Duplicate summoned! 🪐", "#a855f7");
+                } else {
+                    showFlash("No space to duplicate!", "#888");
+                }
+            }
+            setActivationMode(false);
+            setSelectedCard(null);
+            advance("use_guru", game);
+        }
+    }, [activationMode, selectedCard, game, advance]);
+
+    // ── Custom square styles ─────────────────────────────────────────────────────
+    const customSquareStyles = {};
+    if (phase.highlightSquares) {
+        phase.highlightSquares.forEach((sq, i) => {
+            customSquareStyles[sq] = {
+                backgroundColor: i === 0 ? "rgba(251,191,36,0.45)" : "rgba(239,68,68,0.45)",
+                borderRadius: "4px",
+            };
+        });
+    }
+    Object.keys(poweredSquares).forEach(sq => {
+        customSquareStyles[sq] = {
+            ...customSquareStyles[sq],
+            boxShadow: "inset 0 0 0 3px #fbbf24",
+            borderRadius: "4px",
+        };
+    });
+    if (activationMode) {
+        // Highlight all white pieces as clickable
+        const board = game.board();
+        board.forEach(row => row.forEach(cell => {
+            if (cell && cell.color === "w") {
+                customSquareStyles[cell.square] = {
+                    backgroundColor: "rgba(251,191,36,0.3)",
+                    boxShadow: "inset 0 0 0 2px #fbbf24",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                };
+            }
+        }));
+    }
+
+    // ── Available cards based on phase ──────────────────────────────────────────
+    const availableCards = [];
+    if (phase.tier1) availableCards.push(SURYA);
+    if (phase.tier2) availableCards.push(GURU);
+    if (phase.tier3) availableCards.push(MANGALA);
+
+    const isComplete = phase.id === "complete";
+
+    // ── Tier badge ───────────────────────────────────────────────────────────────
+    const tierLabel = (t) => ({ 1: "I", 2: "II", 3: "III" }[t]);
+
+    return (
+        <>
+            <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -614,142 +614,142 @@ export default function Tutorial({ onBack }) {
         }
       `}</style>
 
-      <div className="tut-root">
-        {/* Nav */}
-        <div className="tut-nav">
-          <div className="tut-nav-title">✦ Tutorial</div>
-          <button className="tut-nav-back" onClick={onBack}>✕ Exit</button>
-        </div>
-
-        {/* Flash */}
-        {flash && (
-          <div className="tut-flash" style={{ backgroundColor: flash.color }}>
-            {flash.msg}
-          </div>
-        )}
-
-        {isComplete ? (
-          <div className={`tut-complete ${visible ? "show" : ""}`}>
-            <div className="tut-complete-glyph">🌟</div>
-            <div className="tut-complete-title">You are ready</div>
-            <div className="tut-complete-sub">
-              The Navagraha bow to you. Enter the board with their blessings — and face whatever the Asura dare send.
-            </div>
-            <button className="tut-complete-btn" onClick={onBack}>Begin your journey</button>
-          </div>
-        ) : (
-          <>
-            {/* Progress pips */}
-            <div className="tut-progress" style={{ width: "calc(100% - 32px)" }}>
-              {PHASES.filter(p => p.id !== "complete").map((p, i) => (
-                <div key={p.id} className={`tut-pip ${i < phaseIdx ? "done" : ""}`} />
-              ))}
-            </div>
-
-            {/* Hint card */}
-            <div className={`tut-hint ${visible ? "show" : ""}`}>
-              <div className="tut-hint-title">{phase.title}</div>
-              <div className="tut-hint-body">{phase.body}</div>
-            </div>
-
-            {/* Activation banner */}
-            {activationMode && (
-              <div className="tut-activation">
-                ⚡ Tap one of your glowing pieces
-              </div>
-            )}
-
-            {/* Board */}
-            <div className="tut-board-wrap" style={{ marginBottom: "80px" }}>
-              <Chessboard
-                position={game.fen()}
-                onPieceDrop={onPieceDrop}
-                onSquareClick={onSquareClick}
-                boardWidth={boardWidth}
-                animationDuration={220}
-                customDarkSquareStyle={{ backgroundColor: "#6b1a1a" }}
-                customLightSquareStyle={{ backgroundColor: "#8b2020" }}
-                customSquareStyles={customSquareStyles}
-              />
-            </div>
-
-            {/* Bottom buttons */}
-            <div className="tut-bottom">
-              <button className="tut-menu-btn" onClick={onBack}>✕ Menu</button>
-              <button
-                className={`tut-ahvan-btn ${phase.arrow === "ahvan" && !activationMode ? "pulse" : ""}`}
-                onClick={() => {
-                  if (availableCards.length > 0) setShowOverlay(true);
-                  else showFlash("Capture a piece first!", "#888");
-                }}
-              >
-                ✨ Āhvān
-              </button>
-            </div>
-
-            {/* Card overlay */}
-            {showOverlay && (
-              <div className="tut-overlay" onClick={(e) => { if (e.target === e.currentTarget) { setShowOverlay(false); setSelectedCard(null); } }}>
-                <div className="tut-overlay-inner">
-                  <div className="tut-overlay-title">✦ Celestial Powers ✦</div>
-
-                  {availableCards.length === 0 ? (
-                    <div style={{ textAlign: "center", color: "#666", fontSize: "14px", padding: "20px 0" }}>
-                      Capture a piece to unlock powers
-                    </div>
-                  ) : (
-                    <div className="tut-card-row">
-                      {availableCards.map(card => (
-                        <div
-                          key={card.id}
-                          className={`tut-card ${selectedCard?.id === card.id ? "selected" : ""}`}
-                          style={{
-                            borderColor: selectedCard?.id === card.id ? card.color : "rgba(255,255,255,0.1)",
-                            boxShadow: selectedCard?.id === card.id ? `0 0 16px ${card.color}88` : "none",
-                          }}
-                          onClick={() => setSelectedCard(selectedCard?.id === card.id ? null : card)}
-                        >
-                          <div className="tut-card-tier">Tier {tierLabel(card.tier)}</div>
-                          <div className="tut-card-cost">{card.cost}s</div>
-                          <img src={`${process.env.PUBLIC_URL}${card.image}`} alt={card.name} />
-                          <div className="tut-card-footer">
-                            <div className="tut-card-name">{card.name}</div>
-                            <div className="tut-card-desc">{card.description}</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  <button
-                    className="tut-use-btn"
-                    disabled={!selectedCard}
-                    style={{
-                      backgroundColor: selectedCard ? selectedCard.color : "#333",
-                      color: selectedCard ? "#000" : "#666",
-                    }}
-                    onClick={() => {
-                      if (!selectedCard) return;
-                      setShowOverlay(false);
-                      setActivationMode(true);
-                      if (selectedCard.id === "MANGALA") {
-                        showFlash("Drag Mangala's warrior onto an adjacent enemy", "#ef4444");
-                      } else {
-                        showFlash(`Tap a piece to empower with ${selectedCard.name}`, selectedCard.color);
-                      }
-                    }}
-                  >
-                    Use {selectedCard?.name ?? "Power"}
-                  </button>
-                  <button className="tut-cancel-btn" onClick={() => { setShowOverlay(false); setSelectedCard(null); }}>
-                    ← Back
-                  </button>
+            <div className="tut-root">
+                {/* Nav */}
+                <div className="tut-nav">
+                    <div className="tut-nav-title">✦ Tutorial</div>
+                    <button className="tut-nav-back" onClick={onBack}>✕ Exit</button>
                 </div>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </>
-  );
+
+                {/* Flash */}
+                {flash && (
+                    <div className="tut-flash" style={{ backgroundColor: flash.color }}>
+                        {flash.msg}
+                    </div>
+                )}
+
+                {isComplete ? (
+                    <div className={`tut-complete ${visible ? "show" : ""}`}>
+                        <div className="tut-complete-glyph">🌟</div>
+                        <div className="tut-complete-title">You are ready</div>
+                        <div className="tut-complete-sub">
+                            The Navagraha bow to you. Enter the board with their blessings — and face whatever the Asura dare send.
+                        </div>
+                        <button className="tut-complete-btn" onClick={onBack}>Begin your journey</button>
+                    </div>
+                ) : (
+                    <>
+                        {/* Progress pips */}
+                        <div className="tut-progress" style={{ width: "calc(100% - 32px)" }}>
+                            {PHASES.filter(p => p.id !== "complete").map((p, i) => (
+                                <div key={p.id} className={`tut-pip ${i < phaseIdx ? "done" : ""}`} />
+                            ))}
+                        </div>
+
+                        {/* Hint card */}
+                        <div className={`tut-hint ${visible ? "show" : ""}`}>
+                            <div className="tut-hint-title">{phase.title}</div>
+                            <div className="tut-hint-body">{phase.body}</div>
+                        </div>
+
+                        {/* Activation banner */}
+                        {activationMode && (
+                            <div className="tut-activation">
+                                ⚡ Tap one of your glowing pieces
+                            </div>
+                        )}
+
+                        {/* Board */}
+                        <div className="tut-board-wrap" style={{ marginBottom: "80px" }}>
+                            <Chessboard
+                                position={game.fen()}
+                                onPieceDrop={onPieceDrop}
+                                onSquareClick={onSquareClick}
+                                boardWidth={boardWidth}
+                                animationDuration={220}
+                                customDarkSquareStyle={{ backgroundColor: "#6b1a1a" }}
+                                customLightSquareStyle={{ backgroundColor: "#8b2020" }}
+                                customSquareStyles={customSquareStyles}
+                            />
+                        </div>
+
+                        {/* Bottom buttons */}
+                        <div className="tut-bottom">
+                            <button className="tut-menu-btn" onClick={onBack}>✕ Menu</button>
+                            <button
+                                className={`tut-ahvan-btn ${phase.arrow === "ahvan" && !activationMode ? "pulse" : ""}`}
+                                onClick={() => {
+                                    if (availableCards.length > 0) setShowOverlay(true);
+                                    else showFlash("Capture a piece first!", "#888");
+                                }}
+                            >
+                                ✨ Āhvān
+                            </button>
+                        </div>
+
+                        {/* Card overlay */}
+                        {showOverlay && (
+                            <div className="tut-overlay" onClick={(e) => { if (e.target === e.currentTarget) { setShowOverlay(false); setSelectedCard(null); } }}>
+                                <div className="tut-overlay-inner">
+                                    <div className="tut-overlay-title">✦ Celestial Powers ✦</div>
+
+                                    {availableCards.length === 0 ? (
+                                        <div style={{ textAlign: "center", color: "#666", fontSize: "14px", padding: "20px 0" }}>
+                                            Capture a piece to unlock powers
+                                        </div>
+                                    ) : (
+                                        <div className="tut-card-row">
+                                            {availableCards.map(card => (
+                                                <div
+                                                    key={card.id}
+                                                    className={`tut-card ${selectedCard?.id === card.id ? "selected" : ""}`}
+                                                    style={{
+                                                        borderColor: selectedCard?.id === card.id ? card.color : "rgba(255,255,255,0.1)",
+                                                        boxShadow: selectedCard?.id === card.id ? `0 0 16px ${card.color}88` : "none",
+                                                    }}
+                                                    onClick={() => setSelectedCard(selectedCard?.id === card.id ? null : card)}
+                                                >
+                                                    <div className="tut-card-tier">Tier {tierLabel(card.tier)}</div>
+                                                    <div className="tut-card-cost">{card.cost}s</div>
+                                                    <img src={`${process.env.PUBLIC_URL}${card.image}`} alt={card.name} />
+                                                    <div className="tut-card-footer">
+                                                        <div className="tut-card-name">{card.name}</div>
+                                                        <div className="tut-card-desc">{card.description}</div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    <button
+                                        className="tut-use-btn"
+                                        disabled={!selectedCard}
+                                        style={{
+                                            backgroundColor: selectedCard ? selectedCard.color : "#333",
+                                            color: selectedCard ? "#000" : "#666",
+                                        }}
+                                        onClick={() => {
+                                            if (!selectedCard) return;
+                                            setShowOverlay(false);
+                                            setActivationMode(true);
+                                            if (selectedCard.id === "MANGALA") {
+                                                showFlash("Drag Mangala's warrior onto an adjacent enemy", "#ef4444");
+                                            } else {
+                                                showFlash(`Tap a piece to empower with ${selectedCard.name}`, selectedCard.color);
+                                            }
+                                        }}
+                                    >
+                                        Use {selectedCard?.name ?? "Power"}
+                                    </button>
+                                    <button className="tut-cancel-btn" onClick={() => { setShowOverlay(false); setSelectedCard(null); }}>
+                                        ← Back
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )}
+            </div>
+        </>
+    );
 }
