@@ -70,7 +70,7 @@ const PHASES = [
 // ─── Initial FEN: mid-game position ──────────────────────────────────────────
 // White: Ra1 Nb5 Bc1 Bg5 Qd1 Ke1 pawns on a2 b2 c2 d4 f2 g2 h2
 // Black: pawn e5, knight f6, bishop d6 (removed — using c7 queen), queen c7
-const INITIAL_FEN = "2q1k3/1N6/3b1n2/4p1B1/3P4/8/PPP2PPP/R1BQK2R w KQ - 0 1";
+const INITIAL_FEN = "2q1k3/5p2/1N1b1n2/4p1B1/3P4/8/PPP2PPP/R1BQK2R w KQ - 0 1";
 
 export default function Tutorial({ onBack }) {
     const [game, setGame] = useState(new Chess(INITIAL_FEN));
