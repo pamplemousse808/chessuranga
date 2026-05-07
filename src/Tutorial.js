@@ -44,7 +44,7 @@ const PHASES = [
     {
         id: "capture_queen",
         title: "Strike the queen",
-        body: "Capture the queen on c7 with your knight on b5. The mightiest Tier 3 power will be yours.",
+        body: "Capture the queen on c7 with your knight on b6. The mightiest Tier 3 power will be yours.",
         arrow: null,
         highlightSquares: ["b5", "c7"],
         tier1: true, tier2: true, tier3: false,
@@ -68,7 +68,7 @@ const PHASES = [
 ];
 
 // ─── Initial FEN: mid-game position ──────────────────────────────────────────
-// White: Ra1 Nb5 Bc1 Bg5 Qd1 Ke1 pawns on a2 b2 c2 d4 f2 g2 h2
+// White: Ra1 Nb6 Bc1 Bg5 Qd1 Ke1 pawns on a2 b2 c2 d4 f2 g2 h2
 // Black: pawn e5, knight f6, bishop d6 (removed — using c7 queen), queen c7
 const INITIAL_FEN = "2q1k3/5p2/1N1b1n2/4p1B1/3P4/8/PPP2PPP/R1BQK2R w KQ - 0 1";
 
@@ -119,15 +119,12 @@ export default function Tutorial({ onBack }) {
     }, []);
 
     // ── Advance phase ───────────────────────────────────────────────────────────
-    const advance = useCallback((currentPhaseId, g) => {
+    const advance = useCallback((currentPhaseId) => {
         const nextIdx = PHASES.findIndex(p => p.id === currentPhaseId) + 1;
         if (nextIdx < PHASES.length) {
             setPhaseIdx(nextIdx);
-            // trigger bot reply for card-use phases
-            if (currentPhaseId === "use_surya") botReply(g, "d6c5");
-            if (currentPhaseId === "use_guru") botReply(g, "c7d7");
         }
-    }, [botReply]);
+    }, []);
 
     // ── Piece drop ──────────────────────────────────────────────────────────────
     const onPieceDrop = useCallback((sourceSquare, targetSquare) => {
@@ -166,13 +163,16 @@ export default function Tutorial({ onBack }) {
         // Check expected captures
         if (phase.id === "capture_pawn" && sourceSquare === "d4" && targetSquare === "e5") {
             showFlash("Pawn captured! Surya awakens ✨", "#fbbf24");
-            setTimeout(() => advance("capture_pawn", clone), 400);
+            botReply(clone, "e8d8");
+            setTimeout(() => advance("capture_pawn"), 400);
         } else if (phase.id === "capture_knight" && sourceSquare === "g5" && targetSquare === "f6") {
             showFlash("Knight captured! Guru stirs 🪐", "#a855f7");
-            setTimeout(() => advance("capture_knight", clone), 400);
+            botReply(clone, "d8c8");
+            setTimeout(() => advance("capture_knight"), 400);
         } else if (phase.id === "capture_queen" && sourceSquare === "b5" && targetSquare === "c7") {
             showFlash("Queen captured! Mangala unleashed 🔥", "#ef4444");
-            setTimeout(() => advance("capture_queen", clone), 400);
+            botReply(clone, "c8b8");
+            setTimeout(() => advance("capture_queen"), 400);
         }
 
         return true;
