@@ -176,7 +176,7 @@ export default function Tutorial({ onBack }) {
         }
 
         return true;
-    }, [game, phase, activationMode, selectedCard, advance]);
+    }, [game, phase, activationMode, selectedCard, advance, botReply]);
 
     // ── Square click (activation mode for Surya / Guru) ─────────────────────────
     const onSquareClick = useCallback((square) => {
