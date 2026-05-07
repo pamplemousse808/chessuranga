@@ -12,6 +12,7 @@ import PvpTabletLayout from "./PvpTabletLayout";
 import DailyPuzzle from "./DailyPuzzle";
 import NavagrahaPage from "./NavagrahaPage";
 import { App as CapApp } from '@capacitor/app';
+import Tutorial from "./Tutorial";
 
 // ── Mobile detection ──────────────────────────────────────────────────────────
 function useIsMobile() {
@@ -35,6 +36,7 @@ function App() {
   const [startingTime, setStartingTime] = useState(180);
   const [gameOver, setGameOver] = useState(false);
   const [winner, setWinner] = useState(null);
+  const [showTutorial, setShowTutorial] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
   const [moveCount, setMoveCount] = useState(0);
   const [shukraDifficulty, setShukraDifficulty] = useState(null);
@@ -84,6 +86,7 @@ function App() {
   const { stockfish, stockfishRef, stockfishMoveRef } = useStockfish(gameMode, gameStarted, shukraDifficulty);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [launchSplash, setLaunchSplash] = useState(null);
+  const [ahvanHintDismissed, setAhvanHintDismissed] = useState(false);
 
 
   useEffect(() => {
@@ -1277,6 +1280,7 @@ function App() {
   if (showNavagraha) return <NavagrahaPage onBack={() => setShowNavagraha(false)} />;
   if (gameMode === "daily") return <DailyPuzzle onBack={() => setGameMode(null)} />;
   if (showHowToPlay) return <HowToPlay onBack={() => setShowHowToPlay(false)} />;
+  if (showTutorial) return <Tutorial onBack={() => setShowTutorial(false)} />;
 
   // Route to daily puzzle
   if (gameMode === "daily") return <DailyPuzzle onBack={() => setGameMode(null)} />;
@@ -1392,6 +1396,11 @@ function App() {
                 </button>
               </div>
 
+              {/* Tutorial button */}
+              <button onClick={() => setShowTutorial(true)} style={{ width: "100%", padding: "12px 16px", fontSize: "14px", backgroundColor: "#c8973a", color: "#060810", border: "none", borderRadius: "10px", cursor: "pointer", fontWeight: "bold", textAlign: "left", marginTop: "10px" }}>
+                ✨ Interactive Tutorial
+                <div style={{ fontSize: "10px", fontWeight: "normal", marginTop: "2px", opacity: 0.7 }}>Learn to summon the Navagraha step by step</div>
+              </button>
             </div>
           </div>
         )}
@@ -1491,7 +1500,7 @@ function App() {
             </div>
           </div>
         )}
-{showPvpTimeSelect && (
+        {showPvpTimeSelect && (
           <div style={{
             position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.85)",
             display: "flex", alignItems: "center", justifyContent: "center", zIndex: 999
@@ -2007,8 +2016,7 @@ function App() {
               <div style={{ fontSize: "13px", color: "#888" }}>
                 {waitingForBot ? <span style={{ color: "#ff6b6b" }}>👹 Thinking...</span> : `Turn: ${game.turn() === "w" ? (gameMode === "asura" ? "You" : "White") : (gameMode === "asura" ? "Asura" : "Black")}`}
               </div>
-              <button onClick={resetGame} style={{ position: "fixed", bottom: "24px", left: "20px", zIndex: 200, padding: "10px 16px", fontSize: "12px", backgroundColor: "#e94560", color: "#fff", border: "none", borderRadius: "20px", cursor: "pointer", fontWeight: "bold", boxShadow: "0 4px 15px rgba(233,69,96,0.5)" }}>✕ Menu</button>
-            </div>
+              <button onClick={resetGame} style={{ position: "fixed", bottom: "calc(24px + env(safe-area-inset-bottom))", left: "20px", zIndex: 200, padding: "10px 16px", fontSize: "12px", backgroundColor: "#e94560", color: "#fff", border: "none", borderRadius: "20px", cursor: "pointer", fontWeight: "bold", boxShadow: "0 4px 15px rgba(233,69,96,0.5)" }}>✕ Menu</button>            </div>
 
             {/* Āhvān hint — fades out after first tap */}
             <div
@@ -2023,7 +2031,7 @@ function App() {
                 textAlign: "center",
                 cursor: game.turn() === "w" ? "pointer" : "default",
                 animation: "bannerPulse 2.5s infinite",
-                opacity: (!showCardOverlay && game.turn() === "w" && !selectedCard) ? 1 : 0,
+                opacity: (!ahvanHintDismissed && !showCardOverlay && game.turn() === "w" && !selectedCard) ? 1 : 0,
                 transition: "opacity 0.3s ease",
                 pointerEvents: game.turn() === "w" ? "auto" : "none"
               }}
@@ -2106,8 +2114,7 @@ function App() {
             )}
 
             {/* ✨ Floating card button */}
-            <div style={{ position: "fixed", bottom: "24px", right: "20px", zIndex: 200, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "8px" }}>
-              {/* Selected card pill */}
+            <div style={{ position: "fixed", bottom: "24px", right: "20px", zIndex: 200, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "8px", paddingBottom: "env(safe-area-inset-bottom)" }}>              {/* Selected card pill */}
               {selectedCard && (
                 <div style={{ backgroundColor: "#1e293b", border: `2px solid ${selectedCard.color}`, borderRadius: "20px", padding: "6px 14px", fontSize: "12px", color: "#fff", display: "flex", alignItems: "center", gap: "8px", boxShadow: `0 0 12px ${selectedCard.color}88` }}>
                   <span>{selectedCard.name}</span>
@@ -2123,7 +2130,7 @@ function App() {
               )}
               {/* Main button */}
               <button
-                onClick={() => setShowCardOverlay(true)}
+                onClick={() => { setShowCardOverlay(true); setAhvanHintDismissed(true); }}
                 style={{ height: "56px", borderRadius: "28px", padding: "0 20px", backgroundColor: theme.accent, border: "none", fontSize: "14px", cursor: "pointer", boxShadow: `0 4px 20px ${theme.accent}88`, display: "flex", alignItems: "center", justifyContent: "center", color: "#000", fontWeight: "bold", gap: "6px", whiteSpace: "nowrap" }}
               >
                 ✨ Āhvān
