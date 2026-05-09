@@ -2,754 +2,480 @@ import { useState, useEffect, useCallback } from "react";
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
 
-// ─── Tutorial card definitions ───────────────────────────────────────────────
-const SURYA = { id: "SURYA", name: "Surya", color: "#fbbf24", tier: 1, cost: 8, description: "Can't be captured for 2 moves", image: "/images/surya.jpg" };
-const GURU = { id: "GURU", name: "Guru", color: "#a855f7", tier: 2, cost: 9, description: "Spawn a real duplicate left or right — it moves and can capture for 2 turns before it dissolves", image: "/images/guru.jpg" };
-const MANGALA = { id: "MANGALA", name: "Mangala", color: "#ef4444", tier: 3, cost: 12, description: "Capture any adjacent piece", image: "/images/mangala.jpg" };
+// ─── Card definitions (tutorial subset) ──────────────────────────────────────
+const RAHU   = { id: "RAHU",  name: "Rahu",  color: "#9333ea", tier: 1, cost: 7,  description: "Pass through pieces for 2 moves",                                                              image: "/images/rahu.jpg"  };
+const GURU   = { id: "GURU",  name: "Guru",  color: "#a855f7", tier: 2, cost: 9,  description: "Spawn a real duplicate left or right — it moves and can capture for 2 turns before it dissolves", image: "/images/guru.jpg"  };
+const BUDHA  = { id: "BUDHA", name: "Budha", color: "#3b82f6", tier: 3, cost: 10, description: "One piece can move twice in one turn. But not if the first move is a capture.",               image: "/images/budha.jpg" };
 
-// ─── Tutorial phases ──────────────────────────────────────────────────────────
-const PHASES = [
-    {
-        id: "capture_pawn",
-        title: "Capture the pawn",
-        body: "Move your pawn on d4 to capture the black pawn on e5. This will unlock your first celestial power.",
-        arrow: null,
-        highlightSquares: ["d4", "e5"],
-        tier1: false, tier2: false, tier3: false,
-    },
-    {
-        id: "use_surya",
-        title: "Surya has awakened",
-        body: "You've unlocked a Tier 1 power. Tap Āhvān to open your cards, then select Surya and choose a piece to protect.",
-        arrow: "ahvan",
-        highlightSquares: [],
-        tier1: true, tier2: false, tier3: false,
-    },
-    {
-        id: "capture_knight",
-        title: "Press the attack",
-        body: "Now capture the knight on f6 with your bishop on g5. A Tier 2 power will awaken.",
-        arrow: null,
-        highlightSquares: ["g5", "f6"],
-        tier1: true, tier2: false, tier3: false,
-    },
-    {
-        id: "use_guru",
-        title: "Guru stirs",
-        body: "Tier 2 unlocked. Open Āhvān, select Guru, and spawn a duplicate of one of your pieces.",
-        arrow: "ahvan",
-        highlightSquares: [],
-        tier1: true, tier2: true, tier3: false,
-    },
-    {
-        id: "capture_queen",
-        title: "Strike the queen",
-        body: "Capture the queen on c7 with your knight on b6. The mightiest Tier 3 power will be yours.",
-        arrow: null,
-        highlightSquares: ["b5", "c7"],
-        tier1: true, tier2: true, tier3: false,
-    },
-    {
-        id: "use_mangala",
-        title: "Mangala is unleashed",
-        body: "Tier 3 unlocked. Open Āhvān, select Mangala, and capture any piece adjacent to your chosen warrior.",
-        arrow: "ahvan",
-        highlightSquares: [],
-        tier1: true, tier2: true, tier3: true,
-    },
-    {
-        id: "complete",
-        title: "You are ready",
-        body: "You've wielded the celestial powers. The cosmos awaits.",
-        arrow: null,
-        highlightSquares: [],
-        tier1: true, tier2: true, tier3: true,
-    },
+// ─── Starting FEN ─────────────────────────────────────────────────────────────
+const INITIAL_FEN = "2kr3r/1ppbbppp/p1n2n2/3pp1q1/3P3P/1PN1QPN1/PBP1P1B1/R3K2R w KQ - 0 1";
+
+// ─── Tutorial steps ───────────────────────────────────────────────────────────
+// type: "move"         — player drags piece from `from` to `to`
+// type: "select_card"  — player must open Āhvān and select `card`
+// type: "activate"     — player clicks `targetSquare` to apply selected card
+// type: "power_move"   — player drags powered piece from `from` to `to`
+// type: "power_move2"  — Budha's second move
+// type: "complete"     — tutorial finished
+
+const STEPS = [
+  {
+    id: "move1_capture",
+    type: "move",
+    from: "d4", to: "e5",
+    title: "Move 1 — Capture the pawn",
+    body: "Drag your d4 pawn to e5 to capture the black pawn. This will unlock your first celestial power.",
+    highlightSquares: ["d4", "e5"],
+    availableCards: [],
+    botReply: { from: "d6", to: "e5" },
+    flashMsg: "Pawn captured! ✨ Rahu awakens — Tier 1 unlocked!",
+    flashColor: "#9333ea",
+  },
+  {
+    id: "move2_select",
+    type: "select_card",
+    card: RAHU,
+    title: "Move 2 — Summon Rahu",
+    body: "Open Āhvān and select Rahu. Your g2 bishop will be empowered to pass through pieces.",
+    highlightSquares: [],
+    availableCards: [RAHU],
+    pulseAhvan: true,
+  },
+  {
+    id: "move2_activate",
+    type: "activate",
+    card: RAHU,
+    targetSquare: "g2",
+    title: "Move 2 — Empower the bishop",
+    body: "Tap your g2 bishop to activate Rahu on it.",
+    highlightSquares: ["g2"],
+    availableCards: [RAHU],
+  },
+  {
+    id: "move2_capture",
+    type: "power_move",
+    card: RAHU,
+    from: "g2", to: "c6",
+    title: "Move 2 — Bishop takes knight",
+    body: "Drag your powered bishop from g2 to c6 to capture the black knight.",
+    highlightSquares: ["g2", "c6"],
+    availableCards: [RAHU],
+    botReply: { from: "c7", to: "c6" },
+    flashMsg: "Knight captured! 🪐 Guru awakens — Tier 2 unlocked!",
+    flashColor: "#a855f7",
+  },
+  {
+    id: "move3_select",
+    type: "select_card",
+    card: GURU,
+    title: "Move 3 — Summon Guru",
+    body: "Open Āhvān and select Guru. Your h4 pawn will spawn a duplicate on g4 — ready to strike.",
+    highlightSquares: [],
+    availableCards: [RAHU, GURU],
+    pulseAhvan: true,
+  },
+  {
+    id: "move3_activate",
+    type: "activate",
+    card: GURU,
+    targetSquare: "h4",
+    title: "Move 3 — Empower the pawn",
+    body: "Tap your h4 pawn to activate Guru. A duplicate will appear on g4.",
+    highlightSquares: ["h4"],
+    availableCards: [RAHU, GURU],
+  },
+  {
+    id: "move3_capture",
+    type: "power_move",
+    card: GURU,
+    from: "g4", to: "f5",
+    title: "Move 3 — Duplicate takes the queen!",
+    body: "The duplicate pawn is on g4. Drag it to f5 to capture the black queen!",
+    highlightSquares: ["g4", "f5"],
+    availableCards: [RAHU, GURU],
+    botReply: { from: "g7", to: "g6" },
+    flashMsg: "Queen captured! 🔥 Budha awakens — Tier 3 unlocked!",
+    flashColor: "#3b82f6",
+  },
+  {
+    id: "move4_select",
+    type: "select_card",
+    card: BUDHA,
+    title: "Move 4 — Summon Budha",
+    body: "Open Āhvān and select Budha. Your e3 queen will be granted two moves this turn — enough for checkmate.",
+    highlightSquares: [],
+    availableCards: [RAHU, GURU, BUDHA],
+    pulseAhvan: true,
+  },
+  {
+    id: "move4_activate",
+    type: "activate",
+    card: BUDHA,
+    targetSquare: "e3",
+    title: "Move 4 — Empower the queen",
+    body: "Tap your e3 queen to activate Budha — it will move twice this turn.",
+    highlightSquares: ["e3"],
+    availableCards: [RAHU, GURU, BUDHA],
+  },
+  {
+    id: "move4_first",
+    type: "power_move",
+    card: BUDHA,
+    from: "e3", to: "a7",
+    title: "Move 4 — Queen to a7",
+    body: "Drag your queen to a7. That's the first of two moves — one more to deliver checkmate.",
+    highlightSquares: ["e3", "a7"],
+    availableCards: [RAHU, GURU, BUDHA],
+    botReply: null,
+    flashMsg: "First move done! Now finish it...",
+    flashColor: "#3b82f6",
+  },
+  {
+    id: "move4_checkmate",
+    type: "power_move2",
+    card: BUDHA,
+    from: "a7", to: "a8",
+    title: "Move 4 — Checkmate!",
+    body: "Now drag your queen to a8. The king is trapped — checkmate!",
+    highlightSquares: ["a7", "a8"],
+    availableCards: [RAHU, GURU, BUDHA],
+    flashMsg: "Checkmate! ♟️ The cosmos bows to you.",
+    flashColor: "#fbbf24",
+  },
+  {
+    id: "complete",
+    type: "complete",
+    title: "You are ready",
+    body: "",
+    highlightSquares: [],
+    availableCards: [],
+  },
 ];
 
-// ─── Initial FEN: mid-game position ──────────────────────────────────────────
-// White: Ra1 Nb6 Bc1 Bg5 Qd1 Ke1 pawns on a2 b2 c2 d4 f2 g2 h2
-// Black: pawn e5, knight f6, bishop d6 (removed — using c7 queen), queen c7
-const INITIAL_FEN = "2q1k3/5p2/1N1b1n2/4p1B1/3P4/8/PPP2PPP/R1BQK2R w KQ - 0 1";
-
 export default function Tutorial({ onBack }) {
-    const [game, setGame] = useState(new Chess(INITIAL_FEN));
-    const [phaseIdx, setPhaseIdx] = useState(0);
-    const [showOverlay, setShowOverlay] = useState(false);
-    const [selectedCard, setSelectedCard] = useState(null);
-    const [activationMode, setActivationMode] = useState(false);
-    const [poweredSquares, setPoweredSquares] = useState({});   // square → card id
-    const [flash, setFlash] = useState(null);       // { msg, color }
-    const [boardWidth, setBoardWidth] = useState(360);
-    const [visible, setVisible] = useState(false);
+  const [game, setGame]                       = useState(() => new Chess(INITIAL_FEN));
+  const [stepIdx, setStepIdx]                 = useState(0);
+  const [showOverlay, setShowOverlay]         = useState(false);
+  const [selectedCard, setSelectedCard]       = useState(null);
+  const [activatedSquare, setActivatedSquare] = useState(null);
+  const [flash, setFlash]                     = useState(null);
+  const [boardWidth, setBoardWidth]           = useState(360);
+  const [visible, setVisible]                 = useState(false);
+  const [botThinking, setBotThinking]         = useState(false);
 
-    const phase = PHASES[phaseIdx];
+  const step = STEPS[stepIdx];
 
-    useEffect(() => {
-        const t = setTimeout(() => setVisible(true), 60);
-        return () => clearTimeout(t);
-    }, []);
+  useEffect(() => { setTimeout(() => setVisible(true), 60); }, []);
 
-    useEffect(() => {
-        const update = () => {
-            const w = Math.min(window.innerWidth, 480);
-            setBoardWidth(w - 16);
-        };
-        update();
-        window.addEventListener("resize", update);
-        return () => window.removeEventListener("resize", update);
-    }, []);
+  useEffect(() => {
+    const update = () => setBoardWidth(Math.min(window.innerWidth, 480) - 16);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
-    // ── Flash helper ────────────────────────────────────────────────────────────
-    const showFlash = (msg, color = "#fbbf24") => {
-        setFlash({ msg, color });
-        setTimeout(() => setFlash(null), 2000);
+  // ── Flash ────────────────────────────────────────────────────────────────────
+  const showFlash = (msg, color = "#fbbf24") => {
+    setFlash({ msg, color });
+    setTimeout(() => setFlash(null), 2200);
+  };
+
+  // ── Bot reply (force-moves regardless of chess rules) ────────────────────────
+  const doBotReply = useCallback((g, reply) => {
+    if (!reply) return;
+    setBotThinking(true);
+    setTimeout(() => {
+      const clone = new Chess(g.fen());
+      const piece = clone.get(reply.from);
+      if (piece) {
+        clone.remove(reply.from);
+        clone.remove(reply.to); // remove any piece on target
+        clone.put(piece, reply.to);
+      }
+      setGame(clone);
+      setBotThinking(false);
+    }, 900);
+  }, []);
+
+  // ── Advance step ─────────────────────────────────────────────────────────────
+  const advance = useCallback(() => {
+    setStepIdx(i => Math.min(i + 1, STEPS.length - 1));
+  }, []);
+
+  // ── Piece drop ───────────────────────────────────────────────────────────────
+  const onPieceDrop = useCallback((sourceSquare, targetSquare) => {
+    if (botThinking) return false;
+
+    if (step.type === "move" || step.type === "power_move") {
+      if (sourceSquare !== step.from || targetSquare !== step.to) {
+        showFlash(`Try ${step.from.toUpperCase()} → ${step.to.toUpperCase()}`, "#888");
+        return false;
+      }
+      const clone = new Chess(game.fen());
+      const piece = clone.get(sourceSquare);
+      if (!piece) return false;
+      clone.remove(sourceSquare);
+      clone.remove(targetSquare);
+      clone.put(piece, targetSquare);
+      setGame(clone);
+      if (step.flashMsg) showFlash(step.flashMsg, step.flashColor);
+      if (step.botReply) doBotReply(clone, step.botReply);
+      setActivatedSquare(null);
+      setTimeout(advance, step.botReply ? 1100 : 400);
+      return true;
+    }
+
+    if (step.type === "power_move2") {
+      if (sourceSquare !== step.from || targetSquare !== step.to) {
+        showFlash(`Move your queen to ${step.to.toUpperCase()}`, "#888");
+        return false;
+      }
+      const clone = new Chess(game.fen());
+      const piece = clone.get(sourceSquare);
+      if (!piece) return false;
+      clone.remove(sourceSquare);
+      clone.remove(targetSquare);
+      clone.put(piece, targetSquare);
+      setGame(clone);
+      if (step.flashMsg) showFlash(step.flashMsg, step.flashColor);
+      setTimeout(advance, 900);
+      return true;
+    }
+
+    showFlash("Follow the hint above ✦", "#888");
+    return false;
+  }, [game, step, advance, doBotReply, botThinking]);
+
+  // ── Square click (activate step) ─────────────────────────────────────────────
+  const onSquareClick = useCallback((square) => {
+    if (step.type !== "activate") return;
+    if (square !== step.targetSquare) {
+      showFlash(`Tap the highlighted square: ${step.targetSquare.toUpperCase()}`, "#888");
+      return;
+    }
+
+    // Guru: place duplicate one file left of h4 → g4
+    if (step.card.id === "GURU") {
+      const clone = new Chess(game.fen());
+      const piece = clone.get(square);
+      if (piece) {
+        const files = "abcdefgh";
+        const fi = files.indexOf(square[0]);
+        const rank = square[1];
+        const dupFile = fi > 0 ? files[fi - 1] : files[fi + 1];
+        const dupSquare = `${dupFile}${rank}`;
+        if (!clone.get(dupSquare)) {
+          clone.put({ type: piece.type, color: piece.color }, dupSquare);
+          setGame(clone);
+          showFlash("Duplicate summoned on g4! 🪐", "#a855f7");
+        }
+      }
+    } else {
+      showFlash(`${step.card.name} activated! ✨`, step.card.color);
+    }
+
+    setActivatedSquare(square);
+    setTimeout(advance, 700);
+  }, [step, game, advance]);
+
+  // ── Square styles ─────────────────────────────────────────────────────────────
+  const customSquareStyles = {};
+  (step.highlightSquares || []).forEach((sq, i) => {
+    customSquareStyles[sq] = {
+      backgroundColor: i === 0 ? "rgba(251,191,36,0.45)" : "rgba(239,68,68,0.45)",
+      borderRadius: "4px",
     };
+  });
+  if (step.type === "activate" && step.targetSquare) {
+    customSquareStyles[step.targetSquare] = {
+      backgroundColor: `${step.card.color}55`,
+      boxShadow: `inset 0 0 0 3px ${step.card.color}`,
+      borderRadius: "4px",
+    };
+  }
+  if (activatedSquare && step.type !== "activate") {
+    customSquareStyles[activatedSquare] = {
+      boxShadow: `inset 0 0 0 3px ${step.card?.color || "#fbbf24"}`,
+      borderRadius: "4px",
+    };
+  }
 
-    // ── Bot auto-reply ──────────────────────────────────────────────────────────
-    const botReply = useCallback((g, move) => {
-        if (!move) return;
-        setTimeout(() => {
-            const clone = new Chess(g.fen());
-            try {
-                clone.move({ from: move.slice(0, 2), to: move.slice(2, 4) });
-                setGame(clone);
-            } catch (_) { }
-        }, 800);
-    }, []);
+  const isComplete    = step.type === "complete";
+  const pulseAhvan    = !!step.pulseAhvan && !showOverlay;
+  const progressSteps = STEPS.filter(s => s.type !== "complete");
+  const progressIdx   = progressSteps.findIndex(s => s.id === step.id);
+  const tierLabel     = t => ({ 1: "I", 2: "II", 3: "III" }[t]);
 
-    // ── Advance phase ───────────────────────────────────────────────────────────
-    const advance = useCallback((currentPhaseId) => {
-        const nextIdx = PHASES.findIndex(p => p.id === currentPhaseId) + 1;
-        if (nextIdx < PHASES.length) {
-            setPhaseIdx(nextIdx);
-        }
-    }, []);
-
-    // ── Piece drop ──────────────────────────────────────────────────────────────
-    const onPieceDrop = useCallback((sourceSquare, targetSquare) => {
-        // Activation mode: Mangala adjacent capture
-        if (activationMode && selectedCard?.id === "MANGALA") {
-            const files = "abcdefgh";
-            const sf = files.indexOf(sourceSquare[0]);
-            const sr = parseInt(sourceSquare[1]);
-            const tf = files.indexOf(targetSquare[0]);
-            const tr = parseInt(targetSquare[1]);
-            const adjacent = Math.abs(sf - tf) <= 1 && Math.abs(sr - tr) <= 1;
-            if (!adjacent) { showFlash("Must be adjacent!", "#ef4444"); return false; }
-            const clone = new Chess(game.fen());
-            const target = clone.get(targetSquare);
-            if (!target || target.color === "w") { showFlash("No enemy piece there!", "#ef4444"); return false; }
-            // Force-remove the target piece and keep attacker
-            clone.remove(targetSquare);
-            showFlash("Mangala strikes! ⚡", "#ef4444");
-            setGame(clone);
-            setActivationMode(false);
-            setSelectedCard(null);
-            advance("use_mangala", clone);
-            return true;
-        }
-
-        // Normal move
-        const clone = new Chess(game.fen());
-        let move;
-        try {
-            move = clone.move({ from: sourceSquare, to: targetSquare, promotion: "q" });
-        } catch (_) { return false; }
-        if (!move) return false;
-
-        setGame(clone);
-
-        // Check expected captures
-        if (phase.id === "capture_pawn" && sourceSquare === "d4" && targetSquare === "e5") {
-            showFlash("Pawn captured! Surya awakens ✨", "#fbbf24");
-            botReply(clone, "e8d8");
-            setTimeout(() => advance("capture_pawn"), 400);
-        } else if (phase.id === "capture_knight" && sourceSquare === "g5" && targetSquare === "f6") {
-            showFlash("Knight captured! Guru stirs 🪐", "#a855f7");
-            botReply(clone, "d8c8");
-            setTimeout(() => advance("capture_knight"), 400);
-        } else if (phase.id === "capture_queen" && sourceSquare === "b5" && targetSquare === "c7") {
-            showFlash("Queen captured! Mangala unleashed 🔥", "#ef4444");
-            botReply(clone, "c8b8");
-            setTimeout(() => advance("capture_queen"), 400);
-        }
-
-        return true;
-    }, [game, phase, activationMode, selectedCard, advance, botReply]);
-
-    // ── Square click (activation mode for Surya / Guru) ─────────────────────────
-    const onSquareClick = useCallback((square) => {
-        if (!activationMode || !selectedCard) return;
-        const piece = game.get(square);
-        if (!piece || piece.color !== "w") { showFlash("Pick one of your pieces!", "#888"); return; }
-
-        if (selectedCard.id === "SURYA") {
-            setPoweredSquares(prev => ({ ...prev, [square]: "SURYA" }));
-            showFlash("Surya shields this piece ☀️", "#fbbf24");
-            setActivationMode(false);
-            setSelectedCard(null);
-            advance("use_surya", game);
-        } else if (selectedCard.id === "GURU") {
-            // Place a duplicate pawn adjacent if possible (simplified)
-            const files = "abcdefgh";
-            const fi = files.indexOf(square[0]);
-            const rank = square[1];
-            const leftFile = fi > 0 ? files[fi - 1] : null;
-            const rightFile = fi < 7 ? files[fi + 1] : null;
-            const target = rightFile || leftFile;
-            if (target) {
-                const clone = new Chess(game.fen());
-                const p = clone.get(square);
-                const dest = `${target}${rank}`;
-                if (!clone.get(dest)) {
-                    clone.put({ type: p.type, color: "w" }, dest);
-                    setGame(clone);
-                    showFlash("Duplicate summoned! 🪐", "#a855f7");
-                } else {
-                    showFlash("No space to duplicate!", "#888");
-                }
-            }
-            setActivationMode(false);
-            setSelectedCard(null);
-            advance("use_guru", game);
-        }
-    }, [activationMode, selectedCard, game, advance]);
-
-    // ── Custom square styles ─────────────────────────────────────────────────────
-    const customSquareStyles = {};
-    if (phase.highlightSquares) {
-        phase.highlightSquares.forEach((sq, i) => {
-            customSquareStyles[sq] = {
-                backgroundColor: i === 0 ? "rgba(251,191,36,0.45)" : "rgba(239,68,68,0.45)",
-                borderRadius: "4px",
-            };
-        });
-    }
-    Object.keys(poweredSquares).forEach(sq => {
-        customSquareStyles[sq] = {
-            ...customSquareStyles[sq],
-            boxShadow: "inset 0 0 0 3px #fbbf24",
-            borderRadius: "4px",
-        };
-    });
-    if (activationMode) {
-        // Highlight all white pieces as clickable
-        const board = game.board();
-        board.forEach(row => row.forEach(cell => {
-            if (cell && cell.color === "w") {
-                customSquareStyles[cell.square] = {
-                    backgroundColor: "rgba(251,191,36,0.3)",
-                    boxShadow: "inset 0 0 0 2px #fbbf24",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                };
-            }
-        }));
-    }
-
-    // ── Available cards based on phase ──────────────────────────────────────────
-    const availableCards = [];
-    if (phase.tier1) availableCards.push(SURYA);
-    if (phase.tier2) availableCards.push(GURU);
-    if (phase.tier3) availableCards.push(MANGALA);
-
-    const isComplete = phase.id === "complete";
-
-    // ── Tier badge ───────────────────────────────────────────────────────────────
-    const tierLabel = (t) => ({ 1: "I", 2: "II", 3: "III" }[t]);
-
-    return (
-        <>
-            <style>{`
+  return (
+    <>
+      <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        .tut-root {
-          min-height: 100vh;
-          background: #060810;
-          color: #e8dfc8;
-          font-family: 'Crimson Pro', Georgia, serif;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          overflow-x: hidden;
-          padding-bottom: env(safe-area-inset-bottom);
-        }
-
-        .tut-nav {
-          width: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 14px 20px;
-          background: rgba(6,8,16,0.9);
-          backdrop-filter: blur(12px);
-          border-bottom: 1px solid rgba(255,215,100,0.1);
-          position: sticky;
-          top: 0;
-          z-index: 50;
-        }
-        .tut-nav-title {
-          font-family: 'Cinzel', serif;
-          font-size: 11px;
-          letter-spacing: 0.3em;
-          color: #c8973a;
-          text-transform: uppercase;
-        }
-        .tut-nav-back {
-          font-family: 'Cinzel', serif;
-          font-size: 11px;
-          letter-spacing: 0.1em;
-          color: #060810;
-          background: #c8973a;
-          padding: 7px 16px;
-          border-radius: 50px;
-          border: none;
-          cursor: pointer;
-        }
-
-        .tut-progress {
-          display: flex;
-          gap: 5px;
-          padding: 12px 20px 0;
-          align-items: center;
-        }
-        .tut-pip {
-          height: 3px;
-          border-radius: 2px;
-          background: rgba(255,255,255,0.12);
-          flex: 1;
-          transition: background 0.4s ease;
-        }
-        .tut-pip.done { background: #c8973a; }
-
-        .tut-hint {
-          width: calc(100% - 32px);
-          margin: 12px 16px 0;
-          padding: 14px 16px;
-          border-radius: 14px;
-          border: 1px solid rgba(255,215,100,0.15);
-          background: rgba(255,255,255,0.04);
-          opacity: 0;
-          transform: translateY(10px);
-          transition: opacity 0.4s ease, transform 0.4s ease;
-        }
-        .tut-hint.show {
-          opacity: 1;
-          transform: translateY(0);
-        }
-        .tut-hint-title {
-          font-family: 'Cinzel', serif;
-          font-size: 13px;
-          color: #f5e9c8;
-          margin-bottom: 5px;
-          letter-spacing: 0.05em;
-        }
-        .tut-hint-body {
-          font-size: 14px;
-          color: #a89060;
-          line-height: 1.6;
-        }
-
-        .tut-board-wrap {
-          margin-top: 12px;
-          border-radius: 8px;
-          overflow: hidden;
-          box-shadow: 0 8px 40px rgba(0,0,0,0.6);
-        }
-
-        .tut-flash {
-          position: fixed;
-          top: 80px;
-          left: 50%;
-          transform: translateX(-50%);
-          padding: 10px 20px;
-          border-radius: 20px;
-          font-family: 'Cinzel', serif;
-          font-size: 13px;
-          font-weight: 600;
-          color: #000;
-          z-index: 500;
-          pointer-events: none;
-          animation: flashIn 0.2s ease, flashOut 0.3s ease 1.7s forwards;
-          white-space: nowrap;
-        }
-        @keyframes flashIn  { from { opacity:0; transform:translateX(-50%) translateY(-6px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
-        @keyframes flashOut { from { opacity:1; } to { opacity:0; } }
-
-        /* Card overlay */
-        .tut-overlay {
-          position: fixed;
-          inset: 0;
-          background: rgba(0,0,0,0.75);
-          backdrop-filter: blur(4px);
-          z-index: 300;
-          display: flex;
-          flex-direction: column;
-          justify-content: flex-end;
-          padding-bottom: calc(20px + env(safe-area-inset-bottom));
-        }
-        .tut-overlay-inner {
-          background: #0f172a;
-          border-top: 1px solid rgba(255,215,100,0.15);
-          border-radius: 24px 24px 0 0;
-          padding: 20px 16px;
-          animation: slideUp 0.35s cubic-bezier(0.34,1.56,0.64,1);
-        }
-        @keyframes slideUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
-        .tut-overlay-title {
-          font-family: 'Cinzel', serif;
-          font-size: 12px;
-          letter-spacing: 0.25em;
-          color: #c8973a;
-          text-align: center;
-          margin-bottom: 16px;
-          text-transform: uppercase;
-        }
-        .tut-card-row {
-          display: flex;
-          gap: 10px;
-          justify-content: center;
-          flex-wrap: wrap;
-          margin-bottom: 16px;
-        }
-        .tut-card {
-          width: 90px;
-          border-radius: 12px;
-          overflow: hidden;
-          border: 2px solid transparent;
-          cursor: pointer;
-          transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
-          position: relative;
-          background: #1e293b;
-          flex-shrink: 0;
-        }
-        .tut-card:active { transform: scale(0.97); }
-        .tut-card.selected { transform: scale(1.04); }
-        .tut-card img {
-          width: 100%;
-          height: 110px;
-          object-fit: cover;
-          display: block;
-        }
-        .tut-card-footer {
-          padding: 6px 8px;
-          background: rgba(0,0,0,0.7);
-        }
-        .tut-card-name {
-          font-family: 'Cinzel', serif;
-          font-size: 10px;
-          color: #f5e9c8;
-          margin-bottom: 2px;
-        }
-        .tut-card-desc {
-          font-size: 9px;
-          color: #888;
-          line-height: 1.3;
-        }
-        .tut-card-tier {
-          position: absolute;
-          top: 5px;
-          left: 5px;
-          background: rgba(0,0,0,0.8);
-          color: #ffd700;
-          font-family: 'Cinzel', serif;
-          font-size: 9px;
-          padding: 2px 5px;
-          border-radius: 4px;
-        }
-        .tut-card-cost {
-          position: absolute;
-          top: 5px;
-          right: 5px;
-          background: rgba(0,0,0,0.8);
-          color: #ffd700;
-          font-size: 9px;
-          font-weight: bold;
-          padding: 2px 5px;
-          border-radius: 4px;
-        }
-        .tut-use-btn {
-          display: block;
-          width: 100%;
-          padding: 13px;
-          font-family: 'Cinzel', serif;
-          font-size: 13px;
-          letter-spacing: 0.08em;
-          border: none;
-          border-radius: 12px;
-          cursor: pointer;
-          font-weight: 600;
-          margin-bottom: 10px;
-          transition: opacity 0.2s;
-        }
-        .tut-use-btn:disabled { opacity: 0.35; cursor: default; }
-        .tut-cancel-btn {
-          display: block;
-          width: 100%;
-          padding: 10px;
-          font-size: 12px;
-          color: #666;
-          background: none;
-          border: none;
-          cursor: pointer;
-          font-family: 'Cinzel', serif;
-          letter-spacing: 0.05em;
-        }
-
-        /* Bottom fixed row */
-        .tut-bottom {
-          position: fixed;
-          bottom: calc(20px + env(safe-area-inset-bottom));
-          left: 0;
-          right: 0;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 0 20px;
-          pointer-events: none;
-        }
-        .tut-menu-btn {
-          pointer-events: auto;
-          padding: 10px 18px;
-          font-size: 12px;
-          font-family: 'Cinzel', serif;
-          background: #e94560;
-          color: #fff;
-          border: none;
-          border-radius: 20px;
-          cursor: pointer;
-          font-weight: bold;
-          box-shadow: 0 4px 15px rgba(233,69,96,0.5);
-        }
-        .tut-ahvan-btn {
-          pointer-events: auto;
-          height: 52px;
-          border-radius: 26px;
-          padding: 0 20px;
-          background: #c8973a;
-          border: none;
-          font-size: 14px;
-          font-family: 'Cinzel', serif;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          color: #060810;
-          font-weight: bold;
-          box-shadow: 0 4px 20px rgba(200,151,58,0.55);
-          white-space: nowrap;
-        }
-        .tut-ahvan-btn.pulse {
-          animation: ahvanPulse 1.5s infinite;
-        }
-        @keyframes ahvanPulse {
-          0%,100% { box-shadow: 0 4px 20px rgba(200,151,58,0.55); transform: scale(1); }
-          50%      { box-shadow: 0 4px 32px rgba(200,151,58,0.9);  transform: scale(1.04); }
-        }
-
-        /* Activation mode banner */
-        .tut-activation {
-          width: calc(100% - 32px);
-          margin: 10px 16px 0;
-          padding: 10px 14px;
-          border-radius: 10px;
-          background: rgba(251,191,36,0.12);
-          border: 1px solid rgba(251,191,36,0.3);
-          font-size: 13px;
-          color: #fbbf24;
-          text-align: center;
-          font-family: 'Cinzel', serif;
-          letter-spacing: 0.05em;
-        }
-
-        /* Complete screen */
-        .tut-complete {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          flex: 1;
-          padding: 40px 32px;
-          text-align: center;
-          gap: 20px;
-          opacity: 0;
-          transform: translateY(20px);
-          transition: opacity 0.6s ease, transform 0.6s ease;
-        }
-        .tut-complete.show { opacity: 1; transform: translateY(0); }
-        .tut-complete-glyph {
-          font-size: 64px;
-          animation: floatGlyph 3s ease-in-out infinite;
-        }
-        @keyframes floatGlyph {
-          0%,100% { transform: translateY(0); }
-          50%      { transform: translateY(-10px); }
-        }
-        .tut-complete-title {
-          font-family: 'Cinzel', serif;
-          font-size: 28px;
-          color: #f5e9c8;
-          letter-spacing: 0.05em;
-        }
-        .tut-complete-sub {
-          font-size: 16px;
-          color: #a89060;
-          line-height: 1.7;
-          max-width: 280px;
-        }
-        .tut-complete-btn {
-          padding: 16px 40px;
-          font-family: 'Cinzel', serif;
-          font-size: 14px;
-          letter-spacing: 0.1em;
-          background: #c8973a;
-          color: #060810;
-          border: none;
-          border-radius: 50px;
-          cursor: pointer;
-          font-weight: 700;
-          box-shadow: 0 4px 24px rgba(200,151,58,0.5);
-        }
+        *{box-sizing:border-box;margin:0;padding:0;}
+        .tut-root{min-height:100vh;background:#060810;color:#e8dfc8;font-family:'Crimson Pro',Georgia,serif;display:flex;flex-direction:column;align-items:center;overflow-x:hidden;padding-bottom:env(safe-area-inset-bottom);}
+        .tut-nav{width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:rgba(6,8,16,0.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,215,100,0.1);position:sticky;top:0;z-index:50;}
+        .tut-nav-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.3em;color:#c8973a;text-transform:uppercase;}
+        .tut-nav-back{font-family:'Cinzel',serif;font-size:11px;color:#060810;background:#c8973a;padding:7px 16px;border-radius:50px;border:none;cursor:pointer;}
+        .tut-progress{display:flex;gap:5px;padding:12px 16px 0;width:100%;}
+        .tut-pip{height:3px;border-radius:2px;background:rgba(255,255,255,0.1);flex:1;transition:background 0.4s;}
+        .tut-pip.done{background:#c8973a;}
+        .tut-pip.active{background:rgba(200,151,58,0.5);}
+        .tut-hint{width:calc(100% - 32px);margin:12px 16px 0;padding:14px 16px;border-radius:14px;border:1px solid rgba(255,215,100,0.15);background:rgba(255,255,255,0.04);opacity:0;transform:translateY(8px);transition:opacity 0.4s,transform 0.4s;}
+        .tut-hint.show{opacity:1;transform:translateY(0);}
+        .tut-hint-title{font-family:'Cinzel',serif;font-size:13px;color:#f5e9c8;margin-bottom:5px;letter-spacing:0.05em;}
+        .tut-hint-body{font-size:14px;color:#a89060;line-height:1.6;}
+        .tut-board-wrap{margin-top:12px;border-radius:8px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.6);}
+        .tut-thinking{width:calc(100% - 32px);margin:8px 16px 0;padding:8px 14px;border-radius:10px;background:rgba(233,69,96,0.1);border:1px solid rgba(233,69,96,0.25);font-size:12px;color:#e94560;font-family:'Cinzel',serif;text-align:center;letter-spacing:0.05em;}
+        .tut-bot{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:0 20px;pointer-events:none;}
+        .tut-menu-btn{pointer-events:auto;padding:10px 18px;font-size:12px;font-family:'Cinzel',serif;background:#e94560;color:#fff;border:none;border-radius:20px;cursor:pointer;font-weight:bold;box-shadow:0 4px 15px rgba(233,69,96,0.5);}
+        .tut-ahvan-btn{pointer-events:auto;height:52px;border-radius:26px;padding:0 20px;background:#c8973a;border:none;font-size:14px;font-family:'Cinzel',serif;cursor:pointer;display:flex;align-items:center;gap:6px;color:#060810;font-weight:bold;box-shadow:0 4px 20px rgba(200,151,58,0.55);white-space:nowrap;}
+        .tut-ahvan-btn.pulse{animation:ahvanPulse 1.4s infinite;}
+        @keyframes ahvanPulse{0%,100%{box-shadow:0 4px 20px rgba(200,151,58,0.55);transform:scale(1);}50%{box-shadow:0 4px 36px rgba(200,151,58,0.95);transform:scale(1.05);}}
+        .tut-flash{position:fixed;top:80px;left:50%;transform:translateX(-50%);padding:10px 22px;border-radius:20px;font-family:'Cinzel',serif;font-size:13px;font-weight:600;color:#000;z-index:500;pointer-events:none;animation:flashIn 0.2s ease,flashOut 0.3s ease 1.9s forwards;white-space:nowrap;}
+        @keyframes flashIn{from{opacity:0;transform:translateX(-50%) translateY(-8px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+        @keyframes flashOut{from{opacity:1;}to{opacity:0;}}
+        .tut-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.78);backdrop-filter:blur(4px);z-index:300;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:calc(20px + env(safe-area-inset-bottom));}
+        .tut-overlay-inner{background:#0f172a;border-top:1px solid rgba(255,215,100,0.15);border-radius:24px 24px 0 0;padding:20px 16px;animation:slideUp 0.32s cubic-bezier(0.34,1.56,0.64,1);}
+        @keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+        .tut-overlay-title{font-family:'Cinzel',serif;font-size:12px;letter-spacing:0.25em;color:#c8973a;text-align:center;margin-bottom:16px;text-transform:uppercase;}
+        .tut-card-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;}
+        .tut-card{width:88px;border-radius:12px;overflow:hidden;border:2px solid rgba(255,255,255,0.08);cursor:pointer;transition:border-color 0.2s,transform 0.15s,box-shadow 0.2s;position:relative;background:#1e293b;flex-shrink:0;}
+        .tut-card.selected{transform:scale(1.05);}
+        .tut-card.locked{opacity:0.35;cursor:default;pointer-events:none;}
+        .tut-card img{width:100%;height:108px;object-fit:cover;display:block;}
+        .tut-card-footer{padding:6px 8px;background:rgba(0,0,0,0.65);}
+        .tut-card-name{font-family:'Cinzel',serif;font-size:10px;color:#f5e9c8;margin-bottom:2px;}
+        .tut-card-desc{font-size:9px;color:#888;line-height:1.3;}
+        .tut-card-tier{position:absolute;top:5px;left:5px;background:rgba(0,0,0,0.8);color:#ffd700;font-family:'Cinzel',serif;font-size:9px;padding:2px 5px;border-radius:4px;}
+        .tut-card-cost{position:absolute;top:5px;right:5px;background:rgba(0,0,0,0.8);color:#ffd700;font-size:9px;font-weight:bold;padding:2px 5px;border-radius:4px;}
+        .tut-use-btn{display:block;width:100%;padding:13px;font-family:'Cinzel',serif;font-size:13px;letter-spacing:0.08em;border:none;border-radius:12px;cursor:pointer;font-weight:600;margin-bottom:10px;transition:opacity 0.2s;}
+        .tut-use-btn:disabled{opacity:0.35;cursor:default;}
+        .tut-cancel-btn{display:block;width:100%;padding:10px;font-size:12px;color:#555;background:none;border:none;cursor:pointer;font-family:'Cinzel',serif;letter-spacing:0.05em;}
+        .tut-complete{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:40px 32px;text-align:center;gap:20px;opacity:0;transform:translateY(20px);transition:opacity 0.6s,transform 0.6s;}
+        .tut-complete.show{opacity:1;transform:translateY(0);}
+        .tut-complete-glyph{font-size:64px;animation:floatG 3s ease-in-out infinite;}
+        @keyframes floatG{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+        .tut-complete-title{font-family:'Cinzel',serif;font-size:28px;color:#f5e9c8;letter-spacing:0.05em;}
+        .tut-complete-sub{font-size:16px;color:#a89060;line-height:1.7;max-width:280px;}
+        .tut-complete-btn{padding:16px 40px;font-family:'Cinzel',serif;font-size:14px;letter-spacing:0.1em;background:#c8973a;color:#060810;border:none;border-radius:50px;cursor:pointer;font-weight:700;box-shadow:0 4px 24px rgba(200,151,58,0.5);}
       `}</style>
 
-            <div className="tut-root">
-                {/* Nav */}
-                <div className="tut-nav">
-                    <div className="tut-nav-title">✦ Tutorial</div>
-                    <button className="tut-nav-back" onClick={onBack}>✕ Exit</button>
-                </div>
+      <div className="tut-root">
 
-                {/* Flash */}
-                {flash && (
-                    <div className="tut-flash" style={{ backgroundColor: flash.color }}>
-                        {flash.msg}
-                    </div>
-                )}
+        <div className="tut-nav">
+          <div className="tut-nav-title">✦ Tutorial</div>
+          <button className="tut-nav-back" onClick={onBack}>✕ Exit</button>
+        </div>
 
-                {isComplete ? (
-                    <div className={`tut-complete ${visible ? "show" : ""}`}>
-                        <div className="tut-complete-glyph">🌟</div>
-                        <div className="tut-complete-title">You are ready</div>
-                        <div className="tut-complete-sub">
-                            The Navagraha bow to you. Enter the board with their blessings — and face whatever the Asura dare send.
-                        </div>
-                        <button className="tut-complete-btn" onClick={onBack}>Begin your journey</button>
-                    </div>
-                ) : (
-                    <>
-                        {/* Progress pips */}
-                        <div className="tut-progress" style={{ width: "calc(100% - 32px)" }}>
-                            {PHASES.filter(p => p.id !== "complete").map((p, i) => (
-                                <div key={p.id} className={`tut-pip ${i < phaseIdx ? "done" : ""}`} />
-                            ))}
-                        </div>
+        {flash && <div className="tut-flash" style={{ backgroundColor: flash.color }}>{flash.msg}</div>}
 
-                        {/* Hint card */}
-                        <div className={`tut-hint ${visible ? "show" : ""}`}>
-                            <div className="tut-hint-title">{phase.title}</div>
-                            <div className="tut-hint-body">{phase.body}</div>
-                        </div>
-
-                        {/* Activation banner */}
-                        {activationMode && (
-                            <div className="tut-activation">
-                                ⚡ Tap one of your glowing pieces
-                            </div>
-                        )}
-
-                        {/* Board */}
-                        <div className="tut-board-wrap" style={{ marginBottom: "80px" }}>
-                            <Chessboard
-                                position={game.fen()}
-                                onPieceDrop={onPieceDrop}
-                                onSquareClick={onSquareClick}
-                                boardWidth={boardWidth}
-                                animationDuration={220}
-                                customDarkSquareStyle={{ backgroundColor: "#6b1a1a" }}
-                                customLightSquareStyle={{ backgroundColor: "#8b2020" }}
-                                customSquareStyles={customSquareStyles}
-                            />
-                        </div>
-
-                        {/* Bottom buttons */}
-                        <div className="tut-bottom">
-                            <button className="tut-menu-btn" onClick={onBack}>✕ Menu</button>
-                            <button
-                                className={`tut-ahvan-btn ${phase.arrow === "ahvan" && !activationMode ? "pulse" : ""}`}
-                                onClick={() => {
-                                    if (availableCards.length > 0) setShowOverlay(true);
-                                    else showFlash("Capture a piece first!", "#888");
-                                }}
-                            >
-                                ✨ Āhvān
-                            </button>
-                        </div>
-
-                        {/* Card overlay */}
-                        {showOverlay && (
-                            <div className="tut-overlay" onClick={(e) => { if (e.target === e.currentTarget) { setShowOverlay(false); setSelectedCard(null); } }}>
-                                <div className="tut-overlay-inner">
-                                    <div className="tut-overlay-title">✦ Celestial Powers ✦</div>
-
-                                    {availableCards.length === 0 ? (
-                                        <div style={{ textAlign: "center", color: "#666", fontSize: "14px", padding: "20px 0" }}>
-                                            Capture a piece to unlock powers
-                                        </div>
-                                    ) : (
-                                        <div className="tut-card-row">
-                                            {availableCards.map(card => (
-                                                <div
-                                                    key={card.id}
-                                                    className={`tut-card ${selectedCard?.id === card.id ? "selected" : ""}`}
-                                                    style={{
-                                                        borderColor: selectedCard?.id === card.id ? card.color : "rgba(255,255,255,0.1)",
-                                                        boxShadow: selectedCard?.id === card.id ? `0 0 16px ${card.color}88` : "none",
-                                                    }}
-                                                    onClick={() => setSelectedCard(selectedCard?.id === card.id ? null : card)}
-                                                >
-                                                    <div className="tut-card-tier">Tier {tierLabel(card.tier)}</div>
-                                                    <div className="tut-card-cost">{card.cost}s</div>
-                                                    <img src={`${process.env.PUBLIC_URL}${card.image}`} alt={card.name} />
-                                                    <div className="tut-card-footer">
-                                                        <div className="tut-card-name">{card.name}</div>
-                                                        <div className="tut-card-desc">{card.description}</div>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-
-                                    <button
-                                        className="tut-use-btn"
-                                        disabled={!selectedCard}
-                                        style={{
-                                            backgroundColor: selectedCard ? selectedCard.color : "#333",
-                                            color: selectedCard ? "#000" : "#666",
-                                        }}
-                                        onClick={() => {
-                                            if (!selectedCard) return;
-                                            setShowOverlay(false);
-                                            setActivationMode(true);
-                                            if (selectedCard.id === "MANGALA") {
-                                                showFlash("Drag Mangala's warrior onto an adjacent enemy", "#ef4444");
-                                            } else {
-                                                showFlash(`Tap a piece to empower with ${selectedCard.name}`, selectedCard.color);
-                                            }
-                                        }}
-                                    >
-                                        Use {selectedCard?.name ?? "Power"}
-                                    </button>
-                                    <button className="tut-cancel-btn" onClick={() => { setShowOverlay(false); setSelectedCard(null); }}>
-                                        ← Back
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </>
-                )}
+        {isComplete ? (
+          <div className={`tut-complete ${visible ? "show" : ""}`}>
+            <div className="tut-complete-glyph">🌟</div>
+            <div className="tut-complete-title">You are ready</div>
+            <div className="tut-complete-sub">
+              The Navagraha bow to you. Enter the board with their blessings — and face whatever the Asura dare send.
             </div>
-        </>
-    );
+            <button className="tut-complete-btn" onClick={onBack}>Begin your journey</button>
+          </div>
+        ) : (
+          <>
+            <div className="tut-progress">
+              {progressSteps.map((s, i) => (
+                <div key={s.id} className={`tut-pip ${i < progressIdx ? "done" : i === progressIdx ? "active" : ""}`} />
+              ))}
+            </div>
+
+            <div className={`tut-hint ${visible ? "show" : ""}`}>
+              <div className="tut-hint-title">{step.title}</div>
+              <div className="tut-hint-body">{step.body}</div>
+            </div>
+
+            {botThinking && <div className="tut-thinking">👹 Black is responding...</div>}
+
+            <div className="tut-board-wrap" style={{ marginBottom: "80px" }}>
+              <Chessboard
+                position={game.fen()}
+                onPieceDrop={onPieceDrop}
+                onSquareClick={onSquareClick}
+                boardWidth={boardWidth}
+                animationDuration={220}
+                customDarkSquareStyle={{ backgroundColor: "#6b1a1a" }}
+                customLightSquareStyle={{ backgroundColor: "#8b2020" }}
+                customSquareStyles={customSquareStyles}
+                arePiecesDraggable={!botThinking}
+              />
+            </div>
+
+            <div className="tut-bot">
+              <button className="tut-menu-btn" onClick={onBack}>✕ Menu</button>
+              <button
+                className={`tut-ahvan-btn ${pulseAhvan ? "pulse" : ""}`}
+                onClick={() => {
+                  if (step.type === "select_card") setShowOverlay(true);
+                  else showFlash("Make your board move first ✦", "#888");
+                }}
+              >
+                ✨ Āhvān
+              </button>
+            </div>
+
+            {showOverlay && (
+              <div className="tut-overlay" onClick={e => { if (e.target === e.currentTarget) { setShowOverlay(false); setSelectedCard(null); } }}>
+                <div className="tut-overlay-inner">
+                  <div className="tut-overlay-title">✦ Celestial Powers ✦</div>
+                  <div className="tut-card-row">
+                    {[RAHU, GURU, BUDHA].map(card => {
+                      const unlocked = step.availableCards.some(c => c.id === card.id);
+                      const isTarget = step.card?.id === card.id;
+                      return (
+                        <div
+                          key={card.id}
+                          className={`tut-card ${!unlocked ? "locked" : ""} ${selectedCard?.id === card.id ? "selected" : ""}`}
+                          style={{
+                            borderColor: selectedCard?.id === card.id ? card.color : "rgba(255,255,255,0.08)",
+                            boxShadow: isTarget && unlocked && !selectedCard ? `0 0 20px ${card.color}99` : selectedCard?.id === card.id ? `0 0 14px ${card.color}66` : "none",
+                          }}
+                          onClick={() => unlocked && setSelectedCard(selectedCard?.id === card.id ? null : card)}
+                        >
+                          <div className="tut-card-tier">Tier {tierLabel(card.tier)}</div>
+                          <div className="tut-card-cost">{card.cost}s</div>
+                          <img src={`${process.env.PUBLIC_URL}${card.image}`} alt={card.name} />
+                          <div className="tut-card-footer">
+                            <div className="tut-card-name">{card.name}</div>
+                            <div className="tut-card-desc">{card.description}</div>
+                          </div>
+                          {!unlocked && (
+                            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.55)", fontSize: "18px" }}>🔒</div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <button
+                    className="tut-use-btn"
+                    disabled={!selectedCard}
+                    style={{ backgroundColor: selectedCard ? selectedCard.color : "#333", color: selectedCard ? "#000" : "#666" }}
+                    onClick={() => {
+                      if (!selectedCard) return;
+                      if (selectedCard.id !== step.card?.id) {
+                        showFlash(`Select ${step.card?.name} for this step`, "#888");
+                        return;
+                      }
+                      setShowOverlay(false);
+                      setSelectedCard(null);
+                      advance();
+                    }}
+                  >
+                    Use {selectedCard?.name ?? "Power"}
+                  </button>
+                  <button className="tut-cancel-btn" onClick={() => { setShowOverlay(false); setSelectedCard(null); }}>← Back</button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </>
+  );
 }
