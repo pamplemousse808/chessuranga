@@ -60,7 +60,7 @@ const STEPS = [
     body: "Drag your powered bishop from g2 to c6 to capture the black knight.",
     highlightSquares: ["g2", "c6"],
     availableCards: [RAHU],
-    botReply: { from: "c7", to: "c6" },
+    botReply: { from: "b7", to: "c6" },
     flashMsg: "Knight captured! 🪐 Guru awakens — Tier 2 unlocked!",
     flashColor: "#a855f7",
   },
