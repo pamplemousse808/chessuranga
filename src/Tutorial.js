@@ -8,7 +8,7 @@ const GURU   = { id: "GURU",  name: "Guru",  color: "#a855f7", tier: 2, cost: 9,
 const BUDHA  = { id: "BUDHA", name: "Budha", color: "#3b82f6", tier: 3, cost: 10, description: "One piece can move twice in one turn. But not if the first move is a capture.",               image: "/images/budha.jpg" };
 
 // ─── Starting FEN ─────────────────────────────────────────────────────────────
-const INITIAL_FEN = "2kr3r/1ppb1ppp/p1nb1n2/3ppq2/3P3P/1PN1QPP1/PBP1P1B1/R3K1NR w KQkq - 0 1";
+const INITIAL_FEN = "2kr3r/1ppbnppp/p1nb4/3ppq2/3P3P/1PN1Q1P1/PBP1PPB1/R3K1NR w KQkq - 0 1";
 
 // ─── Tutorial steps ───────────────────────────────────────────────────────────
 // type: "move"         — player drags piece from `from` to `to`
@@ -93,7 +93,7 @@ const STEPS = [
     body: "The duplicate pawn is on g4. Drag it to f5 to capture the black queen!",
     highlightSquares: ["g4", "f5"],
     availableCards: [RAHU, GURU],
-    botReply: { from: "g7", to: "g6" },
+    botReply: { from: "e7", to: "f5" },
     flashMsg: "Queen captured! 🔥 Budha awakens — Tier 3 unlocked!",
     flashColor: "#3b82f6",
   },
