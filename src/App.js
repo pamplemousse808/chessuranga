@@ -686,8 +686,8 @@ function App() {
         else if (piece.type === "q") { if (Math.abs(tf - ff) === Math.abs(tr - fr) || ff === tf || fr === tr) valid = true; }
         else if (piece.type === "k") { if (Math.abs(tf - ff) <= 1 && Math.abs(tr - fr) <= 1) valid = true; }
         if (valid) {
-          if (cp && cp.color === piece.color) return null;
-          gc.remove(from); if (cp) gc.remove(to); gc.put({ type: piece.type, color: piece.color }, to);
+          if (cp) return null; // Rahu cannot capture — must land on empty square
+          gc.remove(from); gc.put({ type: piece.type, color: piece.color }, to);
           const fp = gc.fen().split(" "); fp[1] = fp[1] === "w" ? "b" : "w"; gc.load(fp.join(" ")); moveWasMade = true;
         }
       }

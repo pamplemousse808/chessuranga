@@ -20,7 +20,7 @@ const STEPS = [
         body: "Drag your d4 pawn to e5 to capture the black pawn. This will unlock your first celestial power.",
         highlightSquares: ["d4", "e5"],
         availableCards: [],
-        botReply: { from: "e6", to: "e5" },
+        botReply: { from: "d6", to: "e5" },
         flashMsg: "Pawn captured! ✨ Ketu awakens — Tier 1 unlocked!",
         flashColor: "#f97316",
     },
@@ -169,6 +169,7 @@ export default function Tutorial({ onBack }) {
     const [boardWidth, setBoardWidth] = useState(360);
     const [visible, setVisible] = useState(false);
     const [botThinking, setBotThinking] = useState(false);
+    const [selectedPiece, setSelectedPiece] = useState(null);
 
     const step = STEPS[stepIdx];
 
@@ -273,6 +274,24 @@ export default function Tutorial({ onBack }) {
 
     // ── Square click ─────────────────────────────────────────────────────────────
     const onSquareClick = useCallback((square) => {
+        // Click-to-move: handle move steps
+        if (step.type === "move" || step.type === "power_move" || step.type === "power_move2") {
+            if (!selectedPiece) {
+                // First click — select the piece if it's the expected source
+                if (square === step.from) {
+                    setSelectedPiece(square);
+                    showFlash(`Now tap ${step.to.toUpperCase()} to move`, "#ffd700");
+                } else {
+                    showFlash(`Select the highlighted piece first`, "#888");
+                }
+                return;
+            } else {
+                // Second click — attempt the move
+                setSelectedPiece(null);
+                onPieceDrop(selectedPiece, square);
+                return;
+            }
+        }
         if (step.type !== "activate") return;
         if (square !== step.targetSquare) {
             showFlash(`Tap the highlighted square: ${step.targetSquare.toUpperCase()}`, "#888");
@@ -298,8 +317,8 @@ export default function Tutorial({ onBack }) {
         }
         setActivatedSquare(square);
         setTimeout(advance, 700);
-    }, [step, game, advance]);
-
+    }, [step, game, advance, selectedPiece, onPieceDrop]);
+    
     // ── Square styles ─────────────────────────────────────────────────────────────
     const customSquareStyles = {};
     (step.highlightSquares || []).forEach((sq, i) => {
