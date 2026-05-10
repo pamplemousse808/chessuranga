@@ -3,399 +3,411 @@ import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
 
 // ─── Card definitions (tutorial subset) ──────────────────────────────────────
-const RAHU  = { id: "RAHU",  name: "Rahu",  color: "#9333ea", tier: 1, cost: 7,  description: "Pass through pieces for 2 moves",                                                               image: "/images/rahu.jpg"  };
-const GURU  = { id: "GURU",  name: "Guru",  color: "#a855f7", tier: 2, cost: 9,  description: "Spawn a real duplicate left or right — it moves and can capture for 2 turns before it dissolves", image: "/images/guru.jpg"  };
-const BUDHA = { id: "BUDHA", name: "Budha", color: "#3b82f6", tier: 3, cost: 10, description: "One piece can move twice in one turn. But not if the first move is a capture.",                image: "/images/budha.jpg" };
+const KETU = { id: "KETU", name: "Ketu", color: "#f97316", tier: 1, cost: 8, description: "If captured, returns to activation square instead of dying", image: "/images/ketu.jpg" };
+const GURU = { id: "GURU", name: "Guru", color: "#a855f7", tier: 2, cost: 9, description: "Spawn a real duplicate left or right — it moves and can capture for 2 turns before it dissolves", image: "/images/guru.jpg" };
+const BUDHA = { id: "BUDHA", name: "Budha", color: "#3b82f6", tier: 3, cost: 10, description: "One piece can move twice in one turn. But not if the first move is a capture.", image: "/images/budha.jpg" };
 
 // ─── Starting FEN ─────────────────────────────────────────────────────────────
-const INITIAL_FEN = "2kr3r/1ppbnppp/p1nb4/3ppq2/3P3P/1PN1Q1P1/PBP1PPB1/R3K1NR w KQkq - 0 1";
+const INITIAL_FEN = "2kr1b1r/1ppbnppp/p1np4/4pq2/3P1P2/1PN1Q1P1/PBP1P1BP/R3K1NR w KQkq - 0 1";
 
 // ─── Tutorial steps ───────────────────────────────────────────────────────────
 const STEPS = [
-  {
-    id: "move1_capture",
-    type: "move",
-    from: "d4", to: "e5",
-    title: "Move 1 — Capture the pawn",
-    body: "Drag your d4 pawn to e5 to capture the black pawn. This will unlock your first celestial power.",
-    highlightSquares: ["d4", "e5"],
-    availableCards: [],
-    botReply: { from: "d6", to: "e5" },
-    flashMsg: "Pawn captured! ✨ Rahu awakens — Tier 1 unlocked!",
-    flashColor: "#9333ea",
-  },
-  {
-    id: "move2_select",
-    type: "select_card",
-    card: RAHU,
-    title: "Move 2 — Summon Rahu",
-    body: "Select Rahu from the Celestial Powers panel. Your g2 bishop will be empowered to pass through pieces.",
-    highlightSquares: [],
-    availableCards: [RAHU],
-    pulseAhvan: true,
-  },
-  {
-    id: "move2_activate",
-    type: "activate",
-    card: RAHU,
-    targetSquare: "g2",
-    title: "Move 2 — Empower the bishop",
-    body: "Tap your g2 bishop on the board to activate Rahu on it.",
-    highlightSquares: ["g2"],
-    availableCards: [RAHU],
-  },
-  {
-    id: "move2_capture",
-    type: "power_move",
-    card: RAHU,
-    from: "g2", to: "c6",
-    title: "Move 2 — Bishop takes knight",
-    body: "Drag your powered bishop from g2 to c6 to capture the black knight.",
-    highlightSquares: ["g2", "c6"],
-    availableCards: [RAHU],
-    botReply: { from: "b7", to: "c6" },
-    flashMsg: "Knight captured! 🪐 Guru awakens — Tier 2 unlocked!",
-    flashColor: "#a855f7",
-  },
-  {
-    id: "move3_select",
-    type: "select_card",
-    card: GURU,
-    title: "Move 3 — Summon Guru",
-    body: "Select Guru from the panel. Your h4 pawn will spawn a duplicate on g4 — ready to strike.",
-    highlightSquares: [],
-    availableCards: [RAHU, GURU],
-    pulseAhvan: true,
-  },
-  {
-    id: "move3_activate",
-    type: "activate",
-    card: GURU,
-    targetSquare: "h4",
-    title: "Move 3 — Empower the pawn",
-    body: "Tap your h4 pawn on the board to activate Guru. A duplicate will appear on g4.",
-    highlightSquares: ["h4"],
-    availableCards: [RAHU, GURU],
-  },
-  {
-    id: "move3_capture",
-    type: "power_move",
-    card: GURU,
-    from: "g4", to: "f5",
-    title: "Move 3 — Duplicate takes the queen!",
-    body: "The duplicate pawn is on g4. Drag it to f5 to capture the black queen!",
-    highlightSquares: ["g4", "f5"],
-    availableCards: [RAHU, GURU],
-    botReply: { from: "e7", to: "f5" },
-    flashMsg: "Queen captured! 🔥 Budha awakens — Tier 3 unlocked!",
-    flashColor: "#3b82f6",
-  },
-  {
-    id: "move4_select",
-    type: "select_card",
-    card: BUDHA,
-    title: "Move 4 — Summon Budha",
-    body: "Select Budha from the panel. Your e3 queen will be granted two moves this turn — enough for checkmate.",
-    highlightSquares: [],
-    availableCards: [RAHU, GURU, BUDHA],
-    pulseAhvan: true,
-  },
-  {
-    id: "move4_activate",
-    type: "activate",
-    card: BUDHA,
-    targetSquare: "e3",
-    title: "Move 4 — Empower the queen",
-    body: "Tap your e3 queen on the board to activate Budha — it will move twice this turn.",
-    highlightSquares: ["e3"],
-    availableCards: [RAHU, GURU, BUDHA],
-  },
-  {
-    id: "move4_first",
-    type: "power_move",
-    card: BUDHA,
-    from: "e3", to: "a7",
-    title: "Move 4 — Queen to a7",
-    body: "Drag your queen to a7. That's the first of two moves — one more to deliver checkmate.",
-    highlightSquares: ["e3", "a7"],
-    availableCards: [RAHU, GURU, BUDHA],
-    botReply: null,
-    flashMsg: "First move done! Now finish it...",
-    flashColor: "#3b82f6",
-  },
-  {
-    id: "move4_checkmate",
-    type: "power_move2",
-    card: BUDHA,
-    from: "a7", to: "a8",
-    title: "Move 4 — Checkmate!",
-    body: "Now drag your queen to a8. The king is trapped — checkmate!",
-    highlightSquares: ["a7", "a8"],
-    availableCards: [RAHU, GURU, BUDHA],
-    flashMsg: "Checkmate! ♟️ The cosmos bows to you.",
-    flashColor: "#fbbf24",
-  },
-  {
-    id: "complete",
-    type: "complete",
-    title: "You are ready",
-    body: "",
-    highlightSquares: [],
-    availableCards: [],
-  },
+    {
+        id: "move1_capture",
+        type: "move",
+        from: "d4", to: "e5",
+        title: "Move 1 — Capture the pawn",
+        body: "Drag your d4 pawn to e5 to capture the black pawn. This will unlock your first celestial power.",
+        highlightSquares: ["d4", "e5"],
+        availableCards: [],
+        botReply: { from: "e6", to: "e5" },
+        flashMsg: "Pawn captured! ✨ Ketu awakens — Tier 1 unlocked!",
+        flashColor: "#f97316",
+    },
+    {
+        id: "move2_select",
+        type: "select_card",
+        card: KETU,
+        title: "Move 2 — Summon Ketu",
+        body: "Select Ketu from the Celestial Powers panel. Your g2 bishop will return to its square if captured.",
+        highlightSquares: [],
+        availableCards: [KETU],
+        pulseAhvan: true,
+    },
+    {
+        id: "move2_activate",
+        type: "activate",
+        card: KETU,
+        targetSquare: "g2",
+        title: "Move 2 — Empower the bishop",
+        body: "Tap your g2 bishop on the board to activate Ketu on it.",
+        highlightSquares: ["g2"],
+        availableCards: [KETU],
+    },
+    {
+        id: "move2_capture",
+        type: "power_move",
+        card: KETU,
+        from: "g2", to: "c6",
+        title: "Move 2 — Bishop takes knight",
+        body: "Drag your Ketu-powered bishop from g2 to c6 to capture the black knight.",
+        highlightSquares: ["g2", "c6"],
+        availableCards: [KETU],
+        botReply: { from: "b7", to: "c6" },
+        ketuReturn: { piece: { type: "b", color: "w" }, square: "g2" },
+        flashMsg: "Knight captured! 🪐 Guru awakens — Tier 2 unlocked!",
+        flashColor: "#a855f7",
+    },
+    {
+        id: "move3_select",
+        type: "select_card",
+        card: GURU,
+        title: "Move 3 — Summon Guru",
+        body: "Select Guru from the panel. Your f4 pawn will spawn a duplicate on g4 — ready to strike.",
+        highlightSquares: [],
+        availableCards: [KETU, GURU],
+        pulseAhvan: true,
+    },
+    {
+        id: "move3_activate",
+        type: "activate",
+        card: GURU,
+        targetSquare: "f4",
+        title: "Move 3 — Empower the pawn",
+        body: "Tap your f4 pawn on the board to activate Guru. A duplicate will appear on g4.",
+        highlightSquares: ["f4"],
+        availableCards: [KETU, GURU],
+    },
+    {
+        id: "move3_capture",
+        type: "power_move",
+        card: GURU,
+        from: "g4", to: "f5",
+        title: "Move 3 — Duplicate takes the queen!",
+        body: "The duplicate pawn is on g4. Drag it to f5 to capture the black queen!",
+        highlightSquares: ["g4", "f5"],
+        availableCards: [KETU, GURU],
+        botReply: { from: "e7", to: "f5" },
+        flashMsg: "Queen captured! 🔥 Budha awakens — Tier 3 unlocked!",
+        flashColor: "#3b82f6",
+    },
+    {
+        id: "move4_select",
+        type: "select_card",
+        card: BUDHA,
+        title: "Move 4 — Summon Budha",
+        body: "Select Budha from the panel. Your e3 queen will be granted two moves this turn — enough for checkmate.",
+        highlightSquares: [],
+        availableCards: [KETU, GURU, BUDHA],
+        pulseAhvan: true,
+    },
+    {
+        id: "move4_activate",
+        type: "activate",
+        card: BUDHA,
+        targetSquare: "e3",
+        title: "Move 4 — Empower the queen",
+        body: "Tap your e3 queen on the board to activate Budha — it will move twice this turn.",
+        highlightSquares: ["e3"],
+        availableCards: [KETU, GURU, BUDHA],
+    },
+    {
+        id: "move4_first",
+        type: "power_move",
+        card: BUDHA,
+        from: "e3", to: "a7",
+        title: "Move 4 — Queen to a7",
+        body: "Drag your queen to a7. That's the first of two moves — one more to deliver checkmate.",
+        highlightSquares: ["e3", "a7"],
+        availableCards: [KETU, GURU, BUDHA],
+        botReply: null,
+        flashMsg: "First move done! Now finish it...",
+        flashColor: "#3b82f6",
+    },
+    {
+        id: "move4_checkmate",
+        type: "power_move2",
+        card: BUDHA,
+        from: "a7", to: "a8",
+        title: "Move 4 — Checkmate!",
+        body: "Now drag your queen to a8. The king is trapped — checkmate!",
+        highlightSquares: ["a7", "a8"],
+        availableCards: [KETU, GURU, BUDHA],
+        flashMsg: "Checkmate! ♟️ The cosmos bows to you.",
+        flashColor: "#fbbf24",
+    },
+    {
+        id: "complete",
+        type: "complete",
+        title: "You are ready",
+        body: "",
+        highlightSquares: [],
+        availableCards: [],
+    },
 ];
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  useEffect(() => {
-    const handler = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", handler);
-    return () => window.removeEventListener("resize", handler);
-  }, []);
-  return isMobile;
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    useEffect(() => {
+        const handler = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener("resize", handler);
+        return () => window.removeEventListener("resize", handler);
+    }, []);
+    return isMobile;
 }
 
 export default function Tutorial({ onBack }) {
-  const isMobile = useIsMobile();
+    const isMobile = useIsMobile();
 
-  const [game, setGame]                       = useState(() => new Chess(INITIAL_FEN));
-  const [stepIdx, setStepIdx]                 = useState(0);
-  const [showOverlay, setShowOverlay]         = useState(false);
-  const [selectedCard, setSelectedCard]       = useState(null);
-  const [activatedSquare, setActivatedSquare] = useState(null);
-  const [flash, setFlash]                     = useState(null);
-  const [boardWidth, setBoardWidth]           = useState(360);
-  const [visible, setVisible]                 = useState(false);
-  const [botThinking, setBotThinking]         = useState(false);
+    const [game, setGame] = useState(() => new Chess(INITIAL_FEN));
+    const [stepIdx, setStepIdx] = useState(0);
+    const [showOverlay, setShowOverlay] = useState(false);
+    const [selectedCard, setSelectedCard] = useState(null);
+    const [activatedSquare, setActivatedSquare] = useState(null);
+    const [flash, setFlash] = useState(null);
+    const [boardWidth, setBoardWidth] = useState(360);
+    const [visible, setVisible] = useState(false);
+    const [botThinking, setBotThinking] = useState(false);
 
-  const step = STEPS[stepIdx];
+    const step = STEPS[stepIdx];
 
-  useEffect(() => { setTimeout(() => setVisible(true), 60); }, []);
+    useEffect(() => { setTimeout(() => setVisible(true), 60); }, []);
 
-  useEffect(() => {
-    const update = () => {
-      if (window.innerWidth >= 768) {
-        // Desktop: board takes ~55% of viewport height
-        const h = Math.min(window.innerHeight - 80, 620);
-        setBoardWidth(h);
-      } else {
-        setBoardWidth(Math.min(window.innerWidth, 480) - 16);
-      }
+    useEffect(() => {
+        const update = () => {
+            if (window.innerWidth >= 768) {
+                // Desktop: board takes ~55% of viewport height
+                const h = Math.min(window.innerHeight - 80, 620);
+                setBoardWidth(h);
+            } else {
+                setBoardWidth(Math.min(window.innerWidth, 480) - 16);
+            }
+        };
+        update();
+        window.addEventListener("resize", update);
+        return () => window.removeEventListener("resize", update);
+    }, []);
+
+    // ── Flash ────────────────────────────────────────────────────────────────────
+    const showFlash = (msg, color = "#fbbf24") => {
+        setFlash({ msg, color });
+        setTimeout(() => setFlash(null), 2200);
     };
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
 
-  // ── Flash ────────────────────────────────────────────────────────────────────
-  const showFlash = (msg, color = "#fbbf24") => {
-    setFlash({ msg, color });
-    setTimeout(() => setFlash(null), 2200);
-  };
+    // ── Bot reply ────────────────────────────────────────────────────────────────
+    const doBotReply = useCallback((g, reply) => {
+        if (!reply) return;
+        setBotThinking(true);
+        setTimeout(() => {
+            const clone = new Chess(g.fen());
+            const piece = clone.get(reply.from);
+            if (piece) {
+                clone.remove(reply.from);
+                clone.remove(reply.to);
+                clone.put(piece, reply.to);
+            }
+            setGame(clone);
+            setBotThinking(false);
+        }, 900);
+    }, []);
 
-  // ── Bot reply ────────────────────────────────────────────────────────────────
-  const doBotReply = useCallback((g, reply) => {
-    if (!reply) return;
-    setBotThinking(true);
-    setTimeout(() => {
-      const clone = new Chess(g.fen());
-      const piece = clone.get(reply.from);
-      if (piece) {
-        clone.remove(reply.from);
-        clone.remove(reply.to);
-        clone.put(piece, reply.to);
-      }
-      setGame(clone);
-      setBotThinking(false);
-    }, 900);
-  }, []);
+    // ── Advance ──────────────────────────────────────────────────────────────────
+    const advance = useCallback(() => {
+        setStepIdx(i => Math.min(i + 1, STEPS.length - 1));
+    }, []);
 
-  // ── Advance ──────────────────────────────────────────────────────────────────
-  const advance = useCallback(() => {
-    setStepIdx(i => Math.min(i + 1, STEPS.length - 1));
-  }, []);
+    // ── Piece drop ───────────────────────────────────────────────────────────────
+    const onPieceDrop = useCallback((sourceSquare, targetSquare) => {
+        if (botThinking) return false;
 
-  // ── Piece drop ───────────────────────────────────────────────────────────────
-  const onPieceDrop = useCallback((sourceSquare, targetSquare) => {
-    if (botThinking) return false;
-
-    if (step.type === "move" || step.type === "power_move") {
-      if (sourceSquare !== step.from || targetSquare !== step.to) {
-        showFlash(`Try ${step.from.toUpperCase()} → ${step.to.toUpperCase()}`, "#888");
-        return false;
-      }
-      const clone = new Chess(game.fen());
-      const piece = clone.get(sourceSquare);
-      if (!piece) return false;
-      clone.remove(sourceSquare);
-      clone.remove(targetSquare);
-      clone.put(piece, targetSquare);
-      setGame(clone);
-      if (step.flashMsg) showFlash(step.flashMsg, step.flashColor);
-      if (step.botReply) doBotReply(clone, step.botReply);
-      setActivatedSquare(null);
-      setTimeout(advance, step.botReply ? 1100 : 400);
-      return true;
-    }
-
-    if (step.type === "power_move2") {
-      if (sourceSquare !== step.from || targetSquare !== step.to) {
-        showFlash(`Move your queen to ${step.to.toUpperCase()}`, "#888");
-        return false;
-      }
-      const clone = new Chess(game.fen());
-      const piece = clone.get(sourceSquare);
-      if (!piece) return false;
-      clone.remove(sourceSquare);
-      clone.remove(targetSquare);
-      clone.put(piece, targetSquare);
-      setGame(clone);
-      if (step.flashMsg) showFlash(step.flashMsg, step.flashColor);
-      setTimeout(advance, 900);
-      return true;
-    }
-
-    showFlash("Follow the hint above ✦", "#888");
-    return false;
-  }, [game, step, advance, doBotReply, botThinking]);
-
-  // ── Square click ─────────────────────────────────────────────────────────────
-  const onSquareClick = useCallback((square) => {
-    if (step.type !== "activate") return;
-    if (square !== step.targetSquare) {
-      showFlash(`Tap the highlighted square: ${step.targetSquare.toUpperCase()}`, "#888");
-      return;
-    }
-    if (step.card.id === "GURU") {
-      const clone = new Chess(game.fen());
-      const piece = clone.get(square);
-      if (piece) {
-        const files = "abcdefgh";
-        const fi = files.indexOf(square[0]);
-        const rank = square[1];
-        const dupFile = fi > 0 ? files[fi - 1] : files[fi + 1];
-        const dupSquare = `${dupFile}${rank}`;
-        if (!clone.get(dupSquare)) {
-          clone.put({ type: piece.type, color: piece.color }, dupSquare);
-          setGame(clone);
-          showFlash("Duplicate summoned on g4! 🪐", "#a855f7");
+        if (step.type === "move" || step.type === "power_move") {
+            if (sourceSquare !== step.from || targetSquare !== step.to) {
+                showFlash(`Try ${step.from.toUpperCase()} → ${step.to.toUpperCase()}`, "#888");
+                return false;
+            }
+            const clone = new Chess(game.fen());
+            const piece = clone.get(sourceSquare);
+            if (!piece) return false;
+            clone.remove(sourceSquare);
+            clone.remove(targetSquare);
+            clone.put(piece, targetSquare);
+            setGame(clone);
+            if (step.flashMsg) showFlash(step.flashMsg, step.flashColor);
+            if (step.botReply) doBotReply(clone, step.botReply);
+            if (step.ketuReturn) {
+                setTimeout(() => {
+                    setGame(g => {
+                        const next = new Chess(g.fen());
+                        next.put(step.ketuReturn.piece, step.ketuReturn.square);
+                        return next;
+                    });
+                    showFlash("Ketu returns the bishop to g2! 🌠", "#f97316");
+                }, 1400);
+            }
+            setActivatedSquare(null);
+            setTimeout(advance, step.botReply ? 1100 : 400);
+            return true;
         }
-      }
-    } else {
-      showFlash(`${step.card.name} activated! ✨`, step.card.color);
+
+        if (step.type === "power_move2") {
+            if (sourceSquare !== step.from || targetSquare !== step.to) {
+                showFlash(`Move your queen to ${step.to.toUpperCase()}`, "#888");
+                return false;
+            }
+            const clone = new Chess(game.fen());
+            const piece = clone.get(sourceSquare);
+            if (!piece) return false;
+            clone.remove(sourceSquare);
+            clone.remove(targetSquare);
+            clone.put(piece, targetSquare);
+            setGame(clone);
+            if (step.flashMsg) showFlash(step.flashMsg, step.flashColor);
+            setTimeout(advance, 900);
+            return true;
+        }
+
+        showFlash("Follow the hint above ✦", "#888");
+        return false;
+    }, [game, step, advance, doBotReply, botThinking]);
+
+    // ── Square click ─────────────────────────────────────────────────────────────
+    const onSquareClick = useCallback((square) => {
+        if (step.type !== "activate") return;
+        if (square !== step.targetSquare) {
+            showFlash(`Tap the highlighted square: ${step.targetSquare.toUpperCase()}`, "#888");
+            return;
+        }
+        if (step.card.id === "GURU") {
+            const clone = new Chess(game.fen());
+            const piece = clone.get(square);
+            if (piece) {
+                const files = "abcdefgh";
+                const fi = files.indexOf(square[0]);
+                const rank = square[1];
+                const dupFile = fi < 7 ? files[fi + 1] : files[fi - 1];
+                const dupSquare = `${dupFile}${rank}`;
+                if (!clone.get(dupSquare)) {
+                    clone.put({ type: piece.type, color: piece.color }, dupSquare);
+                    setGame(clone);
+                    showFlash("Duplicate summoned on g4! 🪐", "#a855f7");
+                }
+            }
+        } else {
+            showFlash(`${step.card.name} activated! ✨`, step.card.color);
+        }
+        setActivatedSquare(square);
+        setTimeout(advance, 700);
+    }, [step, game, advance]);
+
+    // ── Square styles ─────────────────────────────────────────────────────────────
+    const customSquareStyles = {};
+    (step.highlightSquares || []).forEach((sq, i) => {
+        customSquareStyles[sq] = {
+            backgroundColor: i === 0 ? "rgba(255,220,0,0.7)" : "rgba(255,80,80,0.7)",
+            boxShadow: i === 0 ? "inset 0 0 0 3px #ffd700" : "inset 0 0 0 3px #ff5050",
+            borderRadius: "4px",
+        };
+    });
+    if (step.type === "activate" && step.targetSquare) {
+        customSquareStyles[step.targetSquare] = {
+            backgroundColor: `${step.card.color}55`,
+            boxShadow: `inset 0 0 0 3px ${step.card.color}`,
+            borderRadius: "4px",
+        };
     }
-    setActivatedSquare(square);
-    setTimeout(advance, 700);
-  }, [step, game, advance]);
+    if (activatedSquare && step.type !== "activate") {
+        customSquareStyles[activatedSquare] = {
+            boxShadow: `inset 0 0 0 3px ${step.card?.color || "#fbbf24"}`,
+            borderRadius: "4px",
+        };
+    }
 
-  // ── Square styles ─────────────────────────────────────────────────────────────
-  const customSquareStyles = {};
-  (step.highlightSquares || []).forEach((sq, i) => {
-    customSquareStyles[sq] = {
-      backgroundColor: i === 0 ? "rgba(251,191,36,0.45)" : "rgba(239,68,68,0.45)",
-      borderRadius: "4px",
-    };
-  });
-  if (step.type === "activate" && step.targetSquare) {
-    customSquareStyles[step.targetSquare] = {
-      backgroundColor: `${step.card.color}55`,
-      boxShadow: `inset 0 0 0 3px ${step.card.color}`,
-      borderRadius: "4px",
-    };
-  }
-  if (activatedSquare && step.type !== "activate") {
-    customSquareStyles[activatedSquare] = {
-      boxShadow: `inset 0 0 0 3px ${step.card?.color || "#fbbf24"}`,
-      borderRadius: "4px",
-    };
-  }
+    const isComplete = step.type === "complete";
+    const pulseAhvan = !!step.pulseAhvan && !showOverlay;
+    const progressSteps = STEPS.filter(s => s.type !== "complete");
+    const progressIdx = progressSteps.findIndex(s => s.id === step.id);
+    const tierLabel = t => ({ 1: "I", 2: "II", 3: "III" }[t]);
 
-  const isComplete    = step.type === "complete";
-  const pulseAhvan    = !!step.pulseAhvan && !showOverlay;
-  const progressSteps = STEPS.filter(s => s.type !== "complete");
-  const progressIdx   = progressSteps.findIndex(s => s.id === step.id);
-  const tierLabel     = t => ({ 1: "I", 2: "II", 3: "III" }[t]);
-
-  // ── Shared card renderer ──────────────────────────────────────────────────────
-  const renderCards = (compact = false) => (
-    [RAHU, GURU, BUDHA].map(card => {
-      const unlocked = step.availableCards.some(c => c.id === card.id);
-      const isTarget = step.card?.id === card.id;
-      const isSelected = selectedCard?.id === card.id;
-      const canSelect  = step.type === "select_card" && unlocked;
-      return (
-        <div
-          key={card.id}
-          className={`tut-card ${!unlocked ? "locked" : ""} ${isSelected ? "selected" : ""}`}
-          style={{
-            width: compact ? "100%" : "88px",
-            flexDirection: compact ? "row" : "column",
-            borderColor: isSelected ? card.color : "rgba(255,255,255,0.08)",
-            boxShadow: isTarget && unlocked && !isSelected ? `0 0 20px ${card.color}99` : isSelected ? `0 0 14px ${card.color}66` : "none",
-            cursor: canSelect ? "pointer" : "default",
-          }}
-          onClick={() => canSelect && setSelectedCard(isSelected ? null : card)}
-        >
-          {compact ? (
-            <>
-              <img src={`${process.env.PUBLIC_URL}${card.image}`} alt={card.name}
-                style={{ width: "56px", height: "56px", objectFit: "cover", flexShrink: 0 }} />
-              <div style={{ padding: "8px 10px", flex: 1, minWidth: 0 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "3px" }}>
-                  <span style={{ fontFamily: "'Cinzel',serif", fontSize: "11px", color: "#f5e9c8" }}>{card.name}</span>
-                  <span style={{ fontSize: "9px", color: "#ffd700", background: "rgba(0,0,0,0.5)", padding: "1px 5px", borderRadius: "3px" }}>Tier {tierLabel(card.tier)}</span>
-                  <span style={{ fontSize: "9px", color: "#ffd700", background: "rgba(0,0,0,0.5)", padding: "1px 5px", borderRadius: "3px", marginLeft: "auto" }}>{card.cost}s</span>
+    // ── Shared card renderer ──────────────────────────────────────────────────────
+    const renderCards = (compact = false) => (
+        [KETU, GURU, BUDHA].map(card => {
+            const unlocked = step.availableCards.some(c => c.id === card.id);
+            const isTarget = step.card?.id === card.id;
+            const isSelected = selectedCard?.id === card.id;
+            const canSelect = step.type === "select_card" && unlocked;
+            return (
+                <div
+                    key={card.id}
+                    className={`tut-card ${!unlocked ? "locked" : ""} ${isSelected ? "selected" : ""}`}
+                    style={{
+                        width: compact ? "100%" : "88px",
+                        flexDirection: compact ? "row" : "column",
+                        borderColor: isSelected ? card.color : "rgba(255,255,255,0.08)",
+                        boxShadow: isTarget && unlocked && !isSelected ? `0 0 20px ${card.color}99` : isSelected ? `0 0 14px ${card.color}66` : "none",
+                        cursor: canSelect ? "pointer" : "default",
+                    }}
+                    onClick={() => canSelect && setSelectedCard(isSelected ? null : card)}
+                >
+                    {compact ? (
+                        <>
+                            <img src={`${process.env.PUBLIC_URL}${card.image}`} alt={card.name}
+                                style={{ width: "56px", height: "56px", objectFit: "cover", flexShrink: 0 }} />
+                            <div style={{ padding: "8px 10px", flex: 1, minWidth: 0 }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "3px" }}>
+                                    <span style={{ fontFamily: "'Cinzel',serif", fontSize: "11px", color: "#f5e9c8" }}>{card.name}</span>
+                                    <span style={{ fontSize: "9px", color: "#ffd700", background: "rgba(0,0,0,0.5)", padding: "1px 5px", borderRadius: "3px" }}>Tier {tierLabel(card.tier)}</span>
+                                    <span style={{ fontSize: "9px", color: "#ffd700", background: "rgba(0,0,0,0.5)", padding: "1px 5px", borderRadius: "3px", marginLeft: "auto" }}>{card.cost}s</span>
+                                </div>
+                                <div style={{ fontSize: "10px", color: "#888", lineHeight: 1.4 }}>{card.description}</div>
+                            </div>
+                            {!unlocked && (
+                                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.55)", fontSize: "18px", borderRadius: "10px" }}>🔒</div>
+                            )}
+                        </>
+                    ) : (
+                        <>
+                            <div className="tut-card-tier">Tier {tierLabel(card.tier)}</div>
+                            <div className="tut-card-cost">{card.cost}s</div>
+                            <img src={`${process.env.PUBLIC_URL}${card.image}`} alt={card.name} />
+                            <div className="tut-card-footer">
+                                <div className="tut-card-name">{card.name}</div>
+                                <div className="tut-card-desc">{card.description}</div>
+                            </div>
+                            {!unlocked && (
+                                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.55)", fontSize: "18px" }}>🔒</div>
+                            )}
+                        </>
+                    )}
                 </div>
-                <div style={{ fontSize: "10px", color: "#888", lineHeight: 1.4 }}>{card.description}</div>
-              </div>
-              {!unlocked && (
-                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.55)", fontSize: "18px", borderRadius: "10px" }}>🔒</div>
-              )}
-            </>
-          ) : (
-            <>
-              <div className="tut-card-tier">Tier {tierLabel(card.tier)}</div>
-              <div className="tut-card-cost">{card.cost}s</div>
-              <img src={`${process.env.PUBLIC_URL}${card.image}`} alt={card.name} />
-              <div className="tut-card-footer">
-                <div className="tut-card-name">{card.name}</div>
-                <div className="tut-card-desc">{card.description}</div>
-              </div>
-              {!unlocked && (
-                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.55)", fontSize: "18px" }}>🔒</div>
-              )}
-            </>
-          )}
-        </div>
-      );
-    })
-  );
+            );
+        })
+    );
 
-  // ── Use power button (shared) ─────────────────────────────────────────────────
-  const renderUseBtn = () => (
-    <button
-      className="tut-use-btn"
-      disabled={!selectedCard}
-      style={{ backgroundColor: selectedCard ? selectedCard.color : "#333", color: selectedCard ? "#000" : "#666" }}
-      onClick={() => {
-        if (!selectedCard) return;
-        if (selectedCard.id !== step.card?.id) {
-          showFlash(`Select ${step.card?.name} for this step`, "#888");
-          return;
-        }
-        setShowOverlay(false);
-        setSelectedCard(null);
-        advance();
-      }}
-    >
-      Use {selectedCard?.name ?? "Power"}
-    </button>
-  );
+    // ── Use power button (shared) ─────────────────────────────────────────────────
+    const renderUseBtn = () => (
+        <button
+            className="tut-use-btn"
+            disabled={!selectedCard}
+            style={{ backgroundColor: selectedCard ? selectedCard.color : "#333", color: selectedCard ? "#000" : "#666" }}
+            onClick={() => {
+                if (!selectedCard) return;
+                if (selectedCard.id !== step.card?.id) {
+                    showFlash(`Select ${step.card?.name} for this step`, "#888");
+                    return;
+                }
+                setShowOverlay(false);
+                setSelectedCard(null);
+                advance();
+            }}
+        >
+            Use {selectedCard?.name ?? "Power"}
+        </button>
+    );
 
-  return (
-    <>
-      <style>{`
+    return (
+        <>
+            <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap');
         *{box-sizing:border-box;margin:0;padding:0;}
         .tut-root{min-height:100vh;background:#060810;color:#e8dfc8;font-family:'Crimson Pro',Georgia,serif;display:flex;flex-direction:column;align-items:center;overflow-x:hidden;padding-bottom:env(safe-area-inset-bottom);}
@@ -471,186 +483,186 @@ export default function Tutorial({ onBack }) {
         .tut-complete-btn{padding:16px 40px;font-family:'Cinzel',serif;font-size:14px;letter-spacing:0.1em;background:#c8973a;color:#060810;border:none;border-radius:50px;cursor:pointer;font-weight:700;box-shadow:0 4px 24px rgba(200,151,58,0.5);}
       `}</style>
 
-      <div className="tut-root">
+            <div className="tut-root">
 
-        {/* Nav */}
-        <div className="tut-nav">
-          <div className="tut-nav-title">✦ Tutorial</div>
-          <button className="tut-nav-back" onClick={onBack}>✕ Exit</button>
-        </div>
-
-        {flash && <div className="tut-flash" style={{ backgroundColor: flash.color }}>{flash.msg}</div>}
-
-        {isComplete ? (
-          <div className={`tut-complete ${visible ? "show" : ""}`}>
-            <div className="tut-complete-glyph">🌟</div>
-            <div className="tut-complete-title">You are ready</div>
-            <div className="tut-complete-sub">
-              The Navagraha bow to you. Enter the board with their blessings — and face whatever the Asura dare send.
-            </div>
-            <button className="tut-complete-btn" onClick={onBack}>Begin your journey</button>
-          </div>
-
-        ) : isMobile ? (
-          /* ══════════════ MOBILE LAYOUT ══════════════ */
-          <>
-            <div className="tut-progress">
-              {progressSteps.map((s, i) => (
-                <div key={s.id} className={`tut-pip ${i < progressIdx ? "done" : i === progressIdx ? "active" : ""}`} />
-              ))}
-            </div>
-
-            <div className={`tut-hint ${visible ? "show" : ""}`}>
-              <div className="tut-hint-title">{step.title}</div>
-              <div className="tut-hint-body">{step.body}</div>
-            </div>
-
-            {botThinking && <div className="tut-thinking">👹 Black is responding...</div>}
-
-            <div className="tut-board-wrap" style={{ marginBottom: "80px" }}>
-              <Chessboard
-                position={game.fen()}
-                onPieceDrop={onPieceDrop}
-                onSquareClick={onSquareClick}
-                boardWidth={boardWidth}
-                animationDuration={220}
-                customDarkSquareStyle={{ backgroundColor: "#6b1a1a" }}
-                customLightSquareStyle={{ backgroundColor: "#8b2020" }}
-                customSquareStyles={customSquareStyles}
-                arePiecesDraggable={!botThinking}
-              />
-            </div>
-
-            <div className="tut-bot">
-              <button className="tut-menu-btn" onClick={onBack}>✕ Menu</button>
-              <button
-                className={`tut-ahvan-btn ${pulseAhvan ? "pulse" : ""}`}
-                onClick={() => {
-                  if (step.type === "select_card") setShowOverlay(true);
-                  else showFlash("Make your board move first ✦", "#888");
-                }}
-              >
-                ✨ Āhvān
-              </button>
-            </div>
-
-            {showOverlay && (
-              <div className="tut-overlay" onClick={e => { if (e.target === e.currentTarget) { setShowOverlay(false); setSelectedCard(null); } }}>
-                <div className="tut-overlay-inner">
-                  <div className="tut-overlay-title">✦ Celestial Powers ✦</div>
-                  <div className="tut-card-row">
-                    {renderCards(false)}
-                  </div>
-                  {renderUseBtn()}
-                  <button className="tut-cancel-btn" onClick={() => { setShowOverlay(false); setSelectedCard(null); }}>← Back</button>
+                {/* Nav */}
+                <div className="tut-nav">
+                    <div className="tut-nav-title">✦ Tutorial</div>
+                    <button className="tut-nav-back" onClick={onBack}>✕ Exit</button>
                 </div>
-              </div>
-            )}
-          </>
 
-        ) : (
-          /* ══════════════ DESKTOP LAYOUT ══════════════ */
-          <div className="tut-desktop">
+                {flash && <div className="tut-flash" style={{ backgroundColor: flash.color }}>{flash.msg}</div>}
 
-            {/* Left — board + progress */}
-            <div className="tut-desktop-left">
-              <div className="tut-desktop-pip-row">
-                {progressSteps.map((s, i) => (
-                  <div key={s.id} className={`tut-pip ${i < progressIdx ? "done" : i === progressIdx ? "active" : ""}`} />
-                ))}
-              </div>
-              <div className="tut-board-wrap">
-                <Chessboard
-                  position={game.fen()}
-                  onPieceDrop={onPieceDrop}
-                  onSquareClick={onSquareClick}
-                  boardWidth={boardWidth}
-                  animationDuration={220}
-                  customDarkSquareStyle={{ backgroundColor: "#6b1a1a" }}
-                  customLightSquareStyle={{ backgroundColor: "#8b2020" }}
-                  customSquareStyles={customSquareStyles}
-                  arePiecesDraggable={!botThinking}
-                />
-              </div>
-              <button className="tut-desktop-menu" onClick={onBack}>✕ Exit Tutorial</button>
-            </div>
-
-            {/* Right — hint + cards + action */}
-            <div className="tut-desktop-right">
-
-              {/* Hint */}
-              <div>
-                <div className="tut-desktop-section-label">✦ Current Objective</div>
-                <div className={`tut-desktop-hint ${visible ? "show" : ""}`}>
-                  <div className="tut-desktop-hint-title">{step.title}</div>
-                  <div className="tut-desktop-hint-body">{step.body}</div>
-                </div>
-              </div>
-
-              {botThinking && <div className="tut-desktop-thinking">👹 Black is responding...</div>}
-
-              {/* Cards panel */}
-              <div>
-                <div className="tut-desktop-section-label">✦ Celestial Powers</div>
-                <div className="tut-desktop-cards">
-                  {[RAHU, GURU, BUDHA].map(card => {
-                    const unlocked = step.availableCards.some(c => c.id === card.id);
-                    const isTarget = step.card?.id === card.id;
-                    const isSelected = selectedCard?.id === card.id;
-                    const canSelect = step.type === "select_card" && unlocked;
-                    return (
-                      <div
-                        key={card.id}
-                        className={`tut-desktop-card ${!unlocked ? "locked" : ""} ${isSelected ? "selected" : ""}`}
-                        style={{
-                          borderColor: isSelected ? card.color : isTarget && unlocked ? `${card.color}66` : "rgba(255,255,255,0.08)",
-                          boxShadow: isTarget && unlocked && !isSelected ? `0 0 18px ${card.color}66` : isSelected ? `0 0 16px ${card.color}88` : "none",
-                          cursor: canSelect ? "pointer" : "default",
-                        }}
-                        onClick={() => canSelect && setSelectedCard(isSelected ? null : card)}
-                      >
-                        <img
-                          src={`${process.env.PUBLIC_URL}${card.image}`}
-                          alt={card.name}
-                          style={{ width: "64px", height: "64px", objectFit: "cover", flexShrink: 0 }}
-                        />
-                        <div style={{ padding: "10px 12px", flex: 1, minWidth: 0 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
-                            <span style={{ fontFamily: "'Cinzel',serif", fontSize: "13px", color: "#f5e9c8" }}>{card.name}</span>
-                            <span style={{ fontSize: "10px", color: "#ffd700", background: "rgba(0,0,0,0.5)", padding: "1px 6px", borderRadius: "3px" }}>
-                              Tier {tierLabel(card.tier)}
-                            </span>
-                            <span style={{ fontSize: "10px", color: "#ffd700", background: "rgba(0,0,0,0.5)", padding: "1px 6px", borderRadius: "3px", marginLeft: "auto" }}>
-                              {card.cost}s
-                            </span>
-                          </div>
-                          <div style={{ fontSize: "11px", color: "#888", lineHeight: 1.5 }}>{card.description}</div>
+                {isComplete ? (
+                    <div className={`tut-complete ${visible ? "show" : ""}`}>
+                        <div className="tut-complete-glyph">🌟</div>
+                        <div className="tut-complete-title">You are ready</div>
+                        <div className="tut-complete-sub">
+                            The Navagraha bow to you. Enter the board with their blessings — and face whatever the Asura dare send.
                         </div>
-                        {!unlocked && (
-                          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.55)", fontSize: "20px", borderRadius: "8px" }}>🔒</div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Use power button — only visible on select_card step */}
-              {step.type === "select_card" && (
-                <div>
-                  {renderUseBtn()}
-                  {selectedCard && selectedCard.id !== step.card?.id && (
-                    <div style={{ fontSize: "12px", color: "#888", textAlign: "center", marginTop: "6px" }}>
-                      Select {step.card?.name} for this step
+                        <button className="tut-complete-btn" onClick={onBack}>Begin your journey</button>
                     </div>
-                  )}
-                </div>
-              )}
 
+                ) : isMobile ? (
+                    /* ══════════════ MOBILE LAYOUT ══════════════ */
+                    <>
+                        <div className="tut-progress">
+                            {progressSteps.map((s, i) => (
+                                <div key={s.id} className={`tut-pip ${i < progressIdx ? "done" : i === progressIdx ? "active" : ""}`} />
+                            ))}
+                        </div>
+
+                        <div className={`tut-hint ${visible ? "show" : ""}`}>
+                            <div className="tut-hint-title">{step.title}</div>
+                            <div className="tut-hint-body">{step.body}</div>
+                        </div>
+
+                        {botThinking && <div className="tut-thinking">👹 Black is responding...</div>}
+
+                        <div className="tut-board-wrap" style={{ marginBottom: "80px" }}>
+                            <Chessboard
+                                position={game.fen()}
+                                onPieceDrop={onPieceDrop}
+                                onSquareClick={onSquareClick}
+                                boardWidth={boardWidth}
+                                animationDuration={220}
+                                customDarkSquareStyle={{ backgroundColor: "#6b1a1a" }}
+                                customLightSquareStyle={{ backgroundColor: "#8b2020" }}
+                                customSquareStyles={customSquareStyles}
+                                arePiecesDraggable={!botThinking}
+                            />
+                        </div>
+
+                        <div className="tut-bot">
+                            <button className="tut-menu-btn" onClick={onBack}>✕ Menu</button>
+                            <button
+                                className={`tut-ahvan-btn ${pulseAhvan ? "pulse" : ""}`}
+                                onClick={() => {
+                                    if (step.type === "select_card") setShowOverlay(true);
+                                    else showFlash("Make your board move first ✦", "#888");
+                                }}
+                            >
+                                ✨ Āhvān
+                            </button>
+                        </div>
+
+                        {showOverlay && (
+                            <div className="tut-overlay" onClick={e => { if (e.target === e.currentTarget) { setShowOverlay(false); setSelectedCard(null); } }}>
+                                <div className="tut-overlay-inner">
+                                    <div className="tut-overlay-title">✦ Celestial Powers ✦</div>
+                                    <div className="tut-card-row">
+                                        {renderCards(false)}
+                                    </div>
+                                    {renderUseBtn()}
+                                    <button className="tut-cancel-btn" onClick={() => { setShowOverlay(false); setSelectedCard(null); }}>← Back</button>
+                                </div>
+                            </div>
+                        )}
+                    </>
+
+                ) : (
+                    /* ══════════════ DESKTOP LAYOUT ══════════════ */
+                    <div className="tut-desktop">
+
+                        {/* Left — board + progress */}
+                        <div className="tut-desktop-left">
+                            <div className="tut-desktop-pip-row">
+                                {progressSteps.map((s, i) => (
+                                    <div key={s.id} className={`tut-pip ${i < progressIdx ? "done" : i === progressIdx ? "active" : ""}`} />
+                                ))}
+                            </div>
+                            <div className="tut-board-wrap">
+                                <Chessboard
+                                    position={game.fen()}
+                                    onPieceDrop={onPieceDrop}
+                                    onSquareClick={onSquareClick}
+                                    boardWidth={boardWidth}
+                                    animationDuration={220}
+                                    customDarkSquareStyle={{ backgroundColor: "#6b1a1a" }}
+                                    customLightSquareStyle={{ backgroundColor: "#8b2020" }}
+                                    customSquareStyles={customSquareStyles}
+                                    arePiecesDraggable={!botThinking}
+                                />
+                            </div>
+                            <button className="tut-desktop-menu" onClick={onBack}>✕ Exit Tutorial</button>
+                        </div>
+
+                        {/* Right — hint + cards + action */}
+                        <div className="tut-desktop-right">
+
+                            {/* Hint */}
+                            <div>
+                                <div className="tut-desktop-section-label">✦ Current Objective</div>
+                                <div className={`tut-desktop-hint ${visible ? "show" : ""}`}>
+                                    <div className="tut-desktop-hint-title">{step.title}</div>
+                                    <div className="tut-desktop-hint-body">{step.body}</div>
+                                </div>
+                            </div>
+
+                            {botThinking && <div className="tut-desktop-thinking">👹 Black is responding...</div>}
+
+                            {/* Cards panel */}
+                            <div>
+                                <div className="tut-desktop-section-label">✦ Celestial Powers</div>
+                                <div className="tut-desktop-cards">
+                                    {[KETU, GURU, BUDHA].map(card => {
+                                        const unlocked = step.availableCards.some(c => c.id === card.id);
+                                        const isTarget = step.card?.id === card.id;
+                                        const isSelected = selectedCard?.id === card.id;
+                                        const canSelect = step.type === "select_card" && unlocked;
+                                        return (
+                                            <div
+                                                key={card.id}
+                                                className={`tut-desktop-card ${!unlocked ? "locked" : ""} ${isSelected ? "selected" : ""}`}
+                                                style={{
+                                                    borderColor: isSelected ? card.color : isTarget && unlocked ? `${card.color}66` : "rgba(255,255,255,0.08)",
+                                                    boxShadow: isTarget && unlocked && !isSelected ? `0 0 18px ${card.color}66` : isSelected ? `0 0 16px ${card.color}88` : "none",
+                                                    cursor: canSelect ? "pointer" : "default",
+                                                }}
+                                                onClick={() => canSelect && setSelectedCard(isSelected ? null : card)}
+                                            >
+                                                <img
+                                                    src={`${process.env.PUBLIC_URL}${card.image}`}
+                                                    alt={card.name}
+                                                    style={{ width: "64px", height: "64px", objectFit: "cover", flexShrink: 0 }}
+                                                />
+                                                <div style={{ padding: "10px 12px", flex: 1, minWidth: 0 }}>
+                                                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+                                                        <span style={{ fontFamily: "'Cinzel',serif", fontSize: "13px", color: "#f5e9c8" }}>{card.name}</span>
+                                                        <span style={{ fontSize: "10px", color: "#ffd700", background: "rgba(0,0,0,0.5)", padding: "1px 6px", borderRadius: "3px" }}>
+                                                            Tier {tierLabel(card.tier)}
+                                                        </span>
+                                                        <span style={{ fontSize: "10px", color: "#ffd700", background: "rgba(0,0,0,0.5)", padding: "1px 6px", borderRadius: "3px", marginLeft: "auto" }}>
+                                                            {card.cost}s
+                                                        </span>
+                                                    </div>
+                                                    <div style={{ fontSize: "11px", color: "#888", lineHeight: 1.5 }}>{card.description}</div>
+                                                </div>
+                                                {!unlocked && (
+                                                    <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.55)", fontSize: "20px", borderRadius: "8px" }}>🔒</div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* Use power button — only visible on select_card step */}
+                            {step.type === "select_card" && (
+                                <div>
+                                    {renderUseBtn()}
+                                    {selectedCard && selectedCard.id !== step.card?.id && (
+                                        <div style={{ fontSize: "12px", color: "#888", textAlign: "center", marginTop: "6px" }}>
+                                            Select {step.card?.name} for this step
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                        </div>
+                    </div>
+                )}
             </div>
-          </div>
-        )}
-      </div>
-    </>
-  );
+        </>
+    );
 }
