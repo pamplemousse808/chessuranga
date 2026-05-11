@@ -523,7 +523,8 @@ export default function PvpTabletLayout({
   });
   const wUsed = whiteUsedCards ?? usedCards ?? [];
   const bUsed = blackUsedCards ?? usedCards ?? [];
-
+  const [confirmMenu, setConfirmMenu] = useState(false);
+  
   return (
     <>
       <div
