@@ -874,21 +874,29 @@ export default function PvpTabletLayout({
           >
             ⛶ Fullscreen
           </button>
-          <button
-            onClick={resetGame}
-            style={{
-              marginTop: "4px",
-              padding: "8px 20px",
-              fontSize: "12px",
-              backgroundColor: "transparent",
-              color: "#dadada",
-              border: "1px solid #333",
-              borderRadius: "20px",
-              cursor: "pointer",
-            }}
-          >
-            ✕ Menu
-          </button>
+          {confirmMenu ? (
+            <div style={{ marginTop: "6px", display: "flex", gap: "8px" }}>
+              <button
+                onClick={resetGame}
+                style={{ padding: "8px 16px", fontSize: "12px", backgroundColor: "#e94560", color: "#fff", border: "none", borderRadius: "20px", cursor: "pointer", fontWeight: "bold" }}
+              >
+                Yes, quit
+              </button>
+              <button
+                onClick={() => setConfirmMenu(false)}
+                style={{ padding: "8px 16px", fontSize: "12px", backgroundColor: "transparent", color: "#dadada", border: "1px solid #333", borderRadius: "20px", cursor: "pointer" }}
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirmMenu(true)}
+              style={{ marginTop: "4px", padding: "8px 20px", fontSize: "12px", backgroundColor: "transparent", color: "#dadada", border: "1px solid #333", borderRadius: "20px", cursor: "pointer" }}
+            >
+              ✕ Menu
+            </button>
+          )}
         </div>
 
         {/* ════════════════════════════════════════

@@ -1818,7 +1818,6 @@ function App() {
               </div>
               <div style={{ fontSize: "32px", fontWeight: "bold", marginTop: "10px", color: whiteTime < 30 ? "#ff6b6b" : theme.text }}>🌟 You: {formatTime(whiteTime)}</div>
               {!gameOver && <p style={{ marginTop: "15px", fontSize: "16px" }}>Turn: {game.turn() === "w" ? (gameMode === "asura" ? "You" : "White") : (gameMode === "asura" ? "Asura" : "Black")}{chandraPlacementMode && <span style={{ color: "#e5e7eb", marginLeft: "10px" }}>🌙 CLONES</span>}{guruMode && <span style={{ color: "#a855f7", marginLeft: "10px" }}>🪐 RESURRECT</span>}{shaniMode && <span style={{ color: "#94a3b8", marginLeft: "10px" }}>🪐 FREEZE</span>}{waitingForBot && <span style={{ color: "#ff6b6b", marginLeft: "10px" }}>👹 Thinking...</span>}</p>}
-              {!gameOver && <button onClick={resetGame} style={{ marginTop: "15px", padding: "10px 20px", fontSize: "14px", backgroundColor: "#e94560", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer", fontWeight: "bold" }}>Main Menu</button>}
             </div>
 
             {/* RIGHT: captures */}
@@ -1846,8 +1845,40 @@ function App() {
                 <div style={{ fontSize: "11px", color: "#888", fontStyle: "italic" }}>Final 30s: All cards 50% off</div>
               </div>
             </div>
+            {/* Main Menu button with confirmation */}
+            {!gameOver && (
+              <div style={{ marginTop: "8px" }}>
+                {confirmMenu ? (
+                  <div style={{ backgroundColor: "#16213e", borderRadius: "8px", padding: "12px", textAlign: "center" }}>
+                    <div style={{ fontSize: "13px", color: "#e8dfc8", marginBottom: "10px", fontWeight: "bold" }}>Leave the game?</div>
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      <button
+                        onClick={resetGame}
+                        style={{ flex: 1, padding: "8px 0", fontSize: "12px", backgroundColor: "#e94560", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}
+                      >
+                        Yes, quit
+                      </button>
+                      <button
+                        onClick={() => setConfirmMenu(false)}
+                        style={{ flex: 1, padding: "8px 0", fontSize: "12px", backgroundColor: "#334155", color: "#e8dfc8", border: "none", borderRadius: "6px", cursor: "pointer" }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setConfirmMenu(true)}
+                    style={{ width: "100%", padding: "10px 0", fontSize: "13px", backgroundColor: "#e94560", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}
+                  >
+                    Main Menu
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         )}
+        
         {gameStarted && gameMode === "pvp" && (
           <PvpTabletLayout
             game={game}
