@@ -7,7 +7,6 @@ import { formatTime, getPieceSymbol } from "./gameUtils";
 // ── Which deck does each colour use? ─────────────────────────────────────────
 const DECK_FOR = { w: SHARED_DECK, b: ASURA_DECK };
 const EMOJI_FOR = { w: CARD_EMOJI, b: ASURA_CARD_EMOJI };
-const [confirmMenu, setConfirmMenu] = useState(false);
 
 // ── CardTooltip ───────────────────────────────────────────────────────────────
 function CardTooltip({ card, emoji, cost, onClose, onCancel, flipped }) {
