@@ -87,6 +87,7 @@ function App() {
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [launchSplash, setLaunchSplash] = useState(null);
   const [ahvanHintDismissed, setAhvanHintDismissed] = useState(false);
+  const [confirmMenu, setConfirmMenu] = useState(false);
 
 
   useEffect(() => {
@@ -1878,7 +1879,7 @@ function App() {
             )}
           </div>
         )}
-        
+
         {gameStarted && gameMode === "pvp" && (
           <PvpTabletLayout
             game={game}
