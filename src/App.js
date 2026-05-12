@@ -1503,6 +1503,21 @@ function App() {
                 ✨ Interactive Tutorial
                 <div style={{ fontSize: "10px", fontWeight: "normal", marginTop: "2px", opacity: 0.7 }}>Learn to summon the Navagraha step by step</div>
               </button>
+
+              {/* Rate button */}
+              <button
+                onClick={async () => {
+                  try {
+                    const { Browser } = await import('@capacitor/browser');
+                    await Browser.open({ url: 'https://play.google.com/store/apps/details?id=com.chessuranga.app' });
+                  } catch {
+                    window.open('https://play.google.com/store/apps/details?id=com.chessuranga.app', '_blank');
+                  }
+                }}
+                style={{ width: "100%", padding: "10px 16px", fontSize: "12px", backgroundColor: "rgba(0,0,0,0.4)", color: "#a89060", border: "1px solid rgba(255,215,100,0.15)", borderRadius: "10px", cursor: "pointer", textAlign: "center", marginTop: "8px", backdropFilter: "blur(4px)" }}
+              >
+                ⭐ Enjoying the game? Rate us on the Play Store
+              </button>
             </div>
           </div>
         )}
