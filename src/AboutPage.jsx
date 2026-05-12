@@ -91,7 +91,7 @@ export default function AboutPage({ onBack }) {
 
           <div className={`about-hero fade-up ${visible ? "show" : ""}`}>
             <h1 className="about-hero-title">About</h1>
-            <p className="about-hero-sub">Chess, mythology, and one very long rabbit hole</p>
+            <p className="about-hero-sub">Chess, Hindu mythology, and a very long rabbit hole</p>
             <div className="about-divider" />
           </div>
 
@@ -108,22 +108,12 @@ export default function AboutPage({ onBack }) {
             </div>
           </section>
 
-          {/* How it was built */}
-          <section className={`about-section fade-up delay-2 ${visible ? "show" : ""}`}>
-            <div className="section-label">The Build</div>
-            <h2 className="section-title">No code background. No problem.</h2>
-            <div className="section-body">
-              <p>I've always been obsessed with game mechanics — the perpetual "wouldn't it be cool if..." About 18 months ago, I was playing a lot of Marvel Snap and bullet chess simultaneously, and thought: what if you combined them?</p>
-              <p>The problem was I couldn't code at all. Then Claude came along, and here we are.</p>
-            </div>
-          </section>
-
           {/* Roadmap */}
           <section className={`about-section fade-up delay-3 ${visible ? "show" : ""}`}>
             <div className="section-label">What's Next</div>
             <h2 className="section-title">Roadmap ambitions</h2>
             <div className="section-body">
-              <p>This is a proof of concept — but the ambitions are bigger than what you see here.</p>
+              <p>This is currently a proof of concept — but I hope to continue to build it up.</p>
             </div>
             <div className="roadmap-grid">
               <div className="roadmap-item"><span className="roadmap-icon">🃏</span><span className="roadmap-text">Real card decks, so people can play IRL with any chess set</span></div>
@@ -131,7 +121,7 @@ export default function AboutPage({ onBack }) {
               <div className="roadmap-item"><span className="roadmap-icon">😇</span><span className="roadmap-text">Angels vs. the 7 Deadly Sins expansion — moves already mapped</span></div>
               <div className="roadmap-item"><span className="roadmap-icon">🛠️</span><span className="roadmap-text">Deck builder mode — choose your powers before battle</span></div>
               <div className="roadmap-item"><span className="roadmap-icon">🌍</span><span className="roadmap-text">Expand to other mythologies: Norse, Greek, Egyptian…</span></div>
-              <div className="roadmap-item"><span className="roadmap-icon">🌐</span><span className="roadmap-text">Multiplayer — a pipe dream, unless you know a serious developer with deep pockets</span></div>
+              <div className="roadmap-item"><span className="roadmap-icon">🌐</span><span className="roadmap-text">Multiplayer — a bit of a pipe dream, as coding and servers are so hard</span></div>
             </div>
           </section>
 
@@ -157,7 +147,7 @@ export default function AboutPage({ onBack }) {
           <div className={`fade-up delay-5 ${visible ? "show" : ""}`}>
             <div className="kofi-block">
               <div className="kofi-title">☕ Enjoyed the game?</div>
-              <div className="kofi-sub">If you think this man deserves a tip, you can leave one here. It genuinely means a lot.</div>
+              <div className="kofi-sub">If you think this man deserves a tip, you can leave one here. It would mean a lot.</div>
               <button className="kofi-btn" onClick={openKofi}>Buy me a coffee</button>
             </div>
           </div>
