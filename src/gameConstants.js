@@ -89,7 +89,7 @@ export const ASURA_DECK = [
   { id: "SHUMBHA", name: "Shumbha-Nishumbha", color: "#7A3B00", radius: 1, tier: 2, cost: 12, description: "Capture an enemy piece then snap back to your origin square", image: "/images/shumbhanishumbha.jpg" },
 
   // Tier 3
-  { id: "TARAKA", name: "Tarakasura", color: "#1A1A1A", radius: 1, tier: 3, cost: 11, description: "Can only be captured by a piece of the same type for 3 turns", image: "/images/tarakasura.jpg" },
+  { id: "TARAKA", name: "Tarakasura", color: "#1A1A1A", radius: 1, tier: 3, cost: 11, description: "This piece can only be captured by a piece of the same type for 2 turns. Cannot be applied to a queen.", image: "/images/tarakasura.jpg" },
   { id: "KALI_ASURA", name: "Kali", color: "#4A0E4E", radius: 1, tier: 3, cost: 8, description: "Capture any adjacent enemy piece, ignoring movement rules", image: "/images/kali.jpg" },
   { id: "VRITRA", name: "Vritra", color: "#0A2A4A", radius: 2, tier: 3, cost: 9, description: "Opponent's pieces cannot enter or cross this piece's rank for 2 turns", image: "/images/vritra.jpg" },
 ];

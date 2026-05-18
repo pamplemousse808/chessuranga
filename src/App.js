@@ -401,9 +401,13 @@ function App() {
       return;
     }
 
-    // TARAKA — can only be captured by same piece type for 3 turns
+    // TARAKA — can only be captured by same piece type for 2 turns (queens excluded)
     if (cardId === "TARAKA") {
-      setTarakaProtected(prev => ({ ...prev, [square]: { turnsLeft: 6, pieceType: piece.type } }));
+      if (piece.type === "q") {
+        alert("Tarakasura's curse cannot be placed on a queen.");
+        return;
+      }
+      setTarakaProtected(prev => ({ ...prev, [square]: { turnsLeft: 4, pieceType: piece.type } }));
       commitCard();
       return;
     }
@@ -578,22 +582,9 @@ function App() {
     try {
       if (resurrectedPieces[from]) return null;
 
-      // If enemy is capturing a locked resurrected piece, allow it but clear the lock
-      if (resurrectedPieces[to]) {
-        const lockedPiece = game.get(to);
-        const movingPiece = game.get(from);
-        if (lockedPiece && movingPiece && lockedPiece.color !== movingPiece.color) {
-          // Enemy capture — proceed, and clear the resurrection lock
-          setResurrectedPieces(prev => {
-            const updated = { ...prev };
-            delete updated[to];
-            return updated;
-          });
-          // fall through to normal move handling
-        } else {
-          return null; // same-color interaction, keep blocking
-        }
-      }
+     // Resurrected pieces cannot be captured during their frozen turn
+      if (resurrectedPieces[to]) return null;
+
       if (chandraMode && chandraMode.mirages.includes(from)) return null;
       if (chandraMode && from === chandraMode.realSquare) {
         const cleanGame = new Chess(game.fen());
@@ -839,7 +830,7 @@ function App() {
       checkTierUnlocks(occupant.type);
     }
     const ng = new Chess(game.fen()); ng.put({ type: resurrection.piece, color: guruMode.playerColor }, square); setGame(ng);
-    setResurrectedPieces({ ...resurrectedPieces, [square]: { turnsLeft: 2, resurrectedFrom: resurrection } });
+    setResurrectedPieces({ ...resurrectedPieces, [square]: { turnsLeft: 1, resurrectedFrom: resurrection } });
     setCaptureHistory(captureHistory.filter(c => !(c.square === square && c.piece === resurrection.piece && c.color === resurrection.color)));
     setGuruMode(null); setGuruPickerMode(null);
   }
@@ -855,8 +846,10 @@ function App() {
 
         const safeMoves = moves.filter(m =>
           !(poweredPiecesRef.current[m.to]?.power === "SURYA" &&
-            poweredPiecesRef.current[m.to].usesLeft > 0)
+            poweredPiecesRef.current[m.to].usesLeft > 0) &&
+          !resurrectedPieces[m.to]
         );
+        
         const movesToUse = safeMoves.length > 0 ? safeMoves : moves;
         // Filter out Taraka-protected squares the bot can't legally capture
         const validMoves = movesToUse.filter(m => {
