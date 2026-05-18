@@ -961,12 +961,13 @@ function App() {
     }, 50);
     setTimeout(() => { clearInterval(poll); if (waitingForBot) setWaitingForBot(false); }, 8000);
   }
-  
+
   function handlePromotion(piece) {
     if (!promotionPending) return;
     handleMove(promotionPending.from, promotionPending.to, piece);
     setPromotionPending(null);
   }
+
   function onSquareClick(square) {
     if (gameOver || !gameStarted) return;
     if ((gameMode === "asura" || gameMode === "shukracharya") && game.turn() === "b") return;
@@ -1954,6 +1955,10 @@ function App() {
             guruDuplicateMode={guruDuplicateMode}
             setGuruDuplicateMode={setGuruDuplicateMode}
             promotionPending={promotionPending}
+            onPromotionChoice={(piece) => {
+              handleMove(promotionPending.from, promotionPending.to, piece);
+              setPromotionPending(null);
+            }}
           />
         )}
 
