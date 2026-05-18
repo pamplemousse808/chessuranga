@@ -495,6 +495,8 @@ export default function PvpTabletLayout({
   setMahishasuraMode,
   confirmMahishaShift,
   confirmChandraPlacement,
+  promotionPending,
+  onPromotionChoice,
 }) {
   const currentTurn = game.turn();
   const tabletBoard = Math.min(window.innerWidth - 24, 480);
