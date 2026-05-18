@@ -88,6 +88,7 @@ function App() {
   const [launchSplash, setLaunchSplash] = useState(null);
   const [ahvanHintDismissed, setAhvanHintDismissed] = useState(false);
   const [confirmMenu, setConfirmMenu] = useState(false);
+  const [promotionPending, setPromotionPending] = useState(null); // { from, to }
 
 
   useEffect(() => {
@@ -580,11 +581,15 @@ function App() {
 
   function handleMove(from, to, promotion = "q") {
     try {
-      if (resurrectedPieces[from]) return null;
-
-     // Resurrected pieces cannot be captured during their frozen turn
-      if (resurrectedPieces[to]) return null;
-
+      if (resurrectedPieces[from]) {
+        alert("This piece cannot move yet — it needs one turn to recover.");
+        return null;
+      }
+      // Resurrected pieces cannot be captured during their frozen turn
+      if (resurrectedPieces[to]) {
+        alert("You cannot capture a resurrected piece on the turn it returns.");
+        return null;
+      }
       if (chandraMode && chandraMode.mirages.includes(from)) return null;
       if (chandraMode && from === chandraMode.realSquare) {
         const cleanGame = new Chess(game.fen());
@@ -653,6 +658,7 @@ function App() {
       // ── TARAKASURA — can only be captured by same piece type ──
       if (cp && cp.color !== piece.color && tarakaProtected[to]) {
         if (piece.type !== tarakaProtected[to].pieceType) {
+          alert(`Tarakasura's curse — this piece can only be captured by a ${tarakaProtected[to].pieceType === "p" ? "pawn" : tarakaProtected[to].pieceType === "n" ? "knight" : tarakaProtected[to].pieceType === "b" ? "bishop" : tarakaProtected[to].pieceType === "r" ? "rook" : "queen"}.`);
           return null;
         }
       }
@@ -849,7 +855,7 @@ function App() {
             poweredPiecesRef.current[m.to].usesLeft > 0) &&
           !resurrectedPieces[m.to]
         );
-        
+
         const movesToUse = safeMoves.length > 0 ? safeMoves : moves;
         // Filter out Taraka-protected squares the bot can't legally capture
         const validMoves = movesToUse.filter(m => {
@@ -1099,7 +1105,20 @@ function App() {
       return;
     }
 
-    handleMove(moveFrom, square); setMoveFrom("");
+    if (!checkPromotion(moveFrom, square)) handleMove(moveFrom, square);
+    setMoveFrom("");
+  }
+
+  function checkPromotion(from, to) {
+    if (gameMode !== "pvp") return false;
+    const piece = game.get(from);
+    if (!piece || piece.type !== "p") return false;
+    const toRank = parseInt(to[1]);
+    if ((piece.color === "w" && toRank === 8) || (piece.color === "b" && toRank === 1)) {
+      setPromotionPending({ from, to });
+      return true;
+    }
+    return false;
   }
 
   function onPieceDrop(sourceSquare, targetSquare) {
@@ -1109,6 +1128,7 @@ function App() {
       if (chandraMode.mirages.includes(sourceSquare)) return false;
       if (chandraMode.mirages.includes(targetSquare)) { const ng = new Chess(game.fen()); chandraMode.mirages.forEach(sq => ng.remove(sq)); setGame(ng); setChandraMode(null); return false; }
     }
+    if (checkPromotion(sourceSquare, targetSquare)) { setMoveFrom(""); return true; }
     const result = handleMove(sourceSquare, targetSquare); setMoveFrom(""); return result !== null;
   }
 
@@ -1928,6 +1948,11 @@ function App() {
             confirmChandraPlacement={confirmChandraPlacement}
             guruDuplicateMode={guruDuplicateMode}
             setGuruDuplicateMode={setGuruDuplicateMode}
+            promotionPending={promotionPending}
+            onPromotionChoice={(piece) => {
+              handleMove(promotionPending.from, promotionPending.to, piece);
+              setPromotionPending(null);
+            }}
           />
         )}
 

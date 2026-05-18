@@ -524,7 +524,7 @@ export default function PvpTabletLayout({
   const wUsed = whiteUsedCards ?? usedCards ?? [];
   const bUsed = blackUsedCards ?? usedCards ?? [];
   const [confirmMenu, setConfirmMenu] = useState(false);
-  
+
   return (
     <>
       <div
@@ -948,6 +948,43 @@ export default function PvpTabletLayout({
           </div>
         </div>
       </div>
+      {promotionPending && (
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 900,
+          backgroundColor: "rgba(0,0,0,0.75)",
+          display: "flex", alignItems: "center", justifyContent: "center"
+        }}>
+          <div style={{
+            backgroundColor: "#0f172a", borderRadius: "16px",
+            padding: "24px", textAlign: "center",
+            border: "2px solid #4ecca3", width: "88vw", maxWidth: "320px",
+            transform: game.turn() === "b" ? "rotate(180deg)" : "none"
+          }}>
+            <div style={{ fontSize: "15px", fontWeight: "bold", color: "#4ecca3", marginBottom: "16px" }}>
+              ♟ Promote your pawn
+            </div>
+            <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+              {[
+                { type: "q", symbol: game.turn() === "w" ? "♕" : "♛", label: "Queen" },
+                { type: "r", symbol: game.turn() === "w" ? "♖" : "♜", label: "Rook" },
+                { type: "b", symbol: game.turn() === "w" ? "♗" : "♝", label: "Bishop" },
+                { type: "n", symbol: game.turn() === "w" ? "♘" : "♞", label: "Knight" },
+              ].map(({ type, symbol, label }) => (
+                <button key={type} onClick={() => onPromotionChoice(type)} style={{
+                  display: "flex", flexDirection: "column", alignItems: "center",
+                  padding: "12px", fontSize: "32px",
+                  backgroundColor: "rgba(78,204,163,0.1)",
+                  border: "2px solid #4ecca3", borderRadius: "12px",
+                  cursor: "pointer", color: "#fff", gap: "4px"
+                }}>
+                  {symbol}
+                  <span style={{ fontSize: "10px", color: "#94a3b8" }}>{label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
