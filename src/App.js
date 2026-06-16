@@ -1424,7 +1424,7 @@ function App() {
                 style={{ display: "block", marginTop: "10px" }}
               >
                 <img
-                  src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
+                  src="/images/googleplaybadge.png"
                   alt="Get it on Google Play"
                   style={{ height: "50px", width: "auto" }}
                 />
