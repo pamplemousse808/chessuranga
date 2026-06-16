@@ -1415,6 +1415,20 @@ function App() {
                 ✨ Interactive Tutorial
                 <div style={{ fontSize: "10px", fontWeight: "normal", marginTop: "2px", opacity: 0.7 }}>Learn to summon the Navagraha step by step</div>
               </button>
+
+              {/* Google Play badge */}
+              <a
+                href="https://play.google.com/store/apps/details?id=com.chessuranga.app&pcampaignid=web_share"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ display: "block", marginTop: "10px" }}
+              >
+                <img
+                  src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
+                  alt="Get it on Google Play"
+                  style={{ height: "50px", width: "auto" }}
+                />
+              </a>
             </div>
           </div>
         )}
